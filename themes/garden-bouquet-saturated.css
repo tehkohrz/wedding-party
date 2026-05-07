@@ -1,0 +1,31 @@
+/* Garden Bouquet — more saturated (lightness similar, saturation cranked up) */
+:root {
+  /* Surfaces */
+  --background:         38 70% 96%;
+  --surface:             0  0% 100%;
+  --muted:              38 50% 92%;
+
+  /* Text */
+  --foreground:        340 30% 16%;
+  --muted-foreground:  340 15% 40%;
+
+  /* Primary CTA */
+  --primary:           350 90% 58%;   /* richer coral */
+  --primary-foreground:  0  0% 100%;
+
+  /* The bouquet */
+  --rose:              340 85% 65%;
+  --marigold:           35 100% 55%;
+  --lavender:          270 65% 65%;
+  --sage:              140 45% 48%;
+  --sky:               200 80% 62%;
+  --peach:              18 95% 70%;
+
+  /* Status */
+  --arrived:           135 60% 45%;
+  --pending:            30 10% 72%;
+
+  /* Shape */
+  --radius-card:       1rem;
+  --radius-pill:       9999px;
+}

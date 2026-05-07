@@ -1,0 +1,31 @@
+/* Garden Bouquet — balanced (current) */
+:root {
+  /* Surfaces */
+  --background:         38 60% 96%;   /* warm cream */
+  --surface:             0  0% 100%;  /* card / popover */
+  --muted:              38 30% 92%;   /* subtle backdrops */
+
+  /* Text */
+  --foreground:        340 25% 18%;   /* deep plum, near-black with warmth */
+  --muted-foreground:  340 10% 45%;
+
+  /* Primary CTA */
+  --primary:           350 75% 62%;   /* coral pink */
+  --primary-foreground:  0  0% 100%;
+
+  /* The bouquet — accents used contextually */
+  --rose:              340 70% 70%;
+  --marigold:           35 90% 60%;
+  --lavender:          270 45% 72%;
+  --sage:              140 28% 55%;
+  --sky:               200 55% 72%;
+  --peach:              20 78% 76%;
+
+  /* Status */
+  --arrived:           135 45% 50%;
+  --pending:            30  8% 72%;
+
+  /* Shape */
+  --radius-card:       1rem;
+  --radius-pill:       9999px;
+}

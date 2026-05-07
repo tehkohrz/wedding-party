@@ -4,7 +4,7 @@ Tick each session as it's done. Add a one-line note (date + what was decided/ski
 
 ## Milestone 0 — Foundations
 - [x] Session 1 — Project scaffold + Claude memory  *(2026-04-28 — Next 16, React 19, Tailwind v4, Turbopack)*
-- [ ] Session 2 — Theme architecture
+- [x] Session 2 — Theme architecture  *(2026-04-28 — Fraunces + DM Sans, garden-bouquet palette in 4 variants, /sandbox showcase)*
 - [ ] Session 3 — shadcn/ui setup + primitives
 
 ## Milestone 1 — Data layer
