@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { guests, groups, layout } from "@/lib/data";
+import { AttendanceDemo } from "./attendance-demo";
 
 export default function SandboxPage() {
   return (
@@ -244,6 +245,16 @@ export default function SandboxPage() {
               </CardContent>
             </Card>
           </div>
+        </section>
+
+        {/* Attendance store */}
+        <section className="space-y-4">
+          <h2 className="font-display text-3xl">Attendance store</h2>
+          <p className="font-sans text-muted-foreground">
+            Backed by IndexedDB via Dexie. Marks persist across refreshes
+            and sync between tabs via useLiveQuery.
+          </p>
+          <AttendanceDemo />
         </section>
 
         {/* Footer note */}

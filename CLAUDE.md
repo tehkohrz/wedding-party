@@ -49,3 +49,14 @@ The full plan lives at `~/.claude/plans/i-would-like-to-wiggly-brooks.md` — re
 - Be concise and clear in explanations, focus on the rationale for the chosen approach.
 - At essential configurations, explain the purpose of the field and the setting chosen.
 - For commit messages, be concise and describe the main changes or feature added. For example: "Feat: Add guest search functionality with Fuse.js" or "Refactor seating assignment logic for better performance".
+
+## Session workflow
+
+At the end of every session (before committing):
+
+1. **List the files touched or added** in this session, each with a one-line purpose.
+2. **Explain how they link together** — data flow, dependencies, who reads/writes what. Use plain-English arrows ("CSV is read by build-data.ts, validated against schema.ts, written to data.json, re-exported by data.ts").
+3. **Wait for the user to review** before staging or committing. The user will say "looks good, commit" or ask for adjustments.
+4. **Then** tick PROGRESS.md and commit with a concise message.
+
+Do NOT commit before the user has confirmed the review. Reviewing a working tree is easier than reviewing a sprawling diff after the fact.

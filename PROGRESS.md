@@ -9,7 +9,7 @@ Tick each session as it's done. Add a one-line note (date + what was decided/ski
 
 ## Milestone 1 — Data layer
 - [x] Session 4 — CSV → typed data, build script  *(2026-04-28 — Zod schemas, PapaParse, tsx; predev/prebuild auto-regen lib/data.json)*
-- [ ] Session 5 — Attendance store with Dexie
+- [x] Session 5 — Attendance store with Dexie  *(2026-04-28 — IndexedDB via Dexie, useLiveQuery cross-tab sync; demo on /sandbox)*
 
 ## Milestone 2 — Wizard shell & Welcome (Screen 1)
 - [ ] Session 6 — Wizard shell + routing
