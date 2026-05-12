@@ -43,3 +43,9 @@ The full plan lives at `~/.claude/plans/i-would-like-to-wiggly-brooks.md` — re
 - Favor small, complete sessions over long sprawling rewrites.
 - Sessions run 30–60 min; each ends in a working state.
 - I work on this over many days, so be self-contained: don't assume prior conversation context.
+
+## Comments
+
+- Be concise and clear in explanations, focus on the rationale for the chosen approach.
+- At essential configurations, explain the purpose of the field and the setting chosen.
+- For commit messages, be concise and describe the main changes or feature added. For example: "Feat: Add guest search functionality with Fuse.js" or "Refactor seating assignment logic for better performance".

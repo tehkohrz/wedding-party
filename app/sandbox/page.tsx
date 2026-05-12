@@ -2,6 +2,19 @@
 // active theme file (see app/globals.css's @import line). To swap themes,
 // change that one line — this page reflows automatically.
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 export default function SandboxPage() {
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -29,6 +42,64 @@ export default function SandboxPage() {
               View map
             </button>
           </div>
+        </section>
+
+        {/* shadcn primitives */}
+        <section className="space-y-4">
+          <h2 className="font-display text-3xl">shadcn primitives</h2>
+          <p className="font-sans text-muted-foreground">
+            Button, Input, Card, Dialog — all reading our theme tokens.
+            No theme-specific code in any of them.
+          </p>
+
+          {/* Button variants */}
+          <div className="flex flex-wrap gap-2 items-center">
+            <Button>Default</Button>
+            <Button variant="secondary">Secondary</Button>
+            <Button variant="outline">Outline</Button>
+            <Button variant="ghost">Ghost</Button>
+            <Button variant="destructive">Destructive</Button>
+            <Button variant="link">Link</Button>
+          </div>
+
+          {/* Input */}
+          <div className="max-w-sm">
+            <Input placeholder="Enter your name..." />
+          </div>
+
+          {/* Card */}
+          <Card className="max-w-md">
+            <CardHeader>
+              <CardTitle className="font-display text-2xl">Tan Family</CardTitle>
+              <CardDescription>4 guests · Row 1, Section A</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="font-sans text-sm">
+                John, Jane, Bobby, Lucy. All seated together.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Dialog */}
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Open dialog</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="font-display text-2xl">
+                  Are these guests with you?
+                </DialogTitle>
+                <DialogDescription>
+                  Sample dialog so you can see how popovers/modals theme up.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant="ghost">Cancel</Button>
+                <Button>Confirm</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </section>
 
         {/* The bouquet */}
