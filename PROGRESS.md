@@ -12,12 +12,13 @@ Tick each session as it's done. Add a one-line note (date + what was decided/ski
 - [x] Session 5 — Attendance store with Dexie  *(2026-04-28 — IndexedDB via Dexie, useLiveQuery cross-tab sync; demo on /sandbox)*
 
 ## Milestone 2 — Wizard shell & Welcome (Screen 1)
-- [ ] Session 6 — Wizard shell + routing
+- [x] Session 6 — Wizard shell + routing  *(2026-04-28 — 4 routes, Zustand store, idle-timer hook, Back/Home controls)*
 - [ ] Session 7 — Welcome layout + name input
 - [ ] Session 8 — Fuzzy name search
 
 ## Milestone 3 — Transitions & Group (Screen 2)
 - [ ] Session 9 — Slide transitions with Framer Motion
+    - *Note: revisit useRef "callback box" pattern + stale-closure explanation when wiring AnimatePresence (and any setInterval-style callbacks).*
 - [ ] Session 10 — Conditional routing to Group screen
 - [ ] Session 11 — Group toggle UI + attendance write
 

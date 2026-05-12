@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, DM_Sans } from "next/font/google";
 import "./globals.css";
+import { WizardShell } from "@/components/WizardShell";
 
 // Display font — wedding/botanical character, used for headings.
 // `variable` name must match the value referenced in app/globals.css's @theme block.
@@ -33,7 +34,7 @@ export default function RootLayout({
       className={`${fraunces.variable} ${dmSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
-        {children}
+        <WizardShell>{children}</WizardShell>
       </body>
     </html>
   );
