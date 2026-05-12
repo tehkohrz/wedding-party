@@ -1,0 +1,8 @@
+id,display_name,search_aliases,group_id,lunch_row,lunch_section,lunch_seat,solemn_row,solemn_section,solemn_seat
+G001,John Tan,John;Tan Wei Ming;Wei Ming,FAM_TAN,1,A,1,1,A,1
+G002,Jane Tan,Jane;Tan Jia En,FAM_TAN,1,A,2,1,A,2
+G003,Bobby Tan,Bobby,FAM_TAN,1,A,3,1,A,3
+G004,Alice Lee,Alice;Lee Xin Yi,FAM_LEE,2,,5,1,B,4
+G005,David Lee,David,FAM_LEE,2,,6,1,B,5
+G006,Sarah Wong,Sarah,,3,A,2,2,,3
+G007,Michael Chen,Mike;Michael,,3,B,12,2,,8

@@ -8,7 +8,7 @@ Tick each session as it's done. Add a one-line note (date + what was decided/ski
 - [x] Session 3 — shadcn/ui setup + primitives  *(2026-04-28 — Button/Input/Card/Dialog; shadcn tokens shimmed onto our theme; components.json.md sidecar)*
 
 ## Milestone 1 — Data layer
-- [ ] Session 4 — CSV → typed data, build script
+- [x] Session 4 — CSV → typed data, build script  *(2026-04-28 — Zod schemas, PapaParse, tsx; predev/prebuild auto-regen lib/data.json)*
 - [ ] Session 5 — Attendance store with Dexie
 
 ## Milestone 2 — Wizard shell & Welcome (Screen 1)
