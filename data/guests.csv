@@ -1,8 +1,8 @@
-id,display_name,search_aliases,group_id,lunch_row,lunch_section,lunch_seat,solemn_row,solemn_section,solemn_seat
-G001,John Tan,John;Tan Wei Ming;Wei Ming,FAM_TAN,1,A,1,1,A,1
-G002,Jane Tan,Jane;Tan Jia En,FAM_TAN,1,A,2,1,A,2
-G003,Bobby Tan,Bobby,FAM_TAN,1,A,3,1,A,3
-G004,Alice Lee,Alice;Lee Xin Yi,FAM_LEE,2,,5,1,B,4
-G005,David Lee,David,FAM_LEE,2,,6,1,B,5
-G006,Sarah Wong,Sarah,,3,A,2,2,,3
-G007,Michael Chen,Mike;Michael,,3,B,12,2,,8
+id,name,search_aliases,side,group_id,lunch_row,lunch_section,lunch_seat,solemn_row,solemn_section,solemn_seat
+1,John Tan,Wei Ming;Tan Wei Ming,groom,FAM_TAN,1,A,1,1,A,1
+2,Jane Tan,Tan Jia En,groom,FAM_TAN,1,A,2,1,A,2
+3,Bobby Tan,,groom,FAM_TAN,1,A,3,1,A,3
+4,Alice Lee,Lee Xin Yi,bride,FAM_LEE,2,,5,1,B,4
+5,David Lee,,bride,FAM_LEE,2,,6,1,B,5
+6,Sarah Wong,,bride,,3,A,2,2,,3
+7,Michael Chen,Mike,groom,,3,B,12,2,,8

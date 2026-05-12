@@ -199,9 +199,9 @@ export default function SandboxPage() {
               <CardContent className="font-sans text-sm space-y-1">
                 {guests.slice(0, 3).map((g) => (
                   <div key={g.id}>
-                    {g.display_name}{" "}
+                    {g.name}{" "}
                     <span className="text-muted-foreground">
-                      · Row {g.lunch_row} Seat {g.lunch_seat}
+                      · {g.side} · Row {g.lunch_row} Seat {g.lunch_seat}
                     </span>
                   </div>
                 ))}

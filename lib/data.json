@@ -1,13 +1,13 @@
 {
   "guests": [
     {
-      "id": "G001",
-      "display_name": "John Tan",
+      "id": 1,
+      "name": "John Tan",
       "search_aliases": [
-        "John",
-        "Tan Wei Ming",
-        "Wei Ming"
+        "Wei Ming",
+        "Tan Wei Ming"
       ],
+      "side": "groom",
       "group_id": "FAM_TAN",
       "lunch_row": 1,
       "lunch_section": "A",
@@ -17,12 +17,12 @@
       "solemn_seat": 1
     },
     {
-      "id": "G002",
-      "display_name": "Jane Tan",
+      "id": 2,
+      "name": "Jane Tan",
       "search_aliases": [
-        "Jane",
         "Tan Jia En"
       ],
+      "side": "groom",
       "group_id": "FAM_TAN",
       "lunch_row": 1,
       "lunch_section": "A",
@@ -32,11 +32,10 @@
       "solemn_seat": 2
     },
     {
-      "id": "G003",
-      "display_name": "Bobby Tan",
-      "search_aliases": [
-        "Bobby"
-      ],
+      "id": 3,
+      "name": "Bobby Tan",
+      "search_aliases": [],
+      "side": "groom",
       "group_id": "FAM_TAN",
       "lunch_row": 1,
       "lunch_section": "A",
@@ -46,12 +45,12 @@
       "solemn_seat": 3
     },
     {
-      "id": "G004",
-      "display_name": "Alice Lee",
+      "id": 4,
+      "name": "Alice Lee",
       "search_aliases": [
-        "Alice",
         "Lee Xin Yi"
       ],
+      "side": "bride",
       "group_id": "FAM_LEE",
       "lunch_row": 2,
       "lunch_section": null,
@@ -61,11 +60,10 @@
       "solemn_seat": 4
     },
     {
-      "id": "G005",
-      "display_name": "David Lee",
-      "search_aliases": [
-        "David"
-      ],
+      "id": 5,
+      "name": "David Lee",
+      "search_aliases": [],
+      "side": "bride",
       "group_id": "FAM_LEE",
       "lunch_row": 2,
       "lunch_section": null,
@@ -75,11 +73,10 @@
       "solemn_seat": 5
     },
     {
-      "id": "G006",
-      "display_name": "Sarah Wong",
-      "search_aliases": [
-        "Sarah"
-      ],
+      "id": 6,
+      "name": "Sarah Wong",
+      "search_aliases": [],
+      "side": "bride",
       "group_id": null,
       "lunch_row": 3,
       "lunch_section": "A",
@@ -89,12 +86,12 @@
       "solemn_seat": 3
     },
     {
-      "id": "G007",
-      "display_name": "Michael Chen",
+      "id": 7,
+      "name": "Michael Chen",
       "search_aliases": [
-        "Mike",
-        "Michael"
+        "Mike"
       ],
+      "side": "groom",
       "group_id": null,
       "lunch_row": 3,
       "lunch_section": "B",

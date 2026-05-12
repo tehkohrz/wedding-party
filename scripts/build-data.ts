@@ -69,7 +69,7 @@ const layout = parseCsv("layout.csv", LayoutSectionSchema);
 const groupIds = new Set(groups.map((g) => g.id));
 for (const g of guests) {
   if (g.group_id && !groupIds.has(g.group_id)) {
-    fail(`Guest ${g.id} (${g.display_name}) references unknown group: ${g.group_id}`);
+    fail(`Guest ${g.id} (${g.name}) references unknown group: ${g.group_id}`);
   }
 }
 
@@ -104,7 +104,7 @@ function checkSeat(
 ): void {
   if (!findSection(phase, row, section, seat)) {
     fail(
-      `Guest ${g.id} (${g.display_name}): ${phase} seat row=${row} section=${section ?? "(none)"} seat=${seat} doesn't fall within any layout section`
+      `Guest ${g.id} (${g.name}): ${phase} seat row=${row} section=${section ?? "(none)"} seat=${seat} doesn't fall within any layout section`
     );
   }
 }

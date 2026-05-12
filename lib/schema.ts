@@ -16,17 +16,25 @@ const nullableString = z.string().transform((s) => {
 });
 
 export const PhaseSchema = z.enum(["solemn", "lunch"]);
+export const SideSchema = z.enum(["bride", "groom"]);
 
 export const GuestSchema = z.object({
-  id: z.string().min(1),
-  display_name: z.string().min(1),
-  /** Semicolon-separated in CSV; split into an array here. */
+  id: z.coerce.number().int().positive(),
+  name: z.string().min(1),
+  /**
+   * Semicolon-separated in CSV; split into an array here.
+   * Aliases supplement `name` — don't repeat the first/last name,
+   * Fuse.js already does fuzzy substring matching on `name`.
+   * Use for: alternative orderings (Chinese names), maiden names,
+   * nicknames, non-Latin characters.
+   */
   search_aliases: z.string().transform((s) =>
     s
       .split(";")
       .map((x) => x.trim())
       .filter(Boolean)
   ),
+  side: SideSchema,
   group_id: nullableString,
   lunch_row: z.coerce.number().int().positive(),
   lunch_section: nullableString,
@@ -51,6 +59,7 @@ export const LayoutSectionSchema = z.object({
 });
 
 export type Phase = z.infer<typeof PhaseSchema>;
+export type Side = z.infer<typeof SideSchema>;
 export type Guest = z.infer<typeof GuestSchema>;
 export type Group = z.infer<typeof GroupSchema>;
 export type LayoutSection = z.infer<typeof LayoutSectionSchema>;
