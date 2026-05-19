@@ -1,0 +1,36 @@
+/* Garden Electric — pushes neon further toward "bright + airy".
+   Foreground is lifted so dark text doesn't dominate, background is near-
+   white, and three problem accents (sky, sage, peach) are reworked:
+     - sky:    cyan-blue → electric sapphire
+     - sage:   muddy green → deep emerald jewel tone
+     - peach:  hot orange → light airy peach */
+:root {
+  /* Surfaces */
+  --background:         50 100% 99%;   /* practically white, hint of warm */
+  --surface:             0   0% 100%;
+  --muted:              40  50% 95%;
+
+  /* Text */
+  --foreground:        320  25% 22%;   /* lighter plum — less heavy than neon's 14% */
+  --muted-foreground:  320  15% 45%;
+
+  /* Primary CTA */
+  --primary:           320 100% 55%;   /* electric magenta */
+  --primary-foreground:  0   0% 100%;
+
+  /* The bouquet — kept vivid, three reworked */
+  --rose:              335 100% 62%;   /* hot pink (kept) */
+  --marigold:           50 100% 55%;   /* electric yellow (kept) */
+  --lavender:          270 100% 68%;   /* electric violet (kept) */
+  --sage:              155  80% 40%;   /* deep emerald (was muddy green) */
+  --sky:               220 100% 55%;   /* electric sapphire (was cyan) */
+  --peach:              20 100% 78%;   /* light airy peach (was hot orange) */
+
+  /* Status */
+  --arrived:           135  75% 45%;
+  --pending:            30  15% 75%;
+
+  /* Shape */
+  --radius-card:       1rem;
+  --radius-pill:       9999px;
+}

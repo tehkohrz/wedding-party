@@ -4,7 +4,7 @@ import { ForwardLink } from "@/components/WizardShell";
 
 export default function SolemnizationPage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-6">
+    <div className="h-dvh w-screen overflow-hidden flex flex-col items-center justify-center gap-6">
       <h1 className="font-display text-5xl">Solemnization</h1>
       <p className="font-sans text-muted-foreground">Screen 3 placeholder</p>
       <ForwardLink

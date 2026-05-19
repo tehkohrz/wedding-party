@@ -50,6 +50,21 @@ The full plan lives at `~/.claude/plans/i-would-like-to-wiggly-brooks.md` — re
 - At essential configurations, explain the purpose of the field and the setting chosen.
 - For commit messages, be concise and describe the main changes or feature added. For example: "Feat: Add guest search functionality with Fuse.js" or "Refactor seating assignment logic for better performance".
 
+## User-editable text — the `[input]` convention
+
+Any string the user (event organizer) might want to change at the last
+minute — names, dates, prompts, button labels, microcopy — lives in
+`lib/content.ts` as a typed exported const.
+
+Rules:
+- One file: `lib/content.ts`. Don't sprinkle these across components.
+- Group by screen/feature: `COUPLE`, `WELCOME_COPY`, `GROUP_COPY`, `ADMIN_COPY`, etc.
+- Every field has a comment starting with **`[input]`** describing what it controls and where it appears.
+- Components import the consts and render the fields — no inline strings for any customer-facing text.
+
+To find every editable field: `grep -rn "\[input\]" lib/content.ts`
+(or use editor "find in files" for the literal `[input]`).
+
 ## Session workflow
 
 At the end of every session (before committing):

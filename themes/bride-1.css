@@ -1,0 +1,35 @@
+/* Bride 1 — Pantone wedding palette (Option A: official Pantone TCX/TPM HEX values).
+   These match the actual Pantone targets, which means the colors are deeper
+   and more muted than the moodboard image displayed on-screen. If they read
+   as too understated, switch to Option B by adjusting the values upward in
+   saturation/lightness. */
+:root {
+  /* Surfaces */
+  --background:         42  60% 96%;    /* warm cream */
+  --surface:             0   0% 100%;
+  --muted:              42  30% 92%;
+
+  /* Text */
+  --foreground:        330  25% 18%;    /* deep wine — anchors the Pantone palette */
+  --muted-foreground:  330  15% 42%;
+
+  /* Primary CTA — Pantone 20-0112 TPM Celebration (#820043) */
+  --primary:           329 100% 25%;
+  --primary-foreground:  0   0% 100%;
+
+  /* The bouquet — official Pantone TCX values */
+  --rose:              347  56% 65%;    /* 17-2235 TCX Sangria Sunset (#DA728C) */
+  --marigold:           54  86% 61%;    /* 12-0742 TCX Lemon Drop (#F1DD46) */
+  --lavender:          285  35% 65%;    /* invented sophisticated lavender (6th slot) */
+  --sage:               61  48% 34%;    /* 16-0537 TCX Golden Cypress (#7D7F2D) */
+  --sky:               204  12% 79%;    /* 14-4005 TCX Nantucket Breeze (#C2CBD0) */
+  --peach:              28  84% 56%;    /* 16-1462 TCX Golden Poppy (#ED872E) */
+
+  /* Status */
+  --arrived:           135  60% 45%;
+  --pending:            30  15% 75%;
+
+  /* Shape */
+  --radius-card:       1rem;
+  --radius-pill:       9999px;
+}
