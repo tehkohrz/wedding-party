@@ -1,5 +1,5 @@
 // Screen 1 — Welcome.
-// Static layout. Fuzzy-search behavior on the input lands in Session 8.
+// Name search wired: typing finds matching guests, tap to advance to /group.
 //
 // Layout strategy:
 //   - h-dvh + overflow-hidden = locked to viewport, no scrolling
@@ -8,8 +8,7 @@
 //   - One component, Tailwind `landscape:` modifier handles the swap
 
 import { COUPLE, WELCOME_COPY } from "@/lib/content";
-import { Input } from "@/components/ui/input";
-import { ForwardLink } from "@/components/WizardShell";
+import { NameSearch } from "@/components/NameSearch";
 import { Flower2, Leaf } from "lucide-react";
 
 export default function WelcomePage() {
@@ -131,20 +130,9 @@ function FormSide() {
           </p>
         </div>
 
-        {/* Name input — search behavior lands in Session 8 */}
-        <Input
-          placeholder={WELCOME_COPY.inputPlaceholder}
-          className="text-lg h-14 rounded-pill text-center"
-          autoFocus
-        />
-
-        {/* [dev] Temporary navigation — replaced by search-result selection in Session 8 */}
-        <ForwardLink
-          href="/group"
-          className="inline-block text-xs text-muted-foreground hover:underline pt-2"
-        >
-          Continue (dev) →
-        </ForwardLink>
+        {/* Name input — fuzzy search across `name` and `search_aliases`.
+            Tapping a result writes to the wizard store and advances to /group. */}
+        <NameSearch />
       </div>
     </section>
   );
