@@ -14,7 +14,7 @@ Tick each session as it's done. Add a one-line note (date + what was decided/ski
 ## Milestone 2 — Wizard shell & Welcome (Screen 1)
 - [x] Session 6 — Wizard shell + routing  *(2026-04-28 — 4 routes, Zustand store, idle-timer hook, Back/Home controls)*
 - [x] Session 7 — Welcome layout + name input  *(2026-04-28 — equation layout, lib/content.ts with [input] convention, h-dvh locked viewport, responsive split. Theme parked: bride-1/bride-2/garden-electric all on the table, bride still deciding.)*
-- [ ] Session 8 — Fuzzy name search
+- [x] Session 8 — Fuzzy name search  *(2026-04-28 — Fuse.js multi-key search, useGuestSearch hook with debounce, NameSearch component wired to wizard store)*
 
 ## Milestone 3 — Transitions & Group (Screen 2)
 - [ ] Session 9 — Slide transitions with Framer Motion
