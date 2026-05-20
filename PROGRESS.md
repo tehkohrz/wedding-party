@@ -21,17 +21,24 @@ Tick each session as it's done. Add a one-line note (date + what was decided/ski
 - [x] Session 10 — Conditional routing to Group screen  *(2026-04-28 — lib/groups helpers, solo guests skip to /lunch, useRequireGuest guard)*
 - [x] Session 11 — Group toggle UI + attendance write  *(2026-04-28 — color-circle selection per bouquet color, role=switch rows, markArrivedMany batch write)*
 
-## Milestone 4 — Maps (Screens 3 & 4)
-- [ ] Session 12 — Phase-aware `<SeatingMap>` + solemnization screen
-- [ ] Session 13 — Seat overlay + highlight just-arrived (solemnization)
-- [ ] Session 14 — Lunch screen reuses the component
-- [ ] Session 15 — Pinch-zoom, pan, polish on both maps
+## Milestone 4 — Lunch seating map
+(Consolidated from 4 sessions → 3 after solemnization was removed.)
+- [ ] Session 12 — SeatingMap component + venue layout rendering
+- [ ] Session 13 — Seat overlay, highlight your seat + arrived seats, SeatCallout
+- [ ] Session 14 — Pinch-zoom, pan, polish
+
+### Deferred — Path B: Figma SVG background
+We chose Path A: the SeatingMap is generated purely from layout.csv (a clean
+schematic diagram). Path B — compositing a Figma-designed venue SVG behind the
+data-driven seat overlay — is deferred until the SVG asset exists. When ready:
+drop the SVG in public/, add it as a background layer in SeatingMap, keep the
+data-driven seat overlay on top. Path A does not block Path B.
 
 ## Milestone 5 — Admin
-- [ ] Session 16 — Admin PIN gate + dashboard
-- [ ] Session 17 — Export JSON + reset
+- [ ] Session 15 — Admin PIN gate + dashboard
+- [ ] Session 16 — Export JSON + reset
 
 ## Milestone 6 — PWA & polish
-- [ ] Session 18 — PWA shell with Serwist
-- [ ] Session 19 — Visual polish
-- [ ] Session 20 — Real data + dry run
+- [ ] Session 17 — PWA shell with Serwist
+- [ ] Session 18 — Visual polish
+- [ ] Session 19 — Real data + dry run
