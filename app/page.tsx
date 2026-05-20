@@ -100,7 +100,7 @@ function FormSide() {
               - Name size:      text-7xl on the name spans
               - Operator size:  text-5xl on the + and = spans
               - Operator color: text-marigold → swap for text-sky, text-rose, etc.
-              - Result style:   italic + text-primary; remove italic for a flatter look
+              - Result style:   italic + text-lavender; remove italic for a flatter look
         */}
         <header className="space-y-4">
           <h1 className="font-display leading-tight">
@@ -112,7 +112,7 @@ function FormSide() {
             <span className="block text-5xl font-bold text-marigold py-2">
               =
             </span>
-            <span className="block text-7xl italic text-primary">
+            <span className="block text-7xl italic text-lavender">
               {COUPLE.unionWord}
             </span>
           </h1>

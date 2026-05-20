@@ -18,8 +18,8 @@ Tick each session as it's done. Add a one-line note (date + what was decided/ski
 
 ## Milestone 3 — Transitions & Group (Screen 2)
 - [x] Session 9 — Slide transitions with Framer Motion  *(2026-04-28 — enter-only slide via app/template.tsx, direction from Zustand store; AnimatePresence sidestepped due to App Router exit-anim limitations)*
-- [ ] Session 10 — Conditional routing to Group screen
-- [ ] Session 11 — Group toggle UI + attendance write
+- [x] Session 10 — Conditional routing to Group screen  *(2026-04-28 — lib/groups helpers, solo guests skip to /lunch, useRequireGuest guard)*
+- [x] Session 11 — Group toggle UI + attendance write  *(2026-04-28 — color-circle selection per bouquet color, role=switch rows, markArrivedMany batch write)*
 
 ## Milestone 4 — Maps (Screens 3 & 4)
 - [ ] Session 12 — Phase-aware `<SeatingMap>` + solemnization screen

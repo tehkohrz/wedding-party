@@ -37,3 +37,17 @@ export const WELCOME_COPY = {
   // [input] Placeholder text inside the input box.
   inputPlaceholder: "Your name...",
 };
+
+export const GROUP_COPY = {
+  // [input] Heading on the group check-in screen.
+  heading: "Are these guests with you?",
+
+  // [input] Sub-instruction under the heading.
+  subheading: "Toggle off anyone who hasn't arrived yet.",
+
+  // [input] Label on the row for the guest who is checking in.
+  youLabel: "You",
+
+  // [input] Confirm button label on the group screen.
+  confirmLabel: "Confirm & continue",
+};

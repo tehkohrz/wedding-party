@@ -46,6 +46,19 @@ export async function markArrived(guestId: number): Promise<void> {
   });
 }
 
+/**
+ * Mark several guests as arrived in one transaction (group check-in).
+ * Uses Dexie's bulkPut — one write op instead of N. All share the same
+ * timestamp. Idempotent, like markArrived.
+ */
+export async function markArrivedMany(guestIds: number[]): Promise<void> {
+  if (guestIds.length === 0) return;
+  const now = Date.now();
+  await db.attendance.bulkPut(
+    guestIds.map((id) => ({ guest_id: id, arrived_at: now }))
+  );
+}
+
 /** Remove a guest's arrival record (admin manual override / reset). */
 export async function unmark(guestId: number): Promise<void> {
   await db.attendance.delete(guestId);
