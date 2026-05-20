@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useGuestSearch } from "@/hooks/useGuestSearch";
 import { useWizardStore } from "@/lib/store";
+import { hasGroupmates } from "@/lib/groups";
 import { WELCOME_COPY } from "@/lib/content";
 import type { Guest } from "@/lib/schema";
 
@@ -31,7 +32,9 @@ export function NameSearch() {
   function handleSelect(guest: Guest) {
     setCurrentGuest(guest);
     setDirection("forward");
-    router.push("/group");
+    // Grouped guests visit the Group screen to check in companions;
+    // solo guests skip straight to their seating map.
+    router.push(hasGroupmates(guest) ? "/group" : "/lunch");
   }
 
   const showResults = query.trim().length > 0;
