@@ -9,12 +9,9 @@
       ],
       "side": "groom",
       "group_id": "FAM_TAN",
-      "lunch_row": 1,
-      "lunch_section": "A",
-      "lunch_seat": 1,
-      "solemn_row": 1,
-      "solemn_section": "A",
-      "solemn_seat": 1
+      "row": 1,
+      "section": "A",
+      "seat": 1
     },
     {
       "id": 2,
@@ -24,12 +21,9 @@
       ],
       "side": "groom",
       "group_id": "FAM_TAN",
-      "lunch_row": 1,
-      "lunch_section": "A",
-      "lunch_seat": 2,
-      "solemn_row": 1,
-      "solemn_section": "A",
-      "solemn_seat": 2
+      "row": 1,
+      "section": "A",
+      "seat": 2
     },
     {
       "id": 3,
@@ -37,12 +31,9 @@
       "search_aliases": [],
       "side": "groom",
       "group_id": "FAM_TAN",
-      "lunch_row": 1,
-      "lunch_section": "A",
-      "lunch_seat": 3,
-      "solemn_row": 1,
-      "solemn_section": "A",
-      "solemn_seat": 3
+      "row": 1,
+      "section": "A",
+      "seat": 3
     },
     {
       "id": 4,
@@ -52,12 +43,9 @@
       ],
       "side": "bride",
       "group_id": "FAM_LEE",
-      "lunch_row": 2,
-      "lunch_section": null,
-      "lunch_seat": 5,
-      "solemn_row": 1,
-      "solemn_section": "B",
-      "solemn_seat": 4
+      "row": 2,
+      "section": null,
+      "seat": 5
     },
     {
       "id": 5,
@@ -65,12 +53,9 @@
       "search_aliases": [],
       "side": "bride",
       "group_id": "FAM_LEE",
-      "lunch_row": 2,
-      "lunch_section": null,
-      "lunch_seat": 6,
-      "solemn_row": 1,
-      "solemn_section": "B",
-      "solemn_seat": 5
+      "row": 2,
+      "section": null,
+      "seat": 6
     },
     {
       "id": 6,
@@ -78,12 +63,9 @@
       "search_aliases": [],
       "side": "bride",
       "group_id": null,
-      "lunch_row": 3,
-      "lunch_section": "A",
-      "lunch_seat": 2,
-      "solemn_row": 2,
-      "solemn_section": null,
-      "solemn_seat": 3
+      "row": 3,
+      "section": "A",
+      "seat": 2
     },
     {
       "id": 7,
@@ -93,12 +75,9 @@
       ],
       "side": "groom",
       "group_id": null,
-      "lunch_row": 3,
-      "lunch_section": "B",
-      "lunch_seat": 12,
-      "solemn_row": 2,
-      "solemn_section": null,
-      "solemn_seat": 8
+      "row": 3,
+      "section": "B",
+      "seat": 12
     }
   ],
   "groups": [
@@ -113,31 +92,6 @@
   ],
   "layout": [
     {
-      "phase": "solemn",
-      "row": 1,
-      "section": "A",
-      "start_seat": 1,
-      "end_seat": 3,
-      "label": "Front — Bride's Side"
-    },
-    {
-      "phase": "solemn",
-      "row": 1,
-      "section": "B",
-      "start_seat": 4,
-      "end_seat": 6,
-      "label": "Front — Groom's Side"
-    },
-    {
-      "phase": "solemn",
-      "row": 2,
-      "section": null,
-      "start_seat": 1,
-      "end_seat": 10,
-      "label": "Row 2"
-    },
-    {
-      "phase": "lunch",
       "row": 1,
       "section": "A",
       "start_seat": 1,
@@ -145,7 +99,6 @@
       "label": "Row 1 — Bride's Family"
     },
     {
-      "phase": "lunch",
       "row": 1,
       "section": "B",
       "start_seat": 5,
@@ -153,7 +106,6 @@
       "label": "Row 1 — Friends"
     },
     {
-      "phase": "lunch",
       "row": 2,
       "section": null,
       "start_seat": 1,
@@ -161,7 +113,6 @@
       "label": "Row 2"
     },
     {
-      "phase": "lunch",
       "row": 3,
       "section": "A",
       "start_seat": 1,
@@ -169,7 +120,6 @@
       "label": "Row 3 — Section A"
     },
     {
-      "phase": "lunch",
       "row": 3,
       "section": "B",
       "start_seat": 6,

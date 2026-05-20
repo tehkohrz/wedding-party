@@ -67,16 +67,13 @@ export function NameSearch() {
               className="
                 cursor-pointer
                 px-5 py-3
-                flex items-center justify-between
+                flex items-center
                 hover:bg-muted active:bg-muted/70
                 focus-visible:ring-2 focus-visible:ring-ring
                 transition
               "
             >
               <span className="font-display text-xl">{g.name}</span>
-              <span className="font-sans text-xs text-muted-foreground uppercase tracking-wider">
-                {g.side}'s side
-              </span>
             </Card>
           ))}
 

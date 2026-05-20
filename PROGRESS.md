@@ -17,8 +17,7 @@ Tick each session as it's done. Add a one-line note (date + what was decided/ski
 - [x] Session 8 — Fuzzy name search  *(2026-04-28 — Fuse.js multi-key search, useGuestSearch hook with debounce, NameSearch component wired to wizard store)*
 
 ## Milestone 3 — Transitions & Group (Screen 2)
-- [ ] Session 9 — Slide transitions with Framer Motion
-    - *Note: revisit useRef "callback box" pattern + stale-closure explanation when wiring AnimatePresence (and any setInterval-style callbacks).*
+- [x] Session 9 — Slide transitions with Framer Motion  *(2026-04-28 — enter-only slide via app/template.tsx, direction from Zustand store; AnimatePresence sidestepped due to App Router exit-anim limitations)*
 - [ ] Session 10 — Conditional routing to Group screen
 - [ ] Session 11 — Group toggle UI + attendance write
 

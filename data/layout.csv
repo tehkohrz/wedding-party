@@ -1,9 +1,6 @@
-phase,row,section,start_seat,end_seat,label
-solemn,1,A,1,3,Front — Bride's Side
-solemn,1,B,4,6,Front — Groom's Side
-solemn,2,,1,10,Row 2
-lunch,1,A,1,4,Row 1 — Bride's Family
-lunch,1,B,5,8,Row 1 — Friends
-lunch,2,,1,10,Row 2
-lunch,3,A,1,5,Row 3 — Section A
-lunch,3,B,6,12,Row 3 — Section B
+row,section,start_seat,end_seat,label
+1,A,1,4,Row 1 — Bride's Family
+1,B,5,8,Row 1 — Friends
+2,,1,10,Row 2
+3,A,1,5,Row 3 — Section A
+3,B,6,12,Row 3 — Section B

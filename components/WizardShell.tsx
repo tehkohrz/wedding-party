@@ -17,7 +17,7 @@ import { useIdleTimer } from "@/hooks/useIdleTimer";
 const IDLE_TIMEOUT_MS = 15_000;
 
 /** Paths that participate in the wizard. /sandbox, /admin, etc. don't. */
-const WIZARD_PATHS = new Set(["/", "/group", "/solemnization", "/lunch"]);
+const WIZARD_PATHS = new Set(["/", "/group", "/lunch"]);
 
 export function WizardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();

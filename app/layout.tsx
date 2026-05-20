@@ -33,7 +33,10 @@ export default function RootLayout({
       lang="en"
       className={`${fraunces.variable} ${dmSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
+      {/* overflow-x-hidden: clips the horizontal slide-in animation so it
+          doesn't briefly create a horizontal scrollbar. Vertical scrolling
+          (e.g. on /sandbox) is unaffected. */}
+      <body className="min-h-full flex flex-col overflow-x-hidden bg-background text-foreground font-sans">
         <WizardShell>{children}</WizardShell>
       </body>
     </html>

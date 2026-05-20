@@ -15,9 +15,7 @@ import {
   GuestSchema,
   GroupSchema,
   LayoutSectionSchema,
-  type Guest,
   type LayoutSection,
-  type Phase,
 } from "../lib/schema";
 
 const ROOT = process.cwd();
@@ -75,14 +73,12 @@ for (const g of guests) {
 
 // Every guest's seat must fall within a layout section's range.
 function findSection(
-  phase: Phase,
   row: number,
   section: string | null,
   seat: number
 ): LayoutSection | undefined {
   return layout.find(
     (l) =>
-      l.phase === phase &&
       l.row === row &&
       l.section === section &&
       seat >= l.start_seat &&
@@ -91,20 +87,9 @@ function findSection(
 }
 
 for (const g of guests) {
-  checkSeat(g, "solemn", g.solemn_row, g.solemn_section, g.solemn_seat);
-  checkSeat(g, "lunch", g.lunch_row, g.lunch_section, g.lunch_seat);
-}
-
-function checkSeat(
-  g: Guest,
-  phase: Phase,
-  row: number,
-  section: string | null,
-  seat: number
-): void {
-  if (!findSection(phase, row, section, seat)) {
+  if (!findSection(g.row, g.section, g.seat)) {
     fail(
-      `Guest ${g.id} (${g.name}): ${phase} seat row=${row} section=${section ?? "(none)"} seat=${seat} doesn't fall within any layout section`
+      `Guest ${g.id} (${g.name}): seat row=${g.row} section=${g.section ?? "(none)"} seat=${g.seat} doesn't fall within any layout section`
     );
   }
 }

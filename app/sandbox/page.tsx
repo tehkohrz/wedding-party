@@ -202,7 +202,7 @@ export default function SandboxPage() {
                   <div key={g.id}>
                     {g.name}{" "}
                     <span className="text-muted-foreground">
-                      · {g.side} · Row {g.lunch_row} Seat {g.lunch_seat}
+                      · {g.side} · Row {g.row} Seat {g.seat}
                     </span>
                   </div>
                 ))}
@@ -229,17 +229,11 @@ export default function SandboxPage() {
                 <CardTitle className="font-display text-2xl">
                   {layout.length} sections
                 </CardTitle>
-                <CardDescription>
-                  {layout.filter((l) => l.phase === "solemn").length} solemn ·{" "}
-                  {layout.filter((l) => l.phase === "lunch").length} lunch
-                </CardDescription>
+                <CardDescription>lunch seating sections</CardDescription>
               </CardHeader>
               <CardContent className="font-sans text-sm space-y-1">
                 {layout.slice(0, 3).map((l) => (
-                  <div key={`${l.phase}-${l.row}-${l.section}`}>
-                    <span className="text-muted-foreground">{l.phase}</span>{" "}
-                    {l.label}
-                  </div>
+                  <div key={`${l.row}-${l.section}`}>{l.label}</div>
                 ))}
                 <div className="text-muted-foreground">…</div>
               </CardContent>
