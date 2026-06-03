@@ -12,8 +12,10 @@
   --foreground:        215  35% 18%;    /* near-black with a blue cast */
   --muted-foreground:  215  20% 42%;
 
-  /* Primary CTA */
-  --primary:           204  81% 41%;    /* sapphire #147CBF */
+  /* Primary CTA — bright sky blue (lighter & more saturated than the
+     Pantone sapphire so buttons read as "sky" not "deep sea"). The
+     original sapphire is preserved in --sky below if needed. */
+  --primary:           200  90% 55%;
   --primary-foreground:  0   0% 100%;
 
   /* The bouquet */

@@ -5,53 +5,71 @@
 // "use client" + useRequireGuest: needs a selected guest. Reached either
 // from /group (grouped guests) or straight from / (solo guests).
 //
-// Display rules:
-//   - Arrived members: fully-colored name box + solid colored seat on the map.
-//   - Group members not yet checked in: greyed name box + a "pending" seat
-//     (colored outline + light tint) so the seat is still identifiable but
-//     visually distinct from arrived seats.
-//   - Name boxes are ordered: arrived first, not-arrived after.
+// Display rules (round-scoped):
+//   - "This round" = the guests just checked in via this wizard flow
+//     (tracked in lib/store as `checkedInThisRound`).
+//   - Members in this round: fully-colored name box + solid colored seat
+//     on the map + brief pulse animation.
+//   - Members in the same group but NOT in this round (toggled off, or
+//     checked in during a previous round): greyed name box and NO map
+//     highlight — their seat blends with all the other unrelated seats.
+//   - Solo guests see one colored box and one pulsing highlight.
 
-import { useLiveQuery } from "dexie-react-hooks";
 import { ForwardLink } from "@/components/WizardShell";
-import { SeatingMap, type SeatHighlight } from "@/components/SeatingMap";
+import {
+  SeatingMap,
+  type SeatHighlight,
+  type SeatRef,
+} from "@/components/SeatingMap";
 import { useRequireGuest } from "@/hooks/useRequireGuest";
-import { db } from "@/lib/attendance";
+import { useWizardStore } from "@/lib/store";
 import { getMemberColorAssignments } from "@/lib/groups";
 import { LUNCH_COPY } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
 export default function LunchPage() {
   const guest = useRequireGuest();
-
-  // Live attendance — undefined on first render, then the rows.
-  const arrived = useLiveQuery(() => db.attendance.toArray());
-  const arrivedIds = new Set((arrived ?? []).map((r) => r.guest_id));
+  const checkedInThisRound = useWizardStore((s) => s.checkedInThisRound);
 
   if (!guest) return null;
+
+  const thisRound = new Set(checkedInThisRound);
 
   // Stable color per member (current guest first, companions in CSV order).
   const assignments = getMemberColorAssignments(guest);
   const isGroup = assignments.length > 1;
 
-  // Sort: arrived first (preserving original order within each bucket).
-  // Modern Array.sort is stable, so members stay in CSV order within
-  // arrived / not-arrived sub-lists.
+  // Sort: this-round first (stable sort preserves CSV order within each
+  // bucket).
   const sortedAssignments = [...assignments].sort((a, b) => {
-    const aArrived = arrivedIds.has(a.guest.id) ? 0 : 1;
-    const bArrived = arrivedIds.has(b.guest.id) ? 0 : 1;
-    return aArrived - bArrived;
+    const aIn = thisRound.has(a.guest.id) ? 0 : 1;
+    const bIn = thisRound.has(b.guest.id) ? 0 : 1;
+    return aIn - bIn;
   });
 
-  // EVERY group member's seat is highlighted — state distinguishes arrived
-  // vs pending. The map renders them differently (solid vs outlined).
+  // EVERY group member's seat is highlighted on the map, but with two
+  // different visual treatments:
+  //   - This round → "arrived" state → solid bouquet color + pulse
+  //   - Not this round (toggled off / previous round) → "pending" state →
+  //     neutral grey treatment with a visible border, so the seat reads as
+  //     "in your party" but distinct from unrelated seats AND from the
+  //     people actively checking in.
   const highlights: SeatHighlight[] = assignments.map(({ guest: m, color }) => ({
     row: m.row,
     section: m.section,
     seat: m.seat,
     color,
-    state: arrivedIds.has(m.id) ? "arrived" : "pending",
+    state: thisRound.has(m.id) ? ("arrived" as const) : ("pending" as const),
   }));
+
+  // Only this-round members pulse.
+  const pulseAt: SeatRef[] = assignments
+    .filter(({ guest: m }) => thisRound.has(m.id))
+    .map(({ guest: m }) => ({
+      row: m.row,
+      section: m.section,
+      seat: m.seat,
+    }));
 
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col">
@@ -62,20 +80,23 @@ export default function LunchPage() {
         </h1>
       </header>
 
-      {/* Name boxes — arrived first; arrived in color, others greyed */}
+      {/* Name boxes — this-round first; in-round colored, others greyed */}
       <section className="shrink-0 px-6 pb-3">
         <div className="max-w-3xl mx-auto flex flex-wrap justify-center gap-2">
           {sortedAssignments.map(({ guest: m, color }) => {
-            const isArrived = arrivedIds.has(m.id);
+            const isInRound = thisRound.has(m.id);
             return (
               <div
                 key={m.id}
                 className={cn(
                   "rounded-card border px-4 py-2 flex items-center gap-3 transition-colors",
-                  !isArrived && "bg-muted/40 border-border opacity-60"
+                  // Not in this round: standby (taupe) treatment — matches
+                  // the seat's pending-state color so the name box and the
+                  // map seat read as the same "in-group, on standby" pair.
+                  !isInRound && "bg-standby/25 border-standby"
                 )}
                 style={
-                  isArrived
+                  isInRound
                     ? {
                         backgroundColor: `hsl(var(--${color}) / 0.12)`,
                         borderColor: `hsl(var(--${color}))`,
@@ -87,10 +108,10 @@ export default function LunchPage() {
                   aria-hidden
                   className={cn(
                     "size-3 rounded-full shrink-0",
-                    !isArrived && "bg-muted-foreground/30"
+                    !isInRound && "bg-standby"
                   )}
                   style={
-                    isArrived
+                    isInRound
                       ? { backgroundColor: `hsl(var(--${color}))` }
                       : undefined
                   }
@@ -98,7 +119,7 @@ export default function LunchPage() {
                 <span
                   className={cn(
                     "font-display text-base leading-none",
-                    !isArrived && "text-muted-foreground"
+                    !isInRound && "text-foreground/70"
                   )}
                 >
                   {m.name}
@@ -120,10 +141,9 @@ export default function LunchPage() {
         )}
       </section>
 
-      {/* The map — every group member's seat is highlighted (arrived solid,
-          pending outlined) */}
-      <main className="flex-1 overflow-auto grid place-items-center px-6 py-2">
-        <SeatingMap highlights={highlights} />
+      {/* The map — only this-round members' seats are highlighted and pulse */}
+      <main className="flex-1 overflow-hidden grid place-items-center px-6 py-2">
+        <SeatingMap highlights={highlights} pulseAt={pulseAt} />
       </main>
 
       {/* Footer — done */}

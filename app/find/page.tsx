@@ -75,7 +75,7 @@ export default function FindPage() {
             autoComplete="off"
             autoFocus
             placeholder={LOOKUP_COPY.searchPlaceholder}
-            className="text-lg h-14 rounded-pill text-center"
+            className="text-lg h-14 rounded-pill text-center placeholder:transition-opacity placeholder:duration-150 focus:placeholder:opacity-0"
             value={query}
             onChange={(e) => handleQueryChange(e.target.value)}
           />
@@ -109,69 +109,64 @@ export default function FindPage() {
         </div>
       </section>
 
-      {/* Viewing area — name boxes + map, or initial hint */}
-      {viewing ? (
-        <>
-          <section className="shrink-0 px-6 pb-3">
-            <div className="max-w-3xl mx-auto flex flex-wrap justify-center gap-2">
-              {assignments.map(({ guest: m, color }) => {
-                const isArrived = arrivedIds.has(m.id);
-                return (
-                  <div
-                    key={m.id}
+      {/* Name boxes only appear once a guest is selected. The map below
+          is ALWAYS shown — with no highlights at first, then highlights
+          fill in when the user confirms a selection. */}
+      {viewing && (
+        <section className="shrink-0 px-6 pb-3">
+          <div className="max-w-3xl mx-auto flex flex-wrap justify-center gap-2">
+            {assignments.map(({ guest: m, color }) => {
+              const isArrived = arrivedIds.has(m.id);
+              return (
+                <div
+                  key={m.id}
+                  className={cn(
+                    "rounded-card border px-4 py-2 flex items-center gap-3 transition-colors",
+                    !isArrived && "bg-muted/40 border-border opacity-60"
+                  )}
+                  style={
+                    isArrived
+                      ? {
+                          backgroundColor: `hsl(var(--${color}) / 0.12)`,
+                          borderColor: `hsl(var(--${color}))`,
+                        }
+                      : undefined
+                  }
+                >
+                  <span
+                    aria-hidden
                     className={cn(
-                      "rounded-card border px-4 py-2 flex items-center gap-3 transition-colors",
-                      !isArrived && "bg-muted/40 border-border opacity-60"
+                      "size-3 rounded-full shrink-0",
+                      !isArrived && "bg-muted-foreground/30"
                     )}
                     style={
                       isArrived
-                        ? {
-                            backgroundColor: `hsl(var(--${color}) / 0.12)`,
-                            borderColor: `hsl(var(--${color}))`,
-                          }
+                        ? { backgroundColor: `hsl(var(--${color}))` }
                         : undefined
                     }
+                  />
+                  <span
+                    className={cn(
+                      "font-display text-base leading-none",
+                      !isArrived && "text-muted-foreground"
+                    )}
                   >
-                    <span
-                      aria-hidden
-                      className={cn(
-                        "size-3 rounded-full shrink-0",
-                        !isArrived && "bg-muted-foreground/30"
-                      )}
-                      style={
-                        isArrived
-                          ? { backgroundColor: `hsl(var(--${color}))` }
-                          : undefined
-                      }
-                    />
-                    <span
-                      className={cn(
-                        "font-display text-base leading-none",
-                        !isArrived && "text-muted-foreground"
-                      )}
-                    >
-                      {m.name}
-                    </span>
-                    <span className="font-sans text-xs text-muted-foreground leading-none">
-                      R{m.row}
-                      {m.section ? m.section : ""} · Seat {m.seat}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-          <main className="flex-1 overflow-auto grid place-items-center px-6 py-2">
-            <SeatingMap highlights={highlights} />
-          </main>
-        </>
-      ) : (
-        <main className="flex-1 flex items-center justify-center px-6">
-          <p className="font-sans text-sm text-muted-foreground">
-            {LOOKUP_COPY.initialHint}
-          </p>
-        </main>
+                    {m.name}
+                  </span>
+                  <span className="font-sans text-xs text-muted-foreground leading-none">
+                    R{m.row}
+                    {m.section ? m.section : ""} · Seat {m.seat}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </section>
       )}
+
+      <main className="flex-1 overflow-hidden grid place-items-center px-6 py-2">
+        <SeatingMap highlights={highlights} />
+      </main>
     </div>
   );
 }

@@ -24,10 +24,18 @@
   --accent-foreground: var(--foreground);
 
   --border: var(--muted);
-  --input: var(--muted);
+  /* Visible mid-tone slate for input borders. Tied to --muted before, but
+     muted is too close to the page background — the input outline disappeared.
+     Hard-coded value so it stays visible across themes. */
+  --input: 220 10% 70%;
   --ring: var(--primary);
 
   --radius: 0.625rem;
+
+  /* "Standby" — used for guests in your group but NOT in this check-in
+     round. A warm taupe/sand. Theme-independent so the "in-group but on
+     standby" treatment feels consistent. Edit here to retune globally. */
+  --standby: 35 65% 40%;
 }
 
 /* Required by shadcn classes like `dark:bg-...`. We don't use class-based
@@ -59,6 +67,7 @@
   /* Status */
   --color-arrived: hsl(var(--arrived));
   --color-pending: hsl(var(--pending));
+  --color-standby: hsl(var(--standby));
 
   /* shadcn shims */
   --color-secondary: hsl(var(--secondary));

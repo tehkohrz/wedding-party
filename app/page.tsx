@@ -10,7 +10,7 @@
 import { COUPLE, WELCOME_COPY, LOOKUP_COPY } from "@/lib/content";
 import { NameSearch } from "@/components/NameSearch";
 import { ForwardLink } from "@/components/WizardShell";
-import { Flower2, Leaf } from "lucide-react";
+import { Flower2 } from "lucide-react";
 
 export default function WelcomePage() {
   return (
@@ -18,11 +18,12 @@ export default function WelcomePage() {
       <PhotoSide />
       <FormSide />
 
-      {/* Secondary entry point — a subtle link to the seating plan lookup
-          (browse-only, no check-in writes). Bottom-right, low-emphasis. */}
+      {/* Secondary entry point — the seating plan lookup (browse-only,
+          no check-in writes). Bolder and bigger than before so it's
+          discoverable without competing with the main name input. */}
       <ForwardLink
         href="/find"
-        className="fixed bottom-4 right-4 z-40 font-sans text-sm text-muted-foreground hover:text-foreground transition px-3 py-2"
+        className="fixed bottom-4 right-4 z-40 font-sans text-base font-bold text-primary hover:underline transition px-3 py-2"
       >
         {LOOKUP_COPY.welcomeLinkLabel}
       </ForwardLink>
@@ -74,7 +75,7 @@ function PhotoSide() {
 // ─── Form side ───────────────────────────────────────────────────────────────
 // Plain warm-cream background with content centered both axes.
 // Two decorative SVG flourishes in opposing corners — tint-able via text-* colors.
-// Swap Flower2/Leaf for your own SVGs when you have them (see CLAUDE.md / docs).
+// Swap the Flower2 for your own SVG when you have one.
 
 function FormSide() {
   return (
@@ -86,14 +87,11 @@ function FormSide() {
         px-6 py-8
       "
     >
-      {/* Flourishes — swap for custom SVGs later */}
+      {/* Flourish — top-left only. The bottom-right corner is reserved
+          for the Seating plan link; previously had a Leaf SVG that
+          competed visually with the link text. */}
       <Flower2
         className="absolute top-6 left-6 size-12 text-rose/50"
-        strokeWidth={1.25}
-        aria-hidden
-      />
-      <Leaf
-        className="absolute bottom-6 right-6 size-12 text-sage/60"
         strokeWidth={1.25}
         aria-hidden
       />

@@ -26,6 +26,9 @@ export function NameSearch() {
   const router = useRouter();
   const setCurrentGuest = useWizardStore((s) => s.setCurrentGuest);
   const setDirection = useWizardStore((s) => s.setDirection);
+  const setCheckedInThisRound = useWizardStore(
+    (s) => s.setCheckedInThisRound
+  );
 
   const [query, setQuery] = useState("");
   const matches = useGuestSearch(query);
@@ -33,13 +36,15 @@ export function NameSearch() {
   async function handleSelect(guest: Guest) {
     setCurrentGuest(guest);
     setDirection("forward");
-    // Grouped guests visit the Group screen (which writes attendance for
-    // the selected members on Confirm). Solo guests skip /group, so we
-    // mark them arrived here — otherwise they'd reach /lunch unarrived.
     if (hasGroupmates(guest)) {
+      // Grouped: Confirm on /group will populate checkedInThisRound.
+      // Clear it now so /lunch never inherits a stale set from a prior round.
+      setCheckedInThisRound([]);
       router.push("/group");
     } else {
+      // Solo: this guest is the entire round.
       await markArrived(guest.id);
+      setCheckedInThisRound([guest.id]);
       router.push("/lunch");
     }
   }
@@ -55,7 +60,9 @@ export function NameSearch() {
         autoComplete="off"
         autoFocus
         placeholder={WELCOME_COPY.inputPlaceholder}
-        className="text-lg h-14 rounded-pill text-center"
+        // focus:placeholder:opacity-0 hides the placeholder the moment the
+        // input is focused (vs the default "only fade when text is typed").
+        className="text-lg h-14 rounded-pill text-center placeholder:transition-opacity placeholder:duration-150 focus:placeholder:opacity-0"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />

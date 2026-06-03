@@ -31,6 +31,9 @@ import type { Guest } from "@/lib/schema";
 export function GroupCheckin({ guest }: { guest: Guest }) {
   const router = useRouter();
   const setDirection = useWizardStore((s) => s.setDirection);
+  const setCheckedInThisRound = useWizardStore(
+    (s) => s.setCheckedInThisRound
+  );
 
   // Everyone in the group except the current guest.
   const others = useMemo(
@@ -67,6 +70,8 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
   }
 
   async function handleConfirm() {
+    // Already-arrived guests (from a prior round) are NOT in this round —
+    // they don't need re-marking, and we want them rendered grey on /lunch.
     const ids = [
       guest.id,
       ...others
@@ -74,6 +79,7 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
         .map((m) => m.id),
     ];
     await markArrivedMany(ids);
+    setCheckedInThisRound(ids);
     setDirection("forward");
     router.push("/lunch");
   }

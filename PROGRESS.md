@@ -23,7 +23,7 @@ Tick each session as it's done. Add a one-line note (date + what was decided/ski
 
 ## Milestone 4 — Lunch seating map
 (Consolidated from 4 sessions → 3 after solemnization was removed.)
-- [ ] Session 12 — SeatingMap component + venue layout rendering
+- [x] Session 12 — SeatingMap component + venue layout rendering  *(2026-04-28 — Path A schematic from layout.csv, multi-color highlights with arrived/pending states, name boxes per member, /find lookup mode added (browse-only))*
 - [ ] Session 13 — Seat overlay, highlight your seat + arrived seats, SeatCallout
 - [ ] Session 14 — Pinch-zoom, pan, polish
 
@@ -56,6 +56,37 @@ likely for SG), SMS via Twilio, or email. Implementation: a one-off Node
 script (`scripts/send-invitations.ts`) that reads `guests.csv` + a message
 template and either writes a CSV for bulk-send tooling or calls a service API.
 Data implication: add `phone` / `email` columns to `guests.csv`.
+
+### iPad on-screen keyboard accommodation
+When the iOS soft keyboard opens, it covers ~40% of the screen (portrait) /
+~30% (landscape). We already use `h-dvh` everywhere (dynamic viewport),
+which means pages auto-shrink to fit the visible area instead of letting
+content slide under the keyboard. That's the foundational fix and it's done.
+
+The Welcome screen is the one place this might still look rough on a real
+device — the stacked equation (`text-7xl × 5 lines`: brideName / + / groomName
+/ = / unionWord) plus the date/greeting/input is a lot of vertical content
+inside a centered flex column. When `h-dvh` shrinks to make room for the
+keyboard, the centered content gets compressed and may clip at the edges
+because of `overflow-hidden`.
+
+**Fixes to consider when testing on a real iPad reveals it's actually a
+problem (not before):**
+- Anchor form-side content with `justify-start` instead of `justify-center`
+  so the input stays at the top above the keyboard (cheap, robust)
+- Use the `visualViewport` API to detect keyboard height and shrink the
+  equation font sizes conditionally (more elegant, more code)
+- Switch to `overflow-y-auto` on the form side so users can scroll within
+  the squeezed area (less elegant but bulletproof)
+
+Other keyboard quirks worth verifying on real hardware:
+- Inputs are already 18px (`text-lg`), so no auto-zoom triggers
+- `type="search"` shows a Search keyboard return key — currently does
+  nothing on Enter; could wire to "select top fuzzy match" if desired
+- PWA standalone mode (after Add to Home Screen) behaves differently from
+  Safari browser tab — test both
+- Split/floating keyboard on iPad is reported correctly by `visualViewport`
+- Hard refresh while focused → check no weirdness
 
 ### Photo capture during check-in
 Allow guests to take a photo of themselves as part of the check-in flow —
