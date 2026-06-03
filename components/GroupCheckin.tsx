@@ -19,14 +19,14 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { db, markArrivedMany } from "@/lib/attendance";
-import { getGroupMembers } from "@/lib/groups";
+import {
+  getGroupMembers,
+  getMemberColorAssignments,
+  type BouquetColor,
+} from "@/lib/groups";
 import { useWizardStore } from "@/lib/store";
 import { GROUP_COPY } from "@/lib/content";
 import type { Guest } from "@/lib/schema";
-
-/** Bouquet accent colors, cycled across group members. Each name maps to a
- *  CSS variable (--rose, --marigold, ...) defined by the active theme. */
-const BOUQUET = ["lavender", "rose", "marigold", "sage", "sky", "peach"] as const;
 
 export function GroupCheckin({ guest }: { guest: Guest }) {
   const router = useRouter();
@@ -37,6 +37,16 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
     () => getGroupMembers(guest).filter((m) => m.id !== guest.id),
     [guest]
   );
+
+  // Stable color per member (matches the lunch screen's name boxes + seat
+  // highlights so each person has one color across the whole flow).
+  const colorByGuestId = useMemo(() => {
+    const map = new Map<number, BouquetColor>();
+    for (const { guest: g, color } of getMemberColorAssignments(guest)) {
+      map.set(g.id, color);
+    }
+    return map;
+  }, [guest]);
 
   // Live attendance — undefined on first render, then the rows.
   const arrived = useLiveQuery(() => db.attendance.toArray());
@@ -84,12 +94,12 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
       {/* Scrollable member list */}
       <main className="flex-1 overflow-y-auto px-6">
         <div className="max-w-md mx-auto space-y-2 py-2">
-          {/* Current guest — locked, always counted in. Bouquet color 0. */}
+          {/* Current guest — locked, always counted in. */}
           <div
             className="flex items-center justify-between rounded-card border px-5 py-4"
             style={{
-              backgroundColor: `hsl(var(--${BOUQUET[0]}) / 0.12)`,
-              borderColor: `hsl(var(--${BOUQUET[0]}))`,
+              backgroundColor: `hsl(var(--${colorByGuestId.get(guest.id)}) / 0.12)`,
+              borderColor: `hsl(var(--${colorByGuestId.get(guest.id)}))`,
             }}
           >
             <span className="font-display text-xl">{guest.name}</span>
@@ -97,17 +107,18 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
               <span className="font-sans text-xs uppercase tracking-wider text-muted-foreground">
                 {GROUP_COPY.youLabel}
               </span>
-              <ColorCircle color={BOUQUET[0]} filled />
+              <ColorCircle color={colorByGuestId.get(guest.id)!} filled />
             </div>
           </div>
 
           {/* Pending companions — the whole row is the switch.
               role="switch" + click/keydown make the row the single
               interactive control. */}
-          {pending.map((m, i) => {
+          {pending.map((m) => {
             const isOn = selected.has(m.id);
-            // Color 0 is the current guest; companions start at 1.
-            const color = BOUQUET[(i + 1) % BOUQUET.length];
+            // Each member's color is stable (driven by lib/groups), so
+            // marking someone arrived elsewhere doesn't reshuffle colors.
+            const color = colorByGuestId.get(m.id)!;
             return (
               <div
                 key={m.id}

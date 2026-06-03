@@ -5,23 +5,47 @@
  * side with a gap; within a section, seats are circles numbered by their
  * actual seat number (continuous across sections in the same row).
  *
- * `highlight` marks one seat as the current guest's — it's filled in the
- * primary color with a ring. Session 13 adds attendance coloring + the
- * floating SeatCallout; Session 14 adds pinch-zoom.
+ * `highlights` is an array of seats to mark, each with a bouquet color.
+ * Used by the lunch screen to show the current guest plus every group
+ * member in their assigned bouquet color (matching their name box).
  *
- * Path B (a Figma SVG venue background) is deferred — see PROGRESS.md.
+ * Session 13 will layer attendance coloring on the rest. Session 14 adds
+ * pinch-zoom. Path B (Figma SVG background) is deferred — see PROGRESS.md.
  */
 import { cn } from "@/lib/utils";
 import { layout } from "@/lib/data";
 import type { LayoutSection } from "@/lib/schema";
 
-export interface SeatRef {
+export interface SeatHighlight {
   row: number;
   section: string | null;
   seat: number;
+  /** Bouquet color name — must map to a CSS variable in the active theme. */
+  color: string;
+  /**
+   * - "arrived": guest is checked in — solid color fill with a ring
+   * - "pending": guest is in your group but not yet checked in — colored
+   *   outline + light tint so the seat is identifiable but visually
+   *   distinct from arrived seats
+   */
+  state: "arrived" | "pending";
 }
 
-export function SeatingMap({ highlight }: { highlight?: SeatRef }) {
+function seatKey(row: number, section: string | null, seat: number): string {
+  return `${row}|${section ?? ""}|${seat}`;
+}
+
+export function SeatingMap({
+  highlights = [],
+}: {
+  highlights?: SeatHighlight[];
+}) {
+  // Fast O(1) lookup for "is this seat highlighted, and in what color?"
+  const highlightMap = new Map<string, SeatHighlight>();
+  for (const h of highlights) {
+    highlightMap.set(seatKey(h.row, h.section, h.seat), h);
+  }
+
   // Group layout sections by row number.
   const byRow = new Map<number, LayoutSection[]>();
   for (const section of layout) {
@@ -47,7 +71,7 @@ export function SeatingMap({ highlight }: { highlight?: SeatRef }) {
                 <SectionBlock
                   key={`${rowNum}-${section.section ?? "_"}`}
                   section={section}
-                  highlight={highlight}
+                  highlightMap={highlightMap}
                 />
               ))}
           </div>
@@ -59,12 +83,11 @@ export function SeatingMap({ highlight }: { highlight?: SeatRef }) {
 
 function SectionBlock({
   section,
-  highlight,
+  highlightMap,
 }: {
   section: LayoutSection;
-  highlight?: SeatRef;
+  highlightMap: Map<string, SeatHighlight>;
 }) {
-  // Seat numbers in this section: start_seat..end_seat inclusive.
   const seats: number[] = [];
   for (let n = section.start_seat; n <= section.end_seat; n++) seats.push(n);
 
@@ -72,12 +95,8 @@ function SectionBlock({
     <div className="flex flex-col items-center gap-1.5">
       <div className="flex gap-1.5">
         {seats.map((n) => {
-          const isHighlighted =
-            highlight !== undefined &&
-            highlight.row === section.row &&
-            highlight.section === section.section &&
-            highlight.seat === n;
-          return <Seat key={n} number={n} highlighted={isHighlighted} />;
+          const h = highlightMap.get(seatKey(section.row, section.section, n));
+          return <Seat key={n} number={n} highlight={h} />;
         })}
       </div>
       {section.section && (
@@ -91,20 +110,52 @@ function SectionBlock({
 
 function Seat({
   number,
-  highlighted,
+  highlight,
 }: {
   number: number;
-  highlighted: boolean;
+  highlight: SeatHighlight | undefined;
 }) {
+  // Unhighlighted: muted disc + muted text.
+  if (!highlight) {
+    return (
+      <div
+        className={cn(
+          "size-9 rounded-full grid place-items-center",
+          "font-sans text-xs transition-colors",
+          "bg-muted text-muted-foreground"
+        )}
+      >
+        {number}
+      </div>
+    );
+  }
+
+  // Arrived: solid color fill, white bold number, soft same-color ring.
+  if (highlight.state === "arrived") {
+    return (
+      <div
+        className="size-9 rounded-full grid place-items-center font-sans text-xs font-bold text-white transition-colors"
+        style={{
+          backgroundColor: `hsl(var(--${highlight.color}))`,
+          boxShadow: `0 0 0 4px hsl(var(--${highlight.color}) / 0.3)`,
+        }}
+      >
+        {number}
+      </div>
+    );
+  }
+
+  // Pending (in your group but not yet checked in): colored outline,
+  // light tint fill, colored bold number. Identifiable as "theirs" but
+  // visually distinct from arrived (no solid fill, no ring).
   return (
     <div
-      className={cn(
-        "size-9 rounded-full grid place-items-center",
-        "font-sans text-xs transition-colors",
-        highlighted
-          ? "bg-primary text-primary-foreground ring-4 ring-primary/30"
-          : "bg-muted text-muted-foreground"
-      )}
+      className="size-9 rounded-full grid place-items-center font-sans text-xs font-bold border-2 transition-colors"
+      style={{
+        borderColor: `hsl(var(--${highlight.color}))`,
+        backgroundColor: `hsl(var(--${highlight.color}) / 0.18)`,
+        color: `hsl(var(--${highlight.color}))`,
+      }}
     >
       {number}
     </div>

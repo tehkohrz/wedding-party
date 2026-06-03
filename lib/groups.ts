@@ -25,3 +25,44 @@ export function getGroupMembers(guest: Guest): Guest[] {
 export function hasGroupmates(guest: Guest): boolean {
   return getGroupMembers(guest).length > 1;
 }
+
+// ─── Bouquet color assignment ────────────────────────────────────────────────
+// Each group member is assigned a bouquet color. The same assignment is used
+// on the group check-in screen AND the lunch seating screen, so each person's
+// name box and their highlighted seat share a color.
+//
+// Ordering: the current guest always gets the first color; companions follow
+// in CSV order. This keeps every guest's color stable regardless of who has
+// already arrived (vs deriving from the pending-after-filter list).
+
+export const BOUQUET_COLORS = [
+  "lavender",
+  "rose",
+  "marigold",
+  "sage",
+  "sky",
+  "peach",
+] as const;
+
+export type BouquetColor = (typeof BOUQUET_COLORS)[number];
+
+/**
+ * Returns an ordered assignment of bouquet colors to every member of the
+ * guest's group (current guest first, then companions in CSV order). For
+ * a solo guest this is just `[{ guest, color: BOUQUET_COLORS[0] }]`.
+ */
+export function getMemberColorAssignments(
+  guest: Guest
+): Array<{ guest: Guest; color: BouquetColor }> {
+  const others = getGroupMembers(guest).filter((m) => m.id !== guest.id);
+  const result: Array<{ guest: Guest; color: BouquetColor }> = [
+    { guest, color: BOUQUET_COLORS[0] },
+  ];
+  others.forEach((m, i) => {
+    result.push({
+      guest: m,
+      color: BOUQUET_COLORS[(i + 1) % BOUQUET_COLORS.length],
+    });
+  });
+  return result;
+}

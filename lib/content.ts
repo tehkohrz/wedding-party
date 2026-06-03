@@ -32,10 +32,45 @@ export const WELCOME_COPY = {
   greeting: "Welcome!",
 
   // [input] Short instruction line under the greeting.
-  instruction: "Please enter your name to find your seat.",
+  instruction: "Please enter your name to check-in and find your seat.",
 
   // [input] Placeholder text inside the input box.
   inputPlaceholder: "Your name...",
+};
+
+export const LUNCH_COPY = {
+  // [input] Heading on the lunch screen when only the guest is checking in.
+  headingSolo: "Your lunch seat",
+
+  // [input] Heading on the lunch screen when checking in with companions.
+  headingGroup: "Your lunch seats",
+
+  // [input] Friendly note under the name boxes, shown for grouped guests.
+  //         Hint that any group member can take any of their party's seats.
+  groupSeatingNote: "Feel free to sit how you like among your group.",
+
+  // [input] Label on the final button that returns to the welcome screen.
+  doneLabel: "Done",
+};
+
+export const LOOKUP_COPY = {
+  // [input] Heading on the seating-plan lookup page.
+  heading: "Seating plan",
+
+  // [input] Sub-instruction under the heading.
+  subheading: "Search a name to see where they're seated. No check-in.",
+
+  // [input] Placeholder text inside the lookup search input.
+  searchPlaceholder: "Search by name...",
+
+  // [input] Shown when no guests match the typed query.
+  noMatches: "No matches found.",
+
+  // [input] Hint shown before anything is searched.
+  initialHint: "Type a name above to find their seat.",
+
+  // [input] Subtle "Seating plan" link in the bottom-right of the welcome screen.
+  welcomeLinkLabel: "Seating plan →",
 };
 
 export const GROUP_COPY = {
@@ -49,5 +84,5 @@ export const GROUP_COPY = {
   youLabel: "You",
 
   // [input] Confirm button label on the group screen.
-  confirmLabel: "Confirm & continue",
+  confirmLabel: "Check-in",
 };

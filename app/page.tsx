@@ -7,8 +7,9 @@
 //   - portrait: stacked (photo top, form bottom)
 //   - One component, Tailwind `landscape:` modifier handles the swap
 
-import { COUPLE, WELCOME_COPY } from "@/lib/content";
+import { COUPLE, WELCOME_COPY, LOOKUP_COPY } from "@/lib/content";
 import { NameSearch } from "@/components/NameSearch";
+import { ForwardLink } from "@/components/WizardShell";
 import { Flower2, Leaf } from "lucide-react";
 
 export default function WelcomePage() {
@@ -16,6 +17,15 @@ export default function WelcomePage() {
     <div className="h-dvh w-screen overflow-hidden flex flex-col landscape:flex-row">
       <PhotoSide />
       <FormSide />
+
+      {/* Secondary entry point — a subtle link to the seating plan lookup
+          (browse-only, no check-in writes). Bottom-right, low-emphasis. */}
+      <ForwardLink
+        href="/find"
+        className="fixed bottom-4 right-4 z-40 font-sans text-sm text-muted-foreground hover:text-foreground transition px-3 py-2"
+      >
+        {LOOKUP_COPY.welcomeLinkLabel}
+      </ForwardLink>
     </div>
   );
 }

@@ -18,6 +18,7 @@ import { Card } from "@/components/ui/card";
 import { useGuestSearch } from "@/hooks/useGuestSearch";
 import { useWizardStore } from "@/lib/store";
 import { hasGroupmates } from "@/lib/groups";
+import { markArrived } from "@/lib/attendance";
 import { WELCOME_COPY } from "@/lib/content";
 import type { Guest } from "@/lib/schema";
 
@@ -29,12 +30,18 @@ export function NameSearch() {
   const [query, setQuery] = useState("");
   const matches = useGuestSearch(query);
 
-  function handleSelect(guest: Guest) {
+  async function handleSelect(guest: Guest) {
     setCurrentGuest(guest);
     setDirection("forward");
-    // Grouped guests visit the Group screen to check in companions;
-    // solo guests skip straight to their seating map.
-    router.push(hasGroupmates(guest) ? "/group" : "/lunch");
+    // Grouped guests visit the Group screen (which writes attendance for
+    // the selected members on Confirm). Solo guests skip /group, so we
+    // mark them arrived here — otherwise they'd reach /lunch unarrived.
+    if (hasGroupmates(guest)) {
+      router.push("/group");
+    } else {
+      await markArrived(guest.id);
+      router.push("/lunch");
+    }
   }
 
   const showResults = query.trim().length > 0;

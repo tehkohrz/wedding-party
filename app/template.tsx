@@ -21,7 +21,7 @@ import { motion } from "motion/react";
 import { usePathname } from "next/navigation";
 import { useWizardStore } from "@/lib/store";
 
-const WIZARD_PATHS = new Set(["/", "/group", "/lunch"]);
+const WIZARD_PATHS = new Set(["/", "/group", "/lunch", "/find"]);
 
 export default function Template({
   children,

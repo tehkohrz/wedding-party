@@ -14,10 +14,12 @@ import { Button } from "@/components/ui/button";
 import { useWizardStore } from "@/lib/store";
 import { useIdleTimer } from "@/hooks/useIdleTimer";
 
-const IDLE_TIMEOUT_MS = 15_000;
+// 45s — gives guests comfortable time to read their seat info before
+// the screen bounces back to welcome for the next person.
+const IDLE_TIMEOUT_MS = 45_000;
 
 /** Paths that participate in the wizard. /sandbox, /admin, etc. don't. */
-const WIZARD_PATHS = new Set(["/", "/group", "/lunch"]);
+const WIZARD_PATHS = new Set(["/", "/group", "/lunch", "/find"]);
 
 export function WizardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
