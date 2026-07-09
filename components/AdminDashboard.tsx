@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { guests } from "@/lib/data";
 import { db, markArrived, unmark } from "@/lib/attendance";
 import { ADMIN_COPY } from "@/lib/content";
+import { AdminDataControls } from "@/components/AdminDataControls";
 
 type Filter = "all" | "arrived" | "pending";
 
@@ -66,12 +67,15 @@ export function AdminDashboard() {
       {/* Header + stats (fixed) */}
       <header className="shrink-0 px-6 pt-6 pb-4 border-b border-border">
         <div className="max-w-2xl mx-auto space-y-4">
-          <div className="flex items-baseline justify-between">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
             <h1 className="font-display text-3xl">
               {ADMIN_COPY.dashboardHeading}
             </h1>
-            <div className="font-sans text-sm text-muted-foreground">
-              {arrivedCount} / {total} · {pct}%
+            <div className="flex items-center gap-4">
+              <div className="font-sans text-sm text-muted-foreground">
+                {arrivedCount} / {total} · {pct}%
+              </div>
+              <AdminDataControls />
             </div>
           </div>
 

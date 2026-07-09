@@ -23,6 +23,13 @@
   --accent: var(--muted);
   --accent-foreground: var(--foreground);
 
+  /* Popover / card surfaces (Dialog, Popover, DropdownMenu use these).
+     Map to the opaque surface color so overlays are solid, not see-through. */
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+
   --border: var(--muted);
   /* Visible mid-tone slate for input borders. Tied to --muted before, but
      muted is too close to the page background — the input outline disappeared.
@@ -70,6 +77,10 @@
   --color-standby: hsl(var(--standby));
 
   /* shadcn shims */
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
   --color-destructive: hsl(var(--destructive));

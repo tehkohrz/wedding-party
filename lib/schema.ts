@@ -58,3 +58,24 @@ export type Side = z.infer<typeof SideSchema>;
 export type Guest = z.infer<typeof GuestSchema>;
 export type Group = z.infer<typeof GroupSchema>;
 export type LayoutSection = z.infer<typeof LayoutSectionSchema>;
+
+// ─── Attendance export / restore ─────────────────────────────────────────────
+// A backup file read from disk is untrusted input, so we validate it with
+// Zod before writing anything to IndexedDB (same principle as the CSV parse).
+
+export const AttendanceRecordSchema = z.object({
+  guest_id: z.number().int().positive(),
+  arrived_at: z.number().int().nonnegative(),
+});
+
+export const AttendanceExportSchema = z.object({
+  app: z.literal("sitwhereah"),
+  version: z.number().int().positive(),
+  exported_at: z.string(),
+  attendance: z.array(AttendanceRecordSchema),
+  // guests_snapshot is human-readable extra; ignored on restore, so we
+  // accept anything (or absent) without failing validation.
+  guests_snapshot: z.array(z.unknown()).optional(),
+});
+
+export type AttendanceExport = z.infer<typeof AttendanceExportSchema>;

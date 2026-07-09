@@ -35,7 +35,7 @@ drop the SVG in public/, add it as a background layer in SeatingMap, keep the
 data-driven seat overlay on top. Path A does not block Path B.
 
 ## Milestone 5 — Admin
-- [ ] Session 15 — Admin PIN gate + dashboard
+- [x] Session 15 — Admin PIN gate + dashboard  *(2026-04-28 — /admin route, optional PIN gate (NEXT_PUBLIC toggle), live stats + bride/groom split, name filter + All/Arrived/Pending tabs, manual mark/unmark override, "Attendance" entry link)*
 - [ ] Session 16 — Export JSON + reset
 
 ## Milestone 6 — PWA & polish

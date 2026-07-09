@@ -113,4 +113,26 @@ export const ADMIN_COPY = {
 
   // [input] Label for the admin entry link (bottom-left of the welcome screen).
   entryLabel: "Attendance",
+
+  // [input] Data-control button labels in the admin header.
+  exportLabel: "Export",
+  restoreLabel: "Restore",
+  resetLabel: "Reset all",
+
+  // [input] Reset confirmation dialog.
+  resetConfirmTitle: "Reset all attendance?",
+  resetConfirmBody:
+    "This clears every check-in and cannot be undone. Export a backup first if you might need the data.",
+  resetConfirmCancel: "Cancel",
+  resetConfirmAction: "Reset everything",
+
+  // [input] Restore confirmation dialog. {n} is replaced with the record count.
+  restoreConfirmTitle: "Restore {n} check-ins?",
+  restoreConfirmBody:
+    "This replaces all current attendance with the backup file.",
+  restoreConfirmCancel: "Cancel",
+  restoreConfirmAction: "Restore",
+
+  // [input] Message when a restore file can't be read/validated.
+  restoreError: "Couldn't read that file — is it a SitWhereAh backup?",
 };

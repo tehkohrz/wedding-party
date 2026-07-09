@@ -80,3 +80,17 @@ export async function getAllArrived(): Promise<AttendanceRecord[]> {
 export async function resetAll(): Promise<void> {
   await db.attendance.clear();
 }
+
+/**
+ * Replace the entire attendance table with the given records (restore from
+ * a backup file). Clears first so the result exactly matches the backup —
+ * records added since the backup are removed. Runs in one transaction.
+ */
+export async function replaceAllAttendance(
+  records: AttendanceRecord[]
+): Promise<void> {
+  await db.transaction("rw", db.attendance, async () => {
+    await db.attendance.clear();
+    if (records.length > 0) await db.attendance.bulkPut(records);
+  });
+}

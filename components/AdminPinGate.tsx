@@ -40,7 +40,10 @@ export function AdminPinGate({ children }: { children: React.ReactNode }) {
 
   if (unlocked) return <>{children}</>;
 
-  function submit(e: React.FormEvent) {
+  // React.FormEvent is deprecated in current @types/react ("doesn't actually
+  // exist" — use SyntheticEvent / ChangeEvent / SubmitEvent instead). We only
+  // need preventDefault, so the generic SyntheticEvent is the right fit.
+  function submit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
     if (entry === ADMIN_PIN) {
       sessionStorage.setItem(SESSION_KEY, "true");
