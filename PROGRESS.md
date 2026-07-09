@@ -24,8 +24,8 @@ Tick each session as it's done. Add a one-line note (date + what was decided/ski
 ## Milestone 4 — Lunch seating map
 (Consolidated from 4 sessions → 3 after solemnization was removed.)
 - [x] Session 12 — SeatingMap component + venue layout rendering  *(2026-04-28 — Path A schematic from layout.csv, multi-color highlights with arrived/pending states, name boxes per member, /find lookup mode added (browse-only))*
-- [ ] Session 13 — Seat overlay, highlight your seat + arrived seats, SeatCallout
-- [ ] Session 14 — Pinch-zoom, pan, polish
+- [x] Session 13 — Seat overlay, highlight, polish + interactions  *(2026-04-28 — pulse on this-round seats (5s), tap-a-seat popover, /find lookup shows full map, this-round vs arrived state split, standby taupe color, sky-blue buttons, seat/input visibility. Zoom/pan built but default OFF.)*
+- [ ] Session 14 — (mostly absorbed into S13) leftover polish if testing surfaces any
 
 ### Deferred — Path B: Figma SVG background
 We chose Path A: the SeatingMap is generated purely from layout.csv (a clean
