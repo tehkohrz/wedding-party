@@ -86,3 +86,31 @@ export const GROUP_COPY = {
   // [input] Confirm button label on the group screen.
   confirmLabel: "Check-in",
 };
+
+export const ADMIN_COPY = {
+  // [input] Heading on the PIN gate.
+  pinHeading: "Admin access",
+
+  // [input] Instruction under the PIN heading.
+  pinPrompt: "Enter the 4-digit PIN.",
+
+  // [input] Error shown after a wrong PIN.
+  pinError: "Incorrect PIN. Try again.",
+
+  // [input] Heading on the admin dashboard.
+  dashboardHeading: "Attendance",
+
+  // [input] Placeholder in the admin guest-filter input.
+  filterPlaceholder: "Filter by name...",
+
+  // [input] Labels for the filter tabs.
+  filterAll: "All",
+  filterArrived: "Arrived",
+  filterPending: "Pending",
+
+  // [input] Shown when the filter matches no guests.
+  noMatches: "No guests match.",
+
+  // [input] Label for the admin entry link (bottom-left of the welcome screen).
+  entryLabel: "Attendance",
+};

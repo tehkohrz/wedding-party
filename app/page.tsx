@@ -7,7 +7,8 @@
 //   - portrait: stacked (photo top, form bottom)
 //   - One component, Tailwind `landscape:` modifier handles the swap
 
-import { COUPLE, WELCOME_COPY, LOOKUP_COPY } from "@/lib/content";
+import Link from "next/link";
+import { COUPLE, WELCOME_COPY, LOOKUP_COPY, ADMIN_COPY } from "@/lib/content";
 import { NameSearch } from "@/components/NameSearch";
 import { ForwardLink } from "@/components/WizardShell";
 import { Flower2 } from "lucide-react";
@@ -18,15 +19,15 @@ export default function WelcomePage() {
       <PhotoSide />
       <FormSide />
 
-      {/* Secondary entry point — the seating plan lookup (browse-only,
-          no check-in writes). Bolder and bigger than before so it's
-          discoverable without competing with the main name input. */}
-      <ForwardLink
-        href="/find"
+      {/* Admin entry — bottom-right, bold primary. PIN-gated (/admin), so a
+          visible prominent link is fine; the PIN stops guests. Plain Link
+          (not a wizard route, so no slide direction to set). */}
+      <Link
+        href="/admin"
         className="fixed bottom-4 right-4 z-40 font-sans text-base font-bold text-primary hover:underline transition px-3 py-2"
       >
-        {LOOKUP_COPY.welcomeLinkLabel}
-      </ForwardLink>
+        {ADMIN_COPY.entryLabel}
+      </Link>
     </div>
   );
 }
@@ -87,14 +88,22 @@ function FormSide() {
         px-6 py-8
       "
     >
-      {/* Flourish — top-left only. The bottom-right corner is reserved
-          for the Seating plan link; previously had a Leaf SVG that
-          competed visually with the link text. */}
+      {/* Flourish — top-left corner. */}
       <Flower2
         className="absolute top-6 left-6 size-12 text-rose/50"
         strokeWidth={1.25}
         aria-hidden
       />
+
+      {/* Seating plan lookup — bottom-left of the form area (beside the
+          photo side in landscape). Browse-only, no check-in writes.
+          ForwardLink because /find is a wizard route (slide transition). */}
+      <ForwardLink
+        href="/find"
+        className="absolute bottom-4 left-4 z-40 font-sans text-base font-bold text-primary hover:underline transition px-3 py-2"
+      >
+        {LOOKUP_COPY.welcomeLinkLabel}
+      </ForwardLink>
 
       <div className="text-center space-y-6 max-w-xl">
         {/* Names equation — five stacked lines:
