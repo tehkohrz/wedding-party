@@ -1,0 +1,20 @@
+<!-- PLACEHOLDER app icon. Replace this file with real artwork (keep it 512x512
+     and square), then run `pnpm icons` to regenerate all PNG sizes.
+     A simple 6-petal flower on a sky-blue field — on-theme, font-free so it
+     rasterizes identically everywhere. -->
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="112" fill="#1FA6EB"/>
+  <g transform="translate(256 256)">
+    <!-- 6 petals -->
+    <g fill="#FFFFFF">
+      <ellipse cx="0" cy="-96" rx="46" ry="86"/>
+      <ellipse cx="0" cy="-96" rx="46" ry="86" transform="rotate(60)"/>
+      <ellipse cx="0" cy="-96" rx="46" ry="86" transform="rotate(120)"/>
+      <ellipse cx="0" cy="-96" rx="46" ry="86" transform="rotate(180)"/>
+      <ellipse cx="0" cy="-96" rx="46" ry="86" transform="rotate(240)"/>
+      <ellipse cx="0" cy="-96" rx="46" ry="86" transform="rotate(300)"/>
+    </g>
+    <!-- flower center -->
+    <circle cx="0" cy="0" r="52" fill="#FDC700"/>
+  </g>
+</svg>

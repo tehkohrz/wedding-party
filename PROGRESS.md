@@ -36,14 +36,41 @@ data-driven seat overlay on top. Path A does not block Path B.
 
 ## Milestone 5 — Admin
 - [x] Session 15 — Admin PIN gate + dashboard  *(2026-04-28 — /admin route, optional PIN gate (NEXT_PUBLIC toggle), live stats + bride/groom split, name filter + All/Arrived/Pending tabs, manual mark/unmark override, "Attendance" entry link)*
-- [ ] Session 16 — Export JSON + reset
+- [x] Session 16 — Export JSON + restore + reset  *(2026-04-28 — Blob download backup, Zod-validated restore from file, transaction replace, dialog confirms; fixed missing --popover/--card tokens)*
 
 ## Milestone 6 — PWA & polish
-- [ ] Session 17 — PWA shell with Serwist
+- [x] Session 17 — PWA shell (offline + installable)  *(2026-04-28 — manifest, generated placeholder icons (pnpm icons), hand-written runtime-cache service worker + registrar, Apple/kiosk viewport meta, README install docs. Chose hand-rolled SW over Serwist for Next16/Turbopack robustness.)*
 - [ ] Session 18 — Visual polish
 - [ ] Session 19 — Real data + dry run
 
 ---
+
+## Art & asset tasks (before the app is "done")
+
+Everything visual currently uses a placeholder. Swap these before the event:
+
+- [ ] **App icon** — replace `assets/icon-source.svg` (keep 512×512 square) with
+      real artwork, then run `pnpm icons` to regenerate all PNG sizes in
+      `public/icons/`. Also update the two brand colors if the art changes:
+      `background_color`/`theme_color` in `public/manifest.webmanifest`, the
+      `themeColor` in `app/layout.tsx`, and the `#1FA6EB` background in
+      `scripts/generate-icons.mjs` (maskable padding).
+- [ ] **Couple photo** — drop a real photo into `public/` (e.g. `couple.jpg`)
+      and wire it into `<PhotoSide>` in `app/page.tsx` (instructions are in the
+      comment there). Currently a gradient placeholder.
+- [ ] **Welcome flourish** — the top-left corner uses a Lucide `Flower2` icon
+      as a placeholder (`app/page.tsx`). Swap for a custom floral SVG if wanted.
+- [ ] **Final theme/palette** — bride still deciding between bride-1 / bride-2 /
+      garden-electric (see `app/globals.css` @import line). Lock before the day.
+- [ ] **(Optional) Figma venue SVG** — Path B in Milestone 4: a drawn venue
+      background behind the schematic seat map. Only if the schematic isn't
+      enough. See the "Deferred — Path B" note in Milestone 4.
+- [ ] **(Optional) Fraunces "J" glyph** — the display font's capital J has a big
+      descender that looked odd at hero size; parked. Swap the display font in
+      `app/layout.tsx` if it bothers you (Playfair Display / Cormorant / DM Serif
+      Display are drop-in candidates).
+- [ ] **Favicon** — currently the default Next.js favicon (`app/favicon.ico`).
+      Replace with something on-brand.
 
 ## Future considerations (not yet scheduled)
 
