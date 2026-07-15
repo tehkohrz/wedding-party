@@ -1,21 +1,26 @@
 /**
- * Group helpers — derive group membership from the guest list.
+ * SEATING-group helpers for the day-of check-in app — who sits and arrives
+ * together. (RSVP groups — who responds together — are a separate, smaller
+ * grouping handled by the RSVP flow via the database.)
  *
  * Groups aren't a separate lookup at runtime: a guest belongs to a group
- * iff their `group_id` matches. These helpers do that filtering in one
- * place so screens don't each reimplement it.
+ * iff their `seating_group_id` matches. These helpers do that filtering in
+ * one place so screens don't each reimplement it.
  */
 import { guests } from "@/lib/data";
 import type { Guest } from "@/lib/schema";
 
 /**
- * Every guest in the same group as `guest`, including `guest` itself.
- * A solo guest (no group_id) returns just [guest].
+ * Every guest in the same SEATING group as `guest` (who sits/arrives
+ * together — the day-of check-in unit), including `guest` itself.
+ * A guest without a seating group returns just [guest].
  * Order follows the guest list (CSV order).
  */
 export function getGroupMembers(guest: Guest): Guest[] {
-  if (!guest.group_id) return [guest];
-  return guests.filter((g) => g.group_id === guest.group_id);
+  if (!guest.seating_group_id) return [guest];
+  return guests.filter(
+    (g) => g.seating_group_id === guest.seating_group_id
+  );
 }
 
 /**

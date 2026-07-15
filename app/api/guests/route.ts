@@ -12,7 +12,7 @@ export async function GET() {
   const { data, error } = await db()
     .from("guests")
     .select(
-      "id, name, search_aliases, side, group_id, row_num, section, seat"
+      "id, name, search_aliases, side, seating_group_id, row_num, section, seat"
     )
     .order("id");
 

@@ -37,13 +37,13 @@ export async function GET(
   const groupId = slugRow.data.group_id as string;
 
   const [groupRes, membersRes] = await Promise.all([
-    client.from("groups").select("id, label").eq("id", groupId).single(),
+    client.from("rsvp_groups").select("id, label").eq("id", groupId).single(),
     client
       .from("guests")
       .select(
         "id, name, side, attending, food_choice, dietary_comment, after_party, responded_at"
       )
-      .eq("group_id", groupId)
+      .eq("rsvp_group_id", groupId)
       .order("id"),
   ]);
 

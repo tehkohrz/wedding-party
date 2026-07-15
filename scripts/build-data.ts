@@ -16,7 +16,7 @@ import {
   LayoutSectionSchema,
   type LayoutSection,
 } from "../lib/schema";
-import { deriveGroups } from "./derive-groups";
+import { deriveSeatingGroups } from "./derive-groups";
 
 const ROOT = process.cwd();
 const DATA_DIR = resolve(ROOT, "data");
@@ -57,10 +57,10 @@ console.log("Building data...");
 const guests = parseCsv("guests.csv", GuestSchema);
 const layout = parseCsv("layout.csv", LayoutSectionSchema);
 
-// Groups are DERIVED from the guest list's group_id column (there is no
-// groups.csv) — every reference resolves by construction. Labels are
+// The check-in app cares about SEATING groups (who sits/arrives together) —
+// derived from the guest list's seating_group_id column. Labels are
 // auto-generated; see scripts/derive-groups.ts.
-const groups = deriveGroups(guests);
+const groups = deriveSeatingGroups(guests);
 
 // ---------------------------------------------------------------------------
 // 2) Cross-reference validation — catches data integrity issues that no

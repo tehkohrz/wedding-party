@@ -15,6 +15,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 // ─── Row types (mirror supabase/schema.sql) ──────────────────────────────────
 
+/** Shape shared by rsvp_groups and seating_groups rows. */
 export interface DbGroup {
   id: string;
   label: string;
@@ -31,7 +32,8 @@ export interface DbGuest {
   name: string;
   search_aliases: string; // semicolon-separated
   side: "bride" | "groom";
-  group_id: string | null;
+  rsvp_group_id: string | null;
+  seating_group_id: string | null;
   is_kid: boolean;
   row_num: number | null;
   section: string | null;

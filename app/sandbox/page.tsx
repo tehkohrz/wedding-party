@@ -193,8 +193,8 @@ export default function SandboxPage() {
                   {guests.length} guests
                 </CardTitle>
                 <CardDescription>
-                  {guests.filter((g) => g.group_id).length} grouped ·{" "}
-                  {guests.filter((g) => !g.group_id).length} solo
+                  {guests.filter((g) => g.seating_group_id).length} grouped ·{" "}
+                  {guests.filter((g) => !g.seating_group_id).length} solo
                 </CardDescription>
               </CardHeader>
               <CardContent className="font-sans text-sm space-y-1">

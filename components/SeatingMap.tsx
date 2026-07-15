@@ -309,7 +309,9 @@ function SeatInfoCard({
       </div>
     );
   }
-  const group = guest.group_id ? GROUP_BY_ID.get(guest.group_id) : null;
+  const group = guest.seating_group_id
+    ? GROUP_BY_ID.get(guest.seating_group_id)
+    : null;
   const isArrived = arrivedIds.has(guest.id);
   return (
     <div className="space-y-1 min-w-[10rem]">

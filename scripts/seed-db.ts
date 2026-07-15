@@ -28,7 +28,11 @@ import Papa from "papaparse";
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
 import { GuestSchema } from "../lib/schema";
-import { deriveGroups, groupIdOf } from "./derive-groups";
+import {
+  deriveRsvpGroups,
+  deriveSeatingGroups,
+  rsvpGroupIdOf,
+} from "./derive-groups";
 
 const ROOT = process.cwd();
 
@@ -101,11 +105,13 @@ function slugify(name: string): string {
 async function main() {
   const guests = parseCsv("guests.csv", GuestSchema);
 
-  // Groups are derived from the guest list itself — every group_id resolves
-  // by construction, and solo guests get personal SOLO_<id> groups.
-  const groupRows = deriveGroups(guests);
+  // Both group kinds are derived from the guest list itself (see
+  // scripts/derive-groups.ts): rsvp groups (who responds together; solo
+  // guests get SOLO_<id>) and seating groups (who sits/arrives together).
+  const rsvpGroupRows = deriveRsvpGroups(guests);
+  const seatingGroupRows = deriveSeatingGroups(guests);
 
-  // One slug per guest, deduped, resolving to their (possibly solo) group.
+  // One slug per guest, deduped, resolving to their RSVP group.
   // guest_id records whose name the slug is — used by the landing search to
   // route a found guest to their own link.
   const seen = new Map<string, number>();
@@ -115,7 +121,7 @@ async function main() {
     seen.set(base, n);
     return {
       slug: n === 1 ? base : `${base}-${n}`,
-      group_id: groupIdOf(g),
+      group_id: rsvpGroupIdOf(g),
       guest_id: g.id,
     };
   });
@@ -126,7 +132,8 @@ async function main() {
     name: g.name,
     search_aliases: g.search_aliases.join(";"),
     side: g.side,
-    group_id: groupIdOf(g),
+    rsvp_group_id: rsvpGroupIdOf(g),
+    seating_group_id: g.seating_group_id,
     is_kid: g.is_kid,
     row_num: g.row ?? null,
     section: g.section,
@@ -135,17 +142,20 @@ async function main() {
 
   console.log("Seeding Supabase...");
 
-  const up1 = await supabase.from("groups").upsert(groupRows);
-  if (up1.error) fail("groups", up1.error.message);
+  const up1 = await supabase.from("rsvp_groups").upsert(rsvpGroupRows);
+  if (up1.error) fail("rsvp_groups", up1.error.message);
 
-  const up2 = await supabase.from("guests").upsert(guestRows);
-  if (up2.error) fail("guests", up2.error.message);
+  const up2 = await supabase.from("seating_groups").upsert(seatingGroupRows);
+  if (up2.error) fail("seating_groups", up2.error.message);
 
-  const up3 = await supabase.from("rsvp_slugs").upsert(slugRows);
-  if (up3.error) fail("rsvp_slugs", up3.error.message);
+  const up3 = await supabase.from("guests").upsert(guestRows);
+  if (up3.error) fail("guests", up3.error.message);
+
+  const up4 = await supabase.from("rsvp_slugs").upsert(slugRows);
+  if (up4.error) fail("rsvp_slugs", up4.error.message);
 
   console.log(
-    `✓ Seeded ${groupRows.length} groups, ${guestRows.length} guests, ${slugRows.length} slugs.`
+    `✓ Seeded ${rsvpGroupRows.length} rsvp groups, ${seatingGroupRows.length} seating groups, ${guestRows.length} guests, ${slugRows.length} slugs.`
   );
   console.log("\nPersonal RSVP links:");
   for (const s of slugRows) console.log(`  /r/${s.slug}`);

@@ -34,7 +34,18 @@ export const GuestSchema = z.object({
       .filter(Boolean)
   ),
   side: SideSchema,
-  group_id: nullableString,
+  /**
+   * RSVP group — who RESPONDS together (a couple / household / invite unit).
+   * Personal links resolve to this group; one member answers for all of it.
+   * Empty = solo (the seed creates a personal group).
+   */
+  rsvp_group_id: nullableString,
+  /**
+   * Seating group — who SITS and ARRIVES together (the table / friend
+   * circle). Drives the day-of group check-in and the seat-map name boxes.
+   * Usually bigger than the RSVP group. Empty = checks in alone.
+   */
+  seating_group_id: nullableString,
   /**
    * Kid flag — carried to the database so admin food totals can separate
    * kids' meals for the caterer. CSV cell: "true"/"false" (empty = false).
