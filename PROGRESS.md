@@ -58,8 +58,7 @@ single atomic submit with sessionStorage draft.
 - [x] Stage 2 — Attendance step + decline path  *(2026-07 — RsvpFlow single-route stepper w/ AnimatePresence, StepAttendance yes/no chips (reverse-bouquet accents), decline path, rsvp/seating group split (rsvp_groups + seating_groups tables), configurable photo panel width)*
 - [x] Stage 3 — Menu + per-attendee food choices + dietary comments  *(2026-07 — MENU const (2 mains, images optional), StepMenu with per-attending selectors + dietary comments, kids note)*
 - [x] Stage 4 — After-party, confirm, atomic submit, edit-until-deadline  *(2026-07 — StepAfterParty per-attendee toggles, SummaryList + StepConfirm single POST (Zod-validated, group-scoped, deadline-enforced), decline path submits too, StepThanks with Edit-until-deadline, sessionStorage draft persistence, confetti on submit)*
-- [ ] Stage 5 — Admin v2: server-side PIN, RSVP overview tab, guest CRUD,
-      link export CSV
+- [x] Stage 5 — Admin v2  *(2026-07 — server-side PIN (ADMIN_PIN + httpOnly cookie via /api/admin/login; NEXT_PUBLIC names still work as fallback), tabbed admin (RSVP overview with food/kids/after-party totals + per-invitation table · Attendance (still local-Dexie until Stage 6) · Guest list editor with seat assignment + RSVP overrides), links CSV export. E2E-tested: login 401/200, overview live-updates on submit, foreign-guest submit rejected, PATCH works.)*
 - [ ] Stage 6 — Day-of check-in on the database (retire Dexie)
 - [ ] Stage 7 — Hardening + full dry run
 

@@ -62,9 +62,8 @@ Useful scripts:
   field tagged `[input]`. Find them all: `grep -rn "\[input\]" lib/content.ts`.
 - **Theme / colors** — one `@import` line at the top of `app/globals.css`
   selects the active theme file from `themes/`.
-- **Admin PIN** — `.env.local` (`NEXT_PUBLIC_ADMIN_PIN`, and
-  `NEXT_PUBLIC_ADMIN_PIN_ENABLED=true|false` to require it). Restart the dev
-  server after changing — `NEXT_PUBLIC_*` vars are baked in at build time.
+- **Admin PIN** — `.env.local` (`ADMIN_PIN`, and `ADMIN_PIN_ENABLED=true|false`
+  to require it). Verified server-side; restart the dev server after changing.
 
 ---
 
@@ -84,8 +83,8 @@ localhost.
    Environment Variables) — `.env.local` is NOT committed, so add:
    - `SUPABASE_URL` = your project URL
    - `SUPABASE_SECRET_KEY` = the secret key (`sb_secret_…`)
-   - `NEXT_PUBLIC_ADMIN_PIN_ENABLED` = `true` (or `false` to skip the PIN)
-   - `NEXT_PUBLIC_ADMIN_PIN` = your 4-digit code (e.g. `0000`)
+   - `ADMIN_PIN_ENABLED` = `true` (or `false` to skip the PIN)
+   - `ADMIN_PIN` = your admin code (server-side secret)
    Then redeploy so the vars take effect.
 4. Vercel gives you an HTTPS URL, e.g. `https://sitwhereah.vercel.app`.
 

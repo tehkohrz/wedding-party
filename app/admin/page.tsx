@@ -1,19 +1,22 @@
-// Admin dashboard — reception-desk control panel.
+// Admin — reception-desk & planning control panel.
 //
-// NOT in WIZARD_PATHS: no slide transition, no idle-reset, no Back/Home
-// buttons. Reached by typing /admin directly; not linked from the guest UI.
+// Tabbed: RSVP overview (response progress, food totals for the caterer,
+// per-invitation table) · Attendance (day-of dashboard, still local-Dexie
+// until Stage 6) · Guest list (database editor + links CSV export).
 //
-// The AdminPinGate wraps the dashboard: it renders the PIN form until the
-// correct code is entered (or renders straight through if the gate is
-// disabled via NEXT_PUBLIC_ADMIN_PIN_ENABLED).
+// The gate is now SERVER-verified: /api/admin/login checks ADMIN_PIN
+// (a real secret — not NEXT_PUBLIC) and sets an httpOnly session cookie
+// that every /api/admin/* route requires.
+//
+// NOT in WIZARD_PATHS: no slide transition, no idle-reset.
 
-import { AdminPinGate } from "@/components/AdminPinGate";
-import { AdminDashboard } from "@/components/AdminDashboard";
+import { AdminGate } from "@/components/admin/AdminGate";
+import { AdminShell } from "@/components/admin/AdminShell";
 
 export default function AdminPage() {
   return (
-    <AdminPinGate>
-      <AdminDashboard />
-    </AdminPinGate>
+    <AdminGate>
+      <AdminShell />
+    </AdminGate>
   );
 }
