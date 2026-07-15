@@ -143,6 +143,26 @@ export function GuestsTab() {
 
       <div className="flex-1 overflow-y-auto px-6 py-3">
         <div className="max-w-5xl mx-auto space-y-1.5">
+          {/* Column headers — mirrors the row grid; hidden on small screens
+              where the grid collapses to two columns and stops aligning. */}
+          <div
+            className="
+              hidden sm:grid items-end gap-2 px-3 pb-1
+              sm:grid-cols-[2.5rem_1fr_5.5rem_6rem_6rem_4rem_9rem_5.5rem]
+              font-sans text-[10px] uppercase tracking-wider text-muted-foreground
+              sticky top-0 bg-background z-10
+            "
+          >
+            <span>#</span>
+            <span>Name</span>
+            <span>Side</span>
+            <span>RSVP grp</span>
+            <span>Seat grp</span>
+            <span>Kid</span>
+            <span>Row · Sec · Seat</span>
+            <span className="text-right">RSVP · Save</span>
+          </div>
+
           {visible.map((g) => {
             const e = edits[g.id] ?? {};
             const merged = { ...g, ...e };
