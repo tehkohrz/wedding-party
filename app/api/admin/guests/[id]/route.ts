@@ -32,6 +32,9 @@ const PatchSchema = z
     food_choice: z.enum(["A", "B"]).nullable(),
     dietary_comment: z.string().trim().max(500).nullable(),
     after_party: z.boolean().nullable(),
+    // Set when the admin records a response on a guest's behalf; nulled
+    // when the admin resets a response entirely.
+    responded_at: z.string().nullable(),
   })
   .partial()
   .refine((obj) => Object.keys(obj).length > 0, { message: "Empty patch" });
