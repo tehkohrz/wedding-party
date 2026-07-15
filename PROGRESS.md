@@ -53,11 +53,8 @@ name-slug personal links (`/r/john-tan`, one per guest, resolving to the
 group); RSVP editable until deadline; seats assigned after RSVP closes;
 single atomic submit with sessionStorage draft.
 
-- [ ] Stage 0 — Foundations: schema.sql, seed-db script (name slugs), lib/db,
-      first API routes, check-in moved to /checkin/*, RSVP placeholder at /,
-      deploy to Vercel  *(built; awaiting user's Supabase project + deploy)*
-- [ ] Stage 1 — RSVP entry: photo slideshow, landing (event details + name
-      search), /r/[slug] page
+- [x] Stage 0 — Foundations  *(2026-07 — schema.sql, seed-db (name slugs, groups derived from guests.csv — no groups.csv), lib/db (SUPABASE_SECRET_KEY), /api/guests + /api/rsvp/[slug], check-in moved to /checkin/*, real 93-guest list imported with is_kid, Node 22 via .nvmrc. Vercel deploy still pending.)*
+- [x] Stage 1 — RSVP entry  *(2026-07 — PhotoSlideshow (public/photos/ + RSVP_COPY.photos), landing with DB-backed name search → /r/[slug], personal page greets link guest, /api/rsvp-directory, EventCountdown under the date. Seeded + smoke-tested live.)*
 - [ ] Stage 2 — Attendance step + decline path (RSVP stepper, progress dots)
 - [ ] Stage 3 — Menu + per-attendee food choices + dietary comments
 - [ ] Stage 4 — After-party, summary/confirm, atomic submit, edit-until-deadline

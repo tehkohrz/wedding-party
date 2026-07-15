@@ -11,7 +11,8 @@
     "seed:db": "tsx scripts/seed-db.ts",
     "icons": "node scripts/generate-icons.mjs",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "photos": "node scripts/optimize-photos.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.5",

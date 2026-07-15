@@ -81,10 +81,60 @@ export const RSVP_COPY = {
 
   // [input] Photo slideshow images, in order. Drop files into public/photos/
   //         and list them here. Empty list = soft gradient placeholder.
-  photos: [] as string[],
+  photos: ["/photos/one.jpg", "/photos/two.jpg", "/photos/three.jpg", "/photos/four.jpg", "/photos/five.jpg"] as string[],
 
   // [input] Seconds each slideshow photo is shown before crossfading.
   slideshowIntervalSeconds: 6,
+
+  // [input] Width of the photo panel in landscape/desktop, as a percentage
+  //         of the page (the content side gets the rest). 60–70 recommended;
+  //         has no effect on portrait phones (photo becomes a top banner).
+  photoPanelWidthPercent: 65,
+
+  // [input] Height of the photo banner on portrait phones (vh = % of the
+  //         screen height).
+  photoBannerHeightVh: 28,
+};
+
+export const RSVP_STEPS_COPY = {
+  // [input] Labels for the progress dots across the top of the RSVP flow.
+  stepLabels: ["Your party", "Menu", "After-party", "Confirm"],
+
+  // ── Step: attendance ──
+  // [input] Heading on the attendance step.
+  attendanceHeading: "Will you be joining us?",
+
+  // [input] Instruction under the heading.
+  attendanceInstruction:
+    "Let us know for each person — tap an answer for everyone below.",
+
+  // [input] The "yes" choice on each member row.
+  attendingLabel: "Joyfully attending",
+
+  // [input] The "no" choice on each member row.
+  decliningLabel: "Regretfully, decline",
+
+  // [input] Continue button (enabled once everyone has an answer).
+  continueLabel: "Continue",
+
+  // ── Decline path (everyone said no) ──
+  // [input] Heading on the decline confirmation.
+  declineHeading: "We'll miss you!",
+
+  // [input] Body of the decline confirmation.
+  declineBody:
+    "Just to confirm — no one from your party can make it? We completely understand, and we'd love to catch up another time.",
+
+  // [input] Button that confirms the whole-party decline.
+  declineConfirmLabel: "Confirm — we can't make it",
+
+  // [input] Button that returns to the attendance step.
+  declineBackLabel: "Go back",
+
+  // [input] Thank-you shown after a confirmed decline.
+  declinedThanksHeading: "Thank you for letting us know",
+  declinedThanksBody:
+    "We'll miss celebrating with you — hope to see you soon after the big day! 💛",
 };
 
 export const WELCOME_COPY = {

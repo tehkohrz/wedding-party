@@ -19,8 +19,9 @@ import { EventCountdown } from "@/components/EventCountdown";
 export default function RsvpLandingPage() {
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col landscape:flex-row">
-      {/* Photo side — slideshow (gradient placeholder until photos exist) */}
-      <PhotoSlideshow className="h-[32%] landscape:h-full landscape:w-[45%] shrink-0" />
+      {/* Photo side — slideshow. Panel width/height are [input] fields in
+          lib/content.ts (photoPanelWidthPercent / photoBannerHeightVh). */}
+      <PhotoSlideshow />
 
       {/* Content side */}
       <section className="relative flex-1 overflow-y-auto bg-background flex flex-col items-center justify-center px-6 py-8">

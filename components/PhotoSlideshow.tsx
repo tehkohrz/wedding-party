@@ -19,8 +19,33 @@ import { useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { RSVP_COPY } from "@/lib/content";
 
+/** Accept both "/photos/one.jpg" and bare "one.jpg" (auto-prefixed). */
+function normalize(src: string): string {
+  return src.startsWith("/") ? src : `/photos/${src}`;
+}
+
+/**
+ * Panel sizing lives HERE (not at the call sites) and is driven by two
+ * [input] fields in lib/content.ts:
+ *   - RSVP_COPY.photoPanelWidthPercent  (landscape/desktop width)
+ *   - RSVP_COPY.photoBannerHeightVh     (portrait-phone banner height)
+ *
+ * Tailwind's JIT can't build class names from runtime numbers, so the
+ * values flow through CSS variables: inline style sets --photo-panel-w /
+ * --photo-banner-h, and the (static, JIT-visible) arbitrary-value classes
+ * read them with var().
+ */
+const PANEL_CLASSES =
+  "relative overflow-hidden shrink-0 " +
+  "h-[var(--photo-banner-h)] landscape:h-full landscape:w-[var(--photo-panel-w)]";
+
+const PANEL_VARS = {
+  "--photo-panel-w": `${RSVP_COPY.photoPanelWidthPercent}%`,
+  "--photo-banner-h": `${RSVP_COPY.photoBannerHeightVh}vh`,
+} as React.CSSProperties;
+
 export function PhotoSlideshow({ className }: { className?: string }) {
-  const photos = RSVP_COPY.photos;
+  const photos = RSVP_COPY.photos.map(normalize);
   const reduceMotion = useReducedMotion();
   const [index, setIndex] = useState(0);
 
@@ -40,17 +65,18 @@ export function PhotoSlideshow({ className }: { className?: string }) {
     return (
       <div
         className={cn(
-          "relative overflow-hidden",
+          PANEL_CLASSES,
           "bg-gradient-to-br from-rose/30 via-peach/20 to-marigold/20",
           className
         )}
+        style={PANEL_VARS}
         aria-hidden
       />
     );
   }
 
   return (
-    <div className={cn("relative overflow-hidden", className)} aria-hidden>
+    <div className={cn(PANEL_CLASSES, className)} style={PANEL_VARS} aria-hidden>
       {photos.map((src, i) => (
         <div
           key={src}
