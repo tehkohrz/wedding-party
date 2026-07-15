@@ -13,8 +13,8 @@
  *   - all declining     → decline-confirm step (skips menu/after-party)
  */
 import { Check, X } from "lucide-react";
+import { ChoiceChip } from "./ChoiceChip";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { useRsvpStore, EMPTY_ANSWER } from "@/lib/rsvpStore";
 import { EVENT_DETAILS, RSVP_STEPS_COPY } from "@/lib/content";
 import { BOUQUET_COLORS } from "@/lib/groups";
@@ -152,53 +152,3 @@ export function StepAttendance({
   );
 }
 
-function ChoiceChip({
-  selected,
-  onSelect,
-  icon,
-  label,
-  muted = false,
-  accentColor,
-}: {
-  selected: boolean;
-  onSelect: () => void;
-  icon: React.ReactNode;
-  label: string;
-  muted?: boolean;
-  /** Bouquet token for the selected state (runtime value → inline style,
-   *  since Tailwind's JIT can't see dynamic class names). */
-  accentColor?: string;
-}) {
-  const accentStyle =
-    selected && accentColor
-      ? {
-          backgroundColor: `hsl(var(--${accentColor}) / 0.22)`,
-          borderColor: `hsl(var(--${accentColor}))`,
-        }
-      : undefined;
-
-  return (
-    <button
-      type="button"
-      role="radio"
-      aria-checked={selected}
-      onClick={onSelect}
-      style={accentStyle}
-      className={cn(
-        "flex items-center justify-center gap-1.5 rounded-pill border px-3 py-2.5",
-        "font-sans text-sm transition-colors outline-none",
-        "focus-visible:ring-2 focus-visible:ring-ring",
-        selected
-          ? muted
-            ? "bg-standby/30 border-standby font-semibold"
-            : accentColor
-              ? "font-semibold" // colors come from accentStyle
-              : "bg-arrived/15 border-arrived font-semibold"
-          : "bg-surface border-input text-muted-foreground hover:bg-muted"
-      )}
-    >
-      {icon}
-      {label}
-    </button>
-  );
-}

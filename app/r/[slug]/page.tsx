@@ -82,7 +82,7 @@ export default async function PersonalRsvpPage({
             <EventCountdown />
           </header>
 
-          <RsvpFlow group={group} members={members} />
+          <RsvpFlow slug={slug.toLowerCase()} group={group} members={members} />
 
           <div className="text-center">
             <Link

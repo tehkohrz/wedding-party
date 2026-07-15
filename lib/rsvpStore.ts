@@ -4,21 +4,25 @@
  * RSVP stepper state — the guest's in-progress (draft) response.
  *
  * Nothing here touches the database: the draft accumulates across steps and
- * is written in ONE atomic POST at the confirm step (Stage 4). This is the
- * "single atomic submit" decision from the plan — no half-responses can
- * ever poison the food totals.
+ * is written in ONE atomic POST at the confirm step. This is the "single
+ * atomic submit" decision from the plan — no half-responses can ever poison
+ * the food totals.
  *
- * Shape mirrors the wizard store used by check-in, but the RSVP flow is a
- * single route, so `step` lives here instead of in URLs. `direction` feeds
- * the internal slide transition (1 = forward, -1 = back).
+ * PERSISTENCE: the draft lives in sessionStorage (zustand persist), so an
+ * accidental tab-close / phone-lock resumes in place. sessionStorage clears
+ * when the tab closes for good — drafts don't haunt shared devices forever.
+ *
+ * PREFILL: init() seeds answers from the members' existing database values,
+ * so revisiting a responded link enters edit mode with everything filled in.
+ * If the group has already responded, the flow opens on the "thanks"
+ * (summary) view rather than step 1.
  *
  * Steps:
  *   attendance → menu → afterparty → confirm → thanks
  *        └→ decline-confirm → declined-thanks   (when everyone said no)
- *
- * (sessionStorage draft persistence arrives with Stage 4, alongside submit.)
  */
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 export type RsvpStep =
   | "attendance"
@@ -31,9 +35,9 @@ export type RsvpStep =
 
 export interface MemberAnswer {
   attending: boolean | null; // null = not answered yet
-  food: "A" | "B" | null; // Stage 3
-  comment: string; // Stage 3 (dietary)
-  afterParty: boolean | null; // Stage 4
+  food: "A" | "B" | null;
+  comment: string;
+  afterParty: boolean | null;
 }
 
 export const EMPTY_ANSWER: MemberAnswer = {
@@ -43,64 +47,110 @@ export const EMPTY_ANSWER: MemberAnswer = {
   afterParty: null,
 };
 
+/** The subset of member fields init() needs (RsvpMember satisfies this). */
+export interface InitMember {
+  id: number;
+  attending: boolean | null;
+  food_choice: "A" | "B" | null;
+  dietary_comment: string | null;
+  after_party: boolean | null;
+  responded_at: string | null;
+}
+
 interface RsvpState {
-  /** Which group this draft belongs to — guards against stale state when a
-   *  different /r/[slug] page mounts (e.g. someone lost their phone and a
-   *  second guest uses the same browser). */
+  /** Guards against stale drafts when a different /r/[slug] page mounts. */
   groupId: string | null;
   step: RsvpStep;
   direction: 1 | -1;
   answers: Record<number, MemberAnswer>;
+  /** True once this browser submitted (or the DB already had a response). */
+  submitted: boolean;
 
-  /** (Re)initialize for a group. No-op if already initialized for it, so
-   *  back/forward navigation doesn't wipe a draft in progress. */
-  init: (groupId: string, memberIds: number[]) => void;
+  init: (groupId: string, members: InitMember[]) => void;
   setAttending: (guestId: number, attending: boolean) => void;
   setFood: (guestId: number, food: "A" | "B") => void;
   setComment: (guestId: number, comment: string) => void;
+  setAfterParty: (guestId: number, going: boolean) => void;
+  markSubmitted: () => void;
   goTo: (step: RsvpStep, direction?: 1 | -1) => void;
   reset: () => void;
 }
 
-export const useRsvpStore = create<RsvpState>((set, get) => ({
-  groupId: null,
-  step: "attendance",
-  direction: 1,
-  answers: {},
+function updateAnswer(
+  s: RsvpState,
+  guestId: number,
+  patch: Partial<MemberAnswer>
+) {
+  return {
+    answers: {
+      ...s.answers,
+      [guestId]: { ...(s.answers[guestId] ?? EMPTY_ANSWER), ...patch },
+    },
+  };
+}
 
-  init: (groupId, memberIds) => {
-    if (get().groupId === groupId) return;
-    const answers: Record<number, MemberAnswer> = {};
-    for (const id of memberIds) answers[id] = { ...EMPTY_ANSWER };
-    set({ groupId, step: "attendance", direction: 1, answers });
-  },
+export const useRsvpStore = create<RsvpState>()(
+  persist(
+    (set, get) => ({
+      groupId: null,
+      step: "attendance",
+      direction: 1,
+      answers: {},
+      submitted: false,
 
-  setAttending: (guestId, attending) =>
-    set((s) => ({
-      answers: {
-        ...s.answers,
-        [guestId]: { ...(s.answers[guestId] ?? EMPTY_ANSWER), attending },
+      init: (groupId, members) => {
+        // Same group → a draft (possibly rehydrated from sessionStorage)
+        // is in progress; leave it alone.
+        if (get().groupId === groupId) return;
+
+        const answers: Record<number, MemberAnswer> = {};
+        for (const m of members) {
+          answers[m.id] = {
+            attending: m.attending,
+            food: m.food_choice,
+            comment: m.dietary_comment ?? "",
+            afterParty: m.after_party,
+          };
+        }
+        const responded = members.some((m) => m.responded_at !== null);
+        const allDeclined =
+          responded && members.every((m) => m.attending === false);
+        set({
+          groupId,
+          answers,
+          submitted: responded,
+          direction: 1,
+          // Responded groups open on their summary (or decline note),
+          // not back at step 1.
+          step: responded
+            ? allDeclined
+              ? "declined-thanks"
+              : "thanks"
+            : "attendance",
+        });
       },
-    })),
 
-  setFood: (guestId, food) =>
-    set((s) => ({
-      answers: {
-        ...s.answers,
-        [guestId]: { ...(s.answers[guestId] ?? EMPTY_ANSWER), food },
-      },
-    })),
+      setAttending: (id, attending) =>
+        set((s) => updateAnswer(s, id, { attending })),
+      setFood: (id, food) => set((s) => updateAnswer(s, id, { food })),
+      setComment: (id, comment) => set((s) => updateAnswer(s, id, { comment })),
+      setAfterParty: (id, going) =>
+        set((s) => updateAnswer(s, id, { afterParty: going })),
 
-  setComment: (guestId, comment) =>
-    set((s) => ({
-      answers: {
-        ...s.answers,
-        [guestId]: { ...(s.answers[guestId] ?? EMPTY_ANSWER), comment },
-      },
-    })),
-
-  goTo: (step, direction = 1) => set({ step, direction }),
-
-  reset: () =>
-    set({ groupId: null, step: "attendance", direction: 1, answers: {} }),
-}));
+      markSubmitted: () => set({ submitted: true }),
+      goTo: (step, direction = 1) => set({ step, direction }),
+      reset: () =>
+        set({
+          groupId: null,
+          step: "attendance",
+          direction: 1,
+          answers: {},
+          submitted: false,
+        }),
+    }),
+    {
+      name: "swa-rsvp-draft",
+      storage: createJSONStorage(() => sessionStorage),
+    }
+  )
+);

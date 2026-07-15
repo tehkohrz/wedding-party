@@ -136,6 +136,71 @@ export const MENU = {
   backLabel: "Back",
 };
 
+export const AFTER_PARTY = {
+  // [input] Heading on the after-party step.
+  heading: "The after-party",
+
+  // [input] Details paragraph — when/where/what. Edit freely.
+  description:
+    "Once lunch winds down, we're keeping the celebration going — drinks, music and dancing from 7pm at the hotel bar. Casual, come as you are!",
+
+  // [input] The question above the per-person toggles.
+  question: "Who's coming along?",
+
+  // [input] The yes / no choice labels.
+  yesLabel: "Count me in",
+  noLabel: "Sitting this one out",
+
+  // [input] Continue / back buttons.
+  continueLabel: "Continue",
+  backLabel: "Back",
+};
+
+export const RSVP_CONFIRM = {
+  // [input] Heading on the summary/confirm step.
+  heading: "One last look",
+
+  // [input] Instruction under the heading.
+  instruction: "Check everything's right, then send it our way.",
+
+  // [input] The submit button.
+  submitLabel: "Confirm RSVP",
+
+  // [input] Back button.
+  backLabel: "Back",
+
+  // [input] Shown if submission fails (network/server error).
+  submitError: "Something went wrong sending your RSVP — please try again.",
+
+  // [input] Labels used in the summary rows.
+  attendingBadge: "Attending",
+  decliningBadge: "Not attending",
+  afterPartyBadge: "After-party",
+
+  // ── Thank-you / responded view ──
+  // [input] Heading right after submitting.
+  thanksHeading: "Thank you! See you there 🎉",
+
+  // [input] Heading when revisiting a link that already has a response.
+  respondedHeading: "Your RSVP",
+
+  // [input] Note under the summary while editing is still open.
+  //         {deadline} is replaced with the RSVP deadline date.
+  editUntilNote: "You can update your response until {deadline}.",
+
+  // [input] The edit button on the responded view.
+  editLabel: "Edit response",
+
+  // [input] Shown instead of the edit button once the deadline has passed.
+  deadlinePassedNote:
+    "The RSVP period has closed — contact us directly if anything changes.",
+
+  // [input] Shown when someone opens an un-responded link after the deadline.
+  tooLateHeading: "The RSVP period has closed",
+  tooLateBody:
+    "We've had to lock in numbers with the venue — but do reach out to us directly and we'll see what we can do!",
+};
+
 export const RSVP_STEPS_COPY = {
   // [input] Labels for the progress dots across the top of the RSVP flow.
   stepLabels: ["Your party", "Menu", "After-party", "Confirm"],

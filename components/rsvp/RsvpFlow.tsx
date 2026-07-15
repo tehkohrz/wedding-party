@@ -6,23 +6,30 @@
  *
  * A single-route stepper (state in lib/rsvpStore, not URLs) so steps can
  * slide with proper enter+exit animations via AnimatePresence — something
- * route-per-step can't do in the App Router (Session 9 lesson). Forward =
- * slide left, back = slide right, mirroring the check-in wizard's feel.
+ * route-per-step can't do in the App Router. Forward = slide left, back =
+ * slide right, mirroring the check-in wizard's feel.
  *
- * Steps land across stages:
- *   Stage 2 (this): attendance + decline path + the shell
- *   Stage 3: menu/food     Stage 4: after-party, confirm, submit, thanks
+ * Flow: attendance → menu → afterparty → confirm →(one atomic POST)→ thanks
+ *            └→ decline-confirm → declined-thanks   (everyone said no)
+ *
+ * Responded groups open straight on the thanks/summary view (init() in the
+ * store decides); editing re-enters at step 1, prefilled. Past the RSVP
+ * deadline: responses are view-only, and un-responded links see the
+ * closed notice.
  */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useRsvpStore, type RsvpStep } from "@/lib/rsvpStore";
-import { RSVP_STEPS_COPY } from "@/lib/content";
+import { RSVP_STEPS_COPY, RSVP_CONFIRM } from "@/lib/content";
+import { rsvpDeadlinePassed } from "@/lib/rsvpDeadline";
 import { cn } from "@/lib/utils";
 import { StepAttendance } from "./StepAttendance";
 import { StepMenu } from "./StepMenu";
+import { StepAfterParty } from "./StepAfterParty";
+import { StepConfirm } from "./StepConfirm";
+import { StepThanks } from "./StepThanks";
 import { StepDeclineConfirm } from "./StepDeclineConfirm";
 import { StepDeclinedThanks } from "./StepDeclinedThanks";
-import { StepPlaceholder } from "./StepPlaceholder";
 import type { RsvpGroup, RsvpMember } from "./types";
 
 /** Which progress dot lights up for each step (null = dots hidden). */
@@ -37,24 +44,40 @@ const DOT_INDEX: Record<RsvpStep, number | null> = {
 };
 
 export function RsvpFlow({
+  slug,
   group,
   members,
 }: {
+  slug: string;
   group: RsvpGroup;
   members: RsvpMember[];
 }) {
   const reduceMotion = useReducedMotion();
   const step = useRsvpStore((s) => s.step);
   const direction = useRsvpStore((s) => s.direction);
+  const submitted = useRsvpStore((s) => s.submitted);
   const init = useRsvpStore((s) => s.init);
 
-  // Seed the draft store for this group (no-op if already in progress).
+  // True only within the visit where the POST happened — drives the
+  // "Thank you!" vs "Your RSVP" heading.
+  const [justSubmitted, setJustSubmitted] = useState(false);
+
+  // Seed / prefill the draft store for this group (no-op if in progress).
   useEffect(() => {
-    init(
-      group.id,
-      members.map((m) => m.id)
-    );
+    init(group.id, members);
   }, [group.id, members, init]);
+
+  // Deadline gate: no response on file + deadline passed → closed notice.
+  if (rsvpDeadlinePassed() && !submitted) {
+    return (
+      <div className="space-y-3 text-center py-8">
+        <h2 className="font-display text-3xl">{RSVP_CONFIRM.tooLateHeading}</h2>
+        <p className="font-sans text-sm text-muted-foreground max-w-md mx-auto">
+          {RSVP_CONFIRM.tooLateBody}
+        </p>
+      </div>
+    );
+  }
 
   const dotIndex = DOT_INDEX[step];
   const enterX = reduceMotion ? 0 : direction * 48;
@@ -63,7 +86,10 @@ export function RsvpFlow({
     <div className="w-full max-w-xl mx-auto space-y-6">
       {/* Progress dots */}
       {dotIndex !== null && (
-        <ol className="flex items-center justify-center gap-2" aria-label="RSVP steps">
+        <ol
+          className="flex items-center justify-center gap-2"
+          aria-label="RSVP steps"
+        >
           {RSVP_STEPS_COPY.stepLabels.map((label, i) => (
             <li key={label} className="flex items-center gap-2">
               <span
@@ -98,27 +124,34 @@ export function RsvpFlow({
               : { duration: 0.28, ease: [0.32, 0.72, 0, 1] }
           }
         >
-          {renderStep(step, group, members)}
+          {renderStep()}
         </motion.div>
       </AnimatePresence>
     </div>
   );
-}
 
-function renderStep(step: RsvpStep, group: RsvpGroup, members: RsvpMember[]) {
-  switch (step) {
-    case "attendance":
-      return <StepAttendance group={group} members={members} />;
-    case "menu":
-      return <StepMenu members={members} />;
-    case "decline-confirm":
-      return <StepDeclineConfirm />;
-    case "declined-thanks":
-      return <StepDeclinedThanks />;
-    // Stage 4 replaces these placeholders:
-    case "afterparty":
-    case "confirm":
-    case "thanks":
-      return <StepPlaceholder step={step} />;
+  function renderStep() {
+    switch (step) {
+      case "attendance":
+        return <StepAttendance group={group} members={members} />;
+      case "menu":
+        return <StepMenu members={members} />;
+      case "afterparty":
+        return <StepAfterParty members={members} />;
+      case "confirm":
+        return (
+          <StepConfirm
+            slug={slug}
+            members={members}
+            onSubmitted={() => setJustSubmitted(true)}
+          />
+        );
+      case "thanks":
+        return <StepThanks members={members} justSubmitted={justSubmitted} />;
+      case "decline-confirm":
+        return <StepDeclineConfirm slug={slug} members={members} />;
+      case "declined-thanks":
+        return <StepDeclinedThanks />;
+    }
   }
 }

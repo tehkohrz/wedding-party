@@ -55,9 +55,9 @@ single atomic submit with sessionStorage draft.
 
 - [x] Stage 0 — Foundations  *(2026-07 — schema.sql, seed-db (name slugs, groups derived from guests.csv — no groups.csv), lib/db (SUPABASE_SECRET_KEY), /api/guests + /api/rsvp/[slug], check-in moved to /checkin/*, real 93-guest list imported with is_kid, Node 22 via .nvmrc. Vercel deploy still pending.)*
 - [x] Stage 1 — RSVP entry  *(2026-07 — PhotoSlideshow (public/photos/ + RSVP_COPY.photos), landing with DB-backed name search → /r/[slug], personal page greets link guest, /api/rsvp-directory, EventCountdown under the date. Seeded + smoke-tested live.)*
-- [ ] Stage 2 — Attendance step + decline path (RSVP stepper, progress dots)
+- [x] Stage 2 — Attendance step + decline path  *(2026-07 — RsvpFlow single-route stepper w/ AnimatePresence, StepAttendance yes/no chips (reverse-bouquet accents), decline path, rsvp/seating group split (rsvp_groups + seating_groups tables), configurable photo panel width)*
 - [x] Stage 3 — Menu + per-attendee food choices + dietary comments  *(2026-07 — MENU const (2 mains, images optional), StepMenu with per-attending selectors + dietary comments, kids note)*
-- [ ] Stage 4 — After-party, summary/confirm, atomic submit, edit-until-deadline
+- [x] Stage 4 — After-party, confirm, atomic submit, edit-until-deadline  *(2026-07 — StepAfterParty per-attendee toggles, SummaryList + StepConfirm single POST (Zod-validated, group-scoped, deadline-enforced), decline path submits too, StepThanks with Edit-until-deadline, sessionStorage draft persistence, confetti on submit)*
 - [ ] Stage 5 — Admin v2: server-side PIN, RSVP overview tab, guest CRUD,
       link export CSV
 - [ ] Stage 6 — Day-of check-in on the database (retire Dexie)
