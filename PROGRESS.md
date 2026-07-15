@@ -40,8 +40,8 @@ data-driven seat overlay on top. Path A does not block Path B.
 
 ## Milestone 6 — PWA & polish
 - [x] Session 17 — PWA shell (offline + installable)  *(2026-04-28 — manifest, generated placeholder icons (pnpm icons), hand-written runtime-cache service worker + registrar, Apple/kiosk viewport meta, README install docs. Chose hand-rolled SW over Serwist for Next16/Turbopack robustness.)*
-- [ ] Session 18 — Visual polish
-- [ ] Session 19 — Real data + dry run
+- [x] Session 18 — Visual polish  *(2026-04-28 — confetti on check-in (4 upward emitters, slowed floaty physics, hue-normalized vivid colors), staggered entrances (equation, search results, group rows, lunch name boxes), color-circle spring pop, global button press feedback, prefers-reduced-motion throughout, larger wizard Back/Home buttons, admin Home button (far-right, labeled). Also fixed the dev service-worker caching trap: sw.js now self-destructs on localhost.)*
+- [ ] Session 19 — Real data + dry run  *(remaining: deploy to GitHub+Vercel, drop in real guest CSV, gather real assets, rehearse with a few people)*
 
 ---
 

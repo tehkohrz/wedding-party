@@ -10,6 +10,7 @@
 import Link from "next/link";
 import { COUPLE, WELCOME_COPY, LOOKUP_COPY, ADMIN_COPY } from "@/lib/content";
 import { NameSearch } from "@/components/NameSearch";
+import { WelcomeEquation } from "@/components/WelcomeEquation";
 import { ForwardLink } from "@/components/WizardShell";
 import { Flower2 } from "lucide-react";
 
@@ -106,33 +107,10 @@ function FormSide() {
       </ForwardLink>
 
       <div className="text-center space-y-6 max-w-xl">
-        {/* Names equation — five stacked lines:
-              brideName
-                  +
-              groomName
-                  =
-              unionWord
-
-            To tweak:
-              - Name size:      text-7xl on the name spans
-              - Operator size:  text-5xl on the + and = spans
-              - Operator color: text-marigold → swap for text-sky, text-rose, etc.
-              - Result style:   italic + text-lavender; remove italic for a flatter look
-        */}
+        {/* Names equation (bride + groom = unionWord), staggered entrance.
+            Sizes/colors/stagger are tweakable in components/WelcomeEquation.tsx. */}
         <header className="space-y-4">
-          <h1 className="font-display leading-tight">
-            <span className="block text-7xl">{COUPLE.brideName}</span>
-            <span className="block text-5xl font-bold text-marigold py-2">
-              +
-            </span>
-            <span className="block text-7xl">{COUPLE.groomName}</span>
-            <span className="block text-5xl font-bold text-marigold py-2">
-              =
-            </span>
-            <span className="block text-7xl italic text-lavender">
-              {COUPLE.unionWord}
-            </span>
-          </h1>
+          <WelcomeEquation />
           <p className="font-sans text-base text-muted-foreground pt-2">
             {COUPLE.weddingDate}
             {COUPLE.venue && ` · ${COUPLE.venue}`}

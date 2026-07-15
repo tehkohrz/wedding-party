@@ -9,8 +9,9 @@
  * corrections / marking someone who couldn't use the iPad).
  */
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Check } from "lucide-react";
+import { Check, House } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -76,6 +77,19 @@ export function AdminDashboard() {
                 {arrivedCount} / {total} · {pct}%
               </div>
               <AdminDataControls />
+              {/* /admin isn't a wizard route, so WizardShell doesn't render
+                  its Back/Home chrome here. Give admin its own way out —
+                  far right, with a text label so it's unmistakable. */}
+              <Button
+                variant="outline"
+                asChild
+                className="h-11 px-5 gap-2 text-base rounded-pill"
+              >
+                <Link href="/">
+                  <House className="size-5" />
+                  {ADMIN_COPY.homeLabel}
+                </Link>
+              </Button>
             </div>
           </div>
 

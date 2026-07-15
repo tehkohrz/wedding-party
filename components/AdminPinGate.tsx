@@ -17,6 +17,8 @@
  * lib/adminConfig.ts) — it deters casual taps, not determined inspection.
  */
 import { useState } from "react";
+import Link from "next/link";
+import { House } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -56,6 +58,19 @@ export function AdminPinGate({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col items-center justify-center gap-6 px-6">
+      {/* Way out if someone taps "Attendance" by mistake. Top-right to match
+          the dashboard's Home button placement. */}
+      <Button
+        variant="outline"
+        asChild
+        className="fixed top-4 right-4 z-50 h-11 px-5 gap-2 text-base rounded-pill"
+      >
+        <Link href="/">
+          <House className="size-5" />
+          {ADMIN_COPY.homeLabel}
+        </Link>
+      </Button>
+
       <div className="text-center space-y-1">
         <h1 className="font-display text-4xl">{ADMIN_COPY.pinHeading}</h1>
         <p className="font-sans text-sm text-muted-foreground">

@@ -114,6 +114,9 @@ export const ADMIN_COPY = {
   // [input] Label for the admin entry link (bottom-left of the welcome screen).
   entryLabel: "Attendance",
 
+  // [input] Label on the button that leaves admin and returns to the welcome screen.
+  homeLabel: "Home",
+
   // [input] Data-control button labels in the admin header.
   exportLabel: "Export",
   restoreLabel: "Restore",

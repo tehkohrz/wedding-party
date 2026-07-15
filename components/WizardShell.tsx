@@ -55,26 +55,26 @@ export function WizardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {/* Floating controls — only inside the wizard, not on welcome. */}
+      {/* Floating controls — only inside the wizard, not on welcome.
+          Large circular targets (56px) with a solid surface + border so they
+          stay legible over the seat map. Sized for comfortable iPad taps. */}
       {inWizard && !onHome && (
         <div className="fixed top-4 inset-x-4 flex justify-between z-50 pointer-events-none">
           <Button
-            variant="ghost"
-            size="icon-lg"
+            variant="outline"
             onClick={goBack}
-            className="pointer-events-auto"
+            className="pointer-events-auto size-14 rounded-full bg-surface shadow-sm"
             aria-label="Back"
           >
-            <ArrowLeft />
+            <ArrowLeft className="size-6" />
           </Button>
           <Button
-            variant="ghost"
-            size="icon-lg"
+            variant="outline"
             onClick={goHome}
-            className="pointer-events-auto"
+            className="pointer-events-auto size-14 rounded-full bg-surface shadow-sm"
             aria-label="Home"
           >
-            <House />
+            <House className="size-6" />
           </Button>
         </div>
       )}

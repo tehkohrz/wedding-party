@@ -13,6 +13,7 @@
  */
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, useReducedMotion } from "motion/react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useGuestSearch } from "@/hooks/useGuestSearch";
@@ -32,6 +33,7 @@ export function NameSearch() {
 
   const [query, setQuery] = useState("");
   const matches = useGuestSearch(query);
+  const reduceMotion = useReducedMotion();
 
   async function handleSelect(guest: Guest) {
     setCurrentGuest(guest);
@@ -69,29 +71,41 @@ export function NameSearch() {
 
       {showResults && (
         <div className="space-y-2" role="listbox">
-          {matches.map((g) => (
-            <Card
+          {/* Results cascade in — each card 50ms after the last. Reduced
+              motion: rendered instantly with no offset. */}
+          {matches.map((g, i) => (
+            <motion.div
               key={g.id}
-              role="option"
-              tabIndex={0}
-              onClick={() => handleSelect(g)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  handleSelect(g);
-                }
-              }}
-              className="
-                cursor-pointer
-                px-5 py-3
-                flex items-center
-                hover:bg-muted active:bg-muted/70
-                focus-visible:ring-2 focus-visible:ring-ring
-                transition
-              "
+              initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={
+                reduceMotion
+                  ? { duration: 0 }
+                  : { duration: 0.22, delay: i * 0.05, ease: "easeOut" }
+              }
             >
-              <span className="font-display text-xl">{g.name}</span>
-            </Card>
+              <Card
+                role="option"
+                tabIndex={0}
+                onClick={() => handleSelect(g)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleSelect(g);
+                  }
+                }}
+                className="
+                  cursor-pointer
+                  px-5 py-3
+                  flex items-center
+                  hover:bg-muted active:bg-muted/70
+                  focus-visible:ring-2 focus-visible:ring-ring
+                  transition
+                "
+              >
+                <span className="font-display text-xl">{g.name}</span>
+              </Card>
+            </motion.div>
           ))}
 
           {showEmptyState && (

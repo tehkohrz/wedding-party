@@ -17,7 +17,7 @@
  *
  * Non-wizard routes (/sandbox, /admin, ...) render with no animation.
  */
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { usePathname } from "next/navigation";
 import { useWizardStore } from "@/lib/store";
 
@@ -30,9 +30,10 @@ export default function Template({
 }) {
   const pathname = usePathname();
   const direction = useWizardStore((s) => s.direction);
+  const reduceMotion = useReducedMotion();
 
-  // No animation outside the wizard.
-  if (!WIZARD_PATHS.has(pathname)) {
+  // No animation outside the wizard, or when the OS asks for reduced motion.
+  if (!WIZARD_PATHS.has(pathname) || reduceMotion) {
     return <>{children}</>;
   }
 

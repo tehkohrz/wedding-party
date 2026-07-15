@@ -15,6 +15,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
+import { motion, useReducedMotion } from "motion/react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -30,6 +31,7 @@ import type { Guest } from "@/lib/schema";
 
 export function GroupCheckin({ guest }: { guest: Guest }) {
   const router = useRouter();
+  const reduceMotion = useReducedMotion();
   const setDirection = useWizardStore((s) => s.setDirection);
   const setCheckedInThisRound = useWizardStore(
     (s) => s.setCheckedInThisRound
@@ -120,17 +122,25 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
           {/* Pending companions — the whole row is the switch.
               role="switch" + click/keydown make the row the single
               interactive control. */}
-          {pending.map((m) => {
+          {pending.map((m, i) => {
             const isOn = selected.has(m.id);
             // Each member's color is stable (driven by lib/groups), so
             // marking someone arrived elsewhere doesn't reshuffle colors.
             const color = colorByGuestId.get(m.id)!;
             return (
-              <div
+              <motion.div
                 key={m.id}
                 role="switch"
                 aria-checked={isOn}
                 tabIndex={0}
+                // Rows cascade in on load, 60ms apart.
+                initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={
+                  reduceMotion
+                    ? { duration: 0 }
+                    : { duration: 0.25, delay: 0.06 * (i + 1), ease: "easeOut" }
+                }
                 onClick={() => toggle(m.id)}
                 onKeyDown={(e) => {
                   if (e.key === " " || e.key === "Enter") {
@@ -155,7 +165,7 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
               >
                 <span className="font-display text-xl">{m.name}</span>
                 <ColorCircle color={color} filled={isOn} />
-              </div>
+              </motion.div>
             );
           })}
 
@@ -204,16 +214,37 @@ function ColorCircle({
   color: string;
   filled: boolean;
 }) {
+  const reduceMotion = useReducedMotion();
   return (
-    <span
+    <motion.span
       aria-hidden
       className="size-8 rounded-full border-2 shrink-0 grid place-items-center transition-colors"
       style={{
         borderColor: `hsl(var(--${color}))`,
         backgroundColor: filled ? `hsl(var(--${color}))` : "transparent",
       }}
+      // Spring "pop" whenever the filled state flips — makes tapping feel
+      // physical. `filled` in the key of animate makes it re-fire on change.
+      animate={reduceMotion ? { scale: 1 } : { scale: filled ? [1, 1.22, 1] : 1 }}
+      transition={
+        reduceMotion
+          ? { duration: 0 }
+          : { duration: 0.32, ease: "easeOut" }
+      }
     >
-      {filled && <Check className="size-4 text-surface" strokeWidth={3} />}
-    </span>
+      {filled && (
+        <motion.span
+          initial={reduceMotion ? false : { scale: 0.4, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={
+            reduceMotion
+              ? { duration: 0 }
+              : { type: "spring", stiffness: 500, damping: 22 }
+          }
+        >
+          <Check className="size-4 text-surface" strokeWidth={3} />
+        </motion.span>
+      )}
+    </motion.span>
   );
 }

@@ -10,7 +10,7 @@
  * Path B (Figma SVG background) is deferred — see PROGRESS.md.
  */
 import { useLiveQuery } from "dexie-react-hooks";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { Check } from "lucide-react";
 import {
@@ -216,6 +216,9 @@ function Seat({
   pulse: boolean;
   showInfo: boolean;
 }) {
+  // Honor the OS "reduce motion" setting — no pulsing for those users.
+  const reduceMotion = useReducedMotion();
+  const shouldPulse = pulse && !reduceMotion;
   // Visual classes/styles depending on state. Three buckets:
   //   1. no highlight   → plain muted (the venue's default)
   //   2. highlight + pending → standby (taupe) — in your group, not this round
@@ -259,12 +262,12 @@ function Seat({
       // 5-second pulse, 5 cycles of up-down. Plays once on mount per the
       // keyframes array; lands back at scale 1 when finished.
       animate={
-        pulse
+        shouldPulse
           ? { scale: [1, 1.18, 1, 1.18, 1, 1.18, 1, 1.18, 1, 1.18, 1] }
           : { scale: 1 }
       }
       transition={
-        pulse ? { duration: 5, ease: "easeInOut" } : { duration: 0 }
+        shouldPulse ? { duration: 5, ease: "easeInOut" } : { duration: 0 }
       }
       aria-label={guest ? `Seat ${number}, ${guest.name}` : `Seat ${number}`}
     >
