@@ -46,15 +46,19 @@ export default function FindPage() {
 
   // Color assignments for the viewed guest's group (current viewer first,
   // companions after). Same logic as the lunch screen — one color per
-  // person, stable across screens.
+  // person, stable across screens. Members without an assigned seat (nullable
+  // since v2 — seats are assigned after the RSVP deadline) can't be shown on
+  // the map, so they're filtered from the highlights.
   const assignments = viewing ? getMemberColorAssignments(viewing) : [];
-  const highlights: SeatHighlight[] = assignments.map(({ guest: m, color }) => ({
-    row: m.row,
-    section: m.section,
-    seat: m.seat,
-    color,
-    state: arrivedIds.has(m.id) ? "arrived" : "pending",
-  }));
+  const highlights: SeatHighlight[] = assignments
+    .filter(({ guest: m }) => m.row !== null && m.seat !== null)
+    .map(({ guest: m, color }) => ({
+      row: m.row as number,
+      section: m.section,
+      seat: m.seat as number,
+      color,
+      state: arrivedIds.has(m.id) ? ("arrived" as const) : ("pending" as const),
+    }));
 
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col">

@@ -1,14 +1,36 @@
-# SitWhereAh — Wedding Seating & Attendance
+# SitWhereAh — Wedding RSVP, Seating & Attendance
 
-A single-purpose PWA for the wedding reception desk. Guests type their name,
-check in, and see their lunch seat on a map. Runs on one iPad, works offline,
-no backend. See `CLAUDE.md` for architecture and `PROGRESS.md` for build status.
+The full wedding journey in one app:
+
+- **RSVP** (`/`) — guests respond months ahead via personal links
+  (`/r/john-tan`): attendance, food choices, after-party. Backed by Supabase.
+- **Day-of check-in** (`/checkin`) — guests sign in at the reception desk and
+  see their seat on the map. Runs on any laptop/tablet.
+- **Admin** (`/admin`) — RSVP totals, food counts, live attendance,
+  guest-list editing.
+
+See `CLAUDE.md` for architecture and `PROGRESS.md` for build status.
+
+## One-time setup: Supabase
+
+1. Create a free project at [supabase.com](https://supabase.com).
+2. Dashboard → **SQL Editor** → paste and run `supabase/schema.sql`.
+3. Dashboard → **Project Settings → API**: copy the **URL** and the
+   **service_role key** into `.env.local` (see `.env.example`).
+4. Seed the guest list from the CSVs: `pnpm seed:db`
+   (idempotent; prints every generated personal RSVP link).
+
+After seeding, the **database is the source of truth** for guests/groups —
+edit via the admin page or Supabase's table editor. The CSVs remain the
+initial authoring format only. `layout.csv` (the physical room) still uses
+the build-time pipeline.
 
 ## Local development
 
 ```bash
 pnpm install
-pnpm dev            # http://localhost:3000
+cp .env.example .env.local   # fill in Supabase values
+pnpm dev                     # http://localhost:3000
 ```
 
 `pnpm dev` auto-runs `build:data` first (regenerates `lib/data.json` from the
@@ -22,12 +44,16 @@ Useful scripts:
 | `pnpm build` | Production build (data regenerated first) |
 | `pnpm start` | Serve the production build locally |
 | `pnpm build:data` | Regenerate `lib/data.json` from `data/*.csv` |
+| `pnpm seed:db` | Seed/refresh Supabase from `data/guests.csv` + `groups.csv` |
 | `pnpm icons` | Regenerate PWA icons from `assets/icon-source.svg` |
 | `pnpm lint` | ESLint |
 
 ## Editing the data
 
-- **Guests / groups / layout** — edit the CSVs in `data/`, then `pnpm build:data`
+- **Guests / groups** — initially authored in `data/*.csv`, pushed to Supabase
+  with `pnpm seed:db`. After that the database is the source of truth (admin
+  page or Supabase table editor). Re-seeding preserves RSVP responses.
+- **Room layout** — edit `data/layout.csv`, then `pnpm build:data`
   (or just restart `pnpm dev`). Validated on build; bad data fails loudly.
 - **On-screen text** — everything guests read lives in `lib/content.ts`, each
   field tagged `[input]`. Find them all: `grep -rn "\[input\]" lib/content.ts`.
@@ -53,6 +79,8 @@ localhost.
    Vercel auto-detects Next.js and builds it.
 3. **Set environment variables** in the Vercel project settings (Settings →
    Environment Variables) — `.env.local` is NOT committed, so add:
+   - `SUPABASE_URL` = your project URL
+   - `SUPABASE_SERVICE_ROLE_KEY` = the service_role key
    - `NEXT_PUBLIC_ADMIN_PIN_ENABLED` = `true` (or `false` to skip the PIN)
    - `NEXT_PUBLIC_ADMIN_PIN` = your 4-digit code (e.g. `0000`)
    Then redeploy so the vars take effect.

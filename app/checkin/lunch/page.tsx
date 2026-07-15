@@ -67,7 +67,18 @@ export default function LunchPage() {
   //     neutral grey treatment with a visible border, so the seat reads as
   //     "in your party" but distinct from unrelated seats AND from the
   //     people actively checking in.
-  const highlights: SeatHighlight[] = assignments.map(({ guest: m, color }) => ({
+  //
+  // Seats are nullable since v2 (assigned only after the RSVP deadline) —
+  // members without a seat simply can't be shown on the map. By event day
+  // every attending guest has one, so this filter is a no-op on the day.
+  const seated = assignments.filter(
+    (
+      a
+    ): a is typeof a & { guest: { row: number; seat: number } } =>
+      a.guest.row !== null && a.guest.seat !== null
+  );
+
+  const highlights: SeatHighlight[] = seated.map(({ guest: m, color }) => ({
     row: m.row,
     section: m.section,
     seat: m.seat,
@@ -76,7 +87,7 @@ export default function LunchPage() {
   }));
 
   // Only this-round members pulse.
-  const pulseAt: SeatRef[] = assignments
+  const pulseAt: SeatRef[] = seated
     .filter(({ guest: m }) => thisRound.has(m.id))
     .map(({ guest: m }) => ({
       row: m.row,
@@ -175,7 +186,7 @@ export default function LunchPage() {
       <footer className="shrink-0 px-6 py-5">
         <div className="max-w-md mx-auto">
           <ForwardLink
-            href="/"
+            href="/checkin"
             className="flex items-center justify-center bg-primary text-primary-foreground rounded-pill h-14 font-sans font-medium text-lg hover:opacity-90 transition"
           >
             {LUNCH_COPY.doneLabel}

@@ -1,0 +1,72 @@
+/**
+ * Server-only Supabase client + database row types.
+ *
+ * SERVER ONLY: this module reads SUPABASE_SERVICE_ROLE_KEY, which bypasses
+ * RLS entirely. It must only be imported from route handlers (app/api/*) or
+ * server components — never from a "use client" file. The `import "server-only"`
+ * guard turns an accidental client import into a build error.
+ *
+ * All client-side data access goes through the /api routes; the browser
+ * never talks to Supabase directly and never sees any key.
+ */
+import "server-only";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+
+// ─── Row types (mirror supabase/schema.sql) ──────────────────────────────────
+
+export interface DbGroup {
+  id: string;
+  label: string;
+}
+
+export interface DbRsvpSlug {
+  slug: string;
+  group_id: string;
+}
+
+export interface DbGuest {
+  id: number;
+  name: string;
+  search_aliases: string; // semicolon-separated
+  side: "bride" | "groom";
+  group_id: string | null;
+  row_num: number | null;
+  section: string | null;
+  seat: number | null;
+  attending: boolean | null;
+  food_choice: "A" | "B" | null;
+  dietary_comment: string | null;
+  after_party: boolean | null;
+  responded_at: string | null; // ISO timestamptz
+}
+
+export interface DbAttendance {
+  guest_id: number;
+  arrived_at: string; // ISO timestamptz
+}
+
+// ─── Client singleton ────────────────────────────────────────────────────────
+
+let cached: SupabaseClient | null = null;
+
+/**
+ * Lazily-created singleton. Lazy so that builds without env vars (e.g. CI
+ * type-checks) don't crash at import time — only when a route actually runs.
+ */
+export function db(): SupabaseClient {
+  if (cached) return cached;
+
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    throw new Error(
+      "Missing SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY env vars. " +
+        "Copy .env.example to .env.local and fill them in (see README)."
+    );
+  }
+
+  cached = createClient(url, key, {
+    auth: { persistSession: false }, // server-side: no session storage
+  });
+  return cached;
+}

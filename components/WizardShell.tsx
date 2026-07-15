@@ -18,8 +18,20 @@ import { useIdleTimer } from "@/hooks/useIdleTimer";
 // the screen bounces back to welcome for the next person.
 const IDLE_TIMEOUT_MS = 45_000;
 
-/** Paths that participate in the wizard. /sandbox, /admin, etc. don't. */
-const WIZARD_PATHS = new Set(["/", "/group", "/lunch", "/find"]);
+/**
+ * Paths that participate in the DAY-OF CHECK-IN wizard. The RSVP flow at "/"
+ * runs its own internal stepper and doesn't use this shell; /sandbox and
+ * /admin don't either.
+ */
+const WIZARD_PATHS = new Set([
+  "/checkin",
+  "/checkin/group",
+  "/checkin/lunch",
+  "/find",
+]);
+
+/** The check-in wizard's home screen (idle timer + Home button target). */
+const CHECKIN_HOME = "/checkin";
 
 export function WizardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -28,15 +40,15 @@ export function WizardShell({ children }: { children: React.ReactNode }) {
   const setDirection = useWizardStore((s) => s.setDirection);
 
   const inWizard = WIZARD_PATHS.has(pathname);
-  const onHome = pathname === "/";
+  const onHome = pathname === CHECKIN_HOME;
 
   // Idle timer: only active inside the wizard. On idle, dump state and
-  // route back to home.
+  // route back to the check-in welcome screen.
   useIdleTimer(
     () => {
       if (!onHome && inWizard) {
         reset();
-        router.push("/");
+        router.push(CHECKIN_HOME);
       }
     },
     IDLE_TIMEOUT_MS
@@ -50,7 +62,7 @@ export function WizardShell({ children }: { children: React.ReactNode }) {
   function goHome() {
     setDirection("back");
     reset();
-    router.push("/");
+    router.push(CHECKIN_HOME);
   }
 
   return (

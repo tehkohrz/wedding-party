@@ -83,7 +83,7 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
     await markArrivedMany(ids);
     setCheckedInThisRound(ids);
     setDirection("forward");
-    router.push("/lunch");
+    router.push("/checkin/lunch");
   }
 
   const pending = others.filter((m) => !arrivedIds.has(m.id));

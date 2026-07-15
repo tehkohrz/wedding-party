@@ -45,6 +45,29 @@ data-driven seat overlay on top. Path A does not block Path B.
 
 ---
 
+# v2 — RSVP + Hosted Database
+
+Full plan: `~/.claude/plans/i-would-like-to-wiggly-brooks.md`. Key decisions:
+Supabase (DB) + Vercel (hosting); day-of check-in online-only multi-device;
+name-slug personal links (`/r/john-tan`, one per guest, resolving to the
+group); RSVP editable until deadline; seats assigned after RSVP closes;
+single atomic submit with sessionStorage draft.
+
+- [ ] Stage 0 — Foundations: schema.sql, seed-db script (name slugs), lib/db,
+      first API routes, check-in moved to /checkin/*, RSVP placeholder at /,
+      deploy to Vercel  *(built; awaiting user's Supabase project + deploy)*
+- [ ] Stage 1 — RSVP entry: photo slideshow, landing (event details + name
+      search), /r/[slug] page
+- [ ] Stage 2 — Attendance step + decline path (RSVP stepper, progress dots)
+- [ ] Stage 3 — Menu + per-attendee food choices + dietary comments
+- [ ] Stage 4 — After-party, summary/confirm, atomic submit, edit-until-deadline
+- [ ] Stage 5 — Admin v2: server-side PIN, RSVP overview tab, guest CRUD,
+      link export CSV
+- [ ] Stage 6 — Day-of check-in on the database (retire Dexie)
+- [ ] Stage 7 — Hardening + full dry run
+
+---
+
 ## Art & asset tasks (before the app is "done")
 
 Everything visual currently uses a placeholder. Swap these before the event:

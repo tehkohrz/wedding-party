@@ -87,6 +87,9 @@ function findSection(
 }
 
 for (const g of guests) {
+  // Seats are nullable during RSVP season (assigned after the deadline) —
+  // only validate guests who actually have a seat assigned.
+  if (g.row === null || g.seat === null) continue;
   if (!findSection(g.row, g.section, g.seat)) {
     fail(
       `Guest ${g.id} (${g.name}): seat row=${g.row} section=${g.section ?? "(none)"} seat=${g.seat} doesn't fall within any layout section`

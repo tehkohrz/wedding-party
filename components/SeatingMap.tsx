@@ -47,6 +47,9 @@ function seatKey(row: number, section: string | null, seat: number): string {
 
 const GUEST_BY_SEAT_KEY = new Map<string, Guest>();
 for (const g of guests) {
+  // Seats are nullable since v2 (assigned after the RSVP deadline) —
+  // unseated guests simply have no seat to be looked up from.
+  if (g.row === null || g.seat === null) continue;
   GUEST_BY_SEAT_KEY.set(seatKey(g.row, g.section, g.seat), g);
 }
 

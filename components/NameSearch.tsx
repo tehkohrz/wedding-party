@@ -39,15 +39,15 @@ export function NameSearch() {
     setCurrentGuest(guest);
     setDirection("forward");
     if (hasGroupmates(guest)) {
-      // Grouped: Confirm on /group will populate checkedInThisRound.
-      // Clear it now so /lunch never inherits a stale set from a prior round.
+      // Grouped: Confirm on the group screen populates checkedInThisRound.
+      // Clear it now so the lunch screen never inherits a stale prior round.
       setCheckedInThisRound([]);
-      router.push("/group");
+      router.push("/checkin/group");
     } else {
       // Solo: this guest is the entire round.
       await markArrived(guest.id);
       setCheckedInThisRound([guest.id]);
-      router.push("/lunch");
+      router.push("/checkin/lunch");
     }
   }
 

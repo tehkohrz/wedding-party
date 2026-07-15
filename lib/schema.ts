@@ -35,10 +35,20 @@ export const GuestSchema = z.object({
   ),
   side: SideSchema,
   group_id: nullableString,
-  /** Seat address — there is one seating (the lunch). */
-  row: z.coerce.number().int().positive(),
+  /**
+   * Seat address — one seating (the lunch). NULLABLE since v2: seats are
+   * assigned only after the RSVP deadline, so during RSVP season these
+   * cells are empty in the CSV / null in the database.
+   */
+  row: z
+    .string()
+    .transform((s) => (s.trim() === "" ? null : Number(s)))
+    .pipe(z.number().int().positive().nullable()),
   section: nullableString,
-  seat: z.coerce.number().int().positive(),
+  seat: z
+    .string()
+    .transform((s) => (s.trim() === "" ? null : Number(s)))
+    .pipe(z.number().int().positive().nullable()),
 });
 
 export const GroupSchema = z.object({

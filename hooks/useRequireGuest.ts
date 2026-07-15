@@ -27,7 +27,7 @@ export function useRequireGuest(): Guest | null {
 
   useEffect(() => {
     if (!currentGuest) {
-      router.replace("/");
+      router.replace("/checkin");
     }
   }, [currentGuest, router]);
 

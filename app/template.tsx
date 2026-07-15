@@ -21,7 +21,14 @@ import { motion, useReducedMotion } from "motion/react";
 import { usePathname } from "next/navigation";
 import { useWizardStore } from "@/lib/store";
 
-const WIZARD_PATHS = new Set(["/", "/group", "/lunch", "/find"]);
+// Day-of check-in wizard routes. The RSVP flow at "/" animates its own
+// internal stepper (AnimatePresence within one route), so it's not listed.
+const WIZARD_PATHS = new Set([
+  "/checkin",
+  "/checkin/group",
+  "/checkin/lunch",
+  "/find",
+]);
 
 export default function Template({
   children,
