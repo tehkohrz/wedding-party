@@ -56,6 +56,8 @@ interface RsvpState {
    *  back/forward navigation doesn't wipe a draft in progress. */
   init: (groupId: string, memberIds: number[]) => void;
   setAttending: (guestId: number, attending: boolean) => void;
+  setFood: (guestId: number, food: "A" | "B") => void;
+  setComment: (guestId: number, comment: string) => void;
   goTo: (step: RsvpStep, direction?: 1 | -1) => void;
   reset: () => void;
 }
@@ -78,6 +80,22 @@ export const useRsvpStore = create<RsvpState>((set, get) => ({
       answers: {
         ...s.answers,
         [guestId]: { ...(s.answers[guestId] ?? EMPTY_ANSWER), attending },
+      },
+    })),
+
+  setFood: (guestId, food) =>
+    set((s) => ({
+      answers: {
+        ...s.answers,
+        [guestId]: { ...(s.answers[guestId] ?? EMPTY_ANSWER), food },
+      },
+    })),
+
+  setComment: (guestId, comment) =>
+    set((s) => ({
+      answers: {
+        ...s.answers,
+        [guestId]: { ...(s.answers[guestId] ?? EMPTY_ANSWER), comment },
       },
     })),
 

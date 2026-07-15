@@ -96,6 +96,46 @@ export const RSVP_COPY = {
   photoBannerHeightVh: 28,
 };
 
+export const MENU = {
+  // [input] Heading on the menu step.
+  heading: "The wedding menu",
+
+  // [input] Instruction under the heading.
+  instruction: "Choose a main course for each attending guest.",
+
+  // [input] The two mains. id must stay "A"/"B" (stored in the database);
+  //         name/description/image are free. image: drop a file in
+  //         public/menu/ and reference it ("/menu/chicken.jpg"), or "" for none.
+  mains: [
+    {
+      id: "A" as const,
+      name: "Roasted Spring Chicken",
+      description:
+        "With rosemary jus, garlic mash and seasonal greens.",
+      image: "",
+    },
+    {
+      id: "B" as const,
+      name: "Pan-seared Barramundi",
+      description:
+        "With lemon beurre blanc, herbed potatoes and asparagus.",
+      image: "",
+    },
+  ],
+
+  // [input] Placeholder for the per-person comment box.
+  dietaryPlaceholder: "Allergies or dietary needs? (optional)",
+
+  // [input] Small note shown next to kids' selectors. Set "" to hide.
+  kidsNote: "Kids' portions are prepared smaller — still pick their preference.",
+
+  // [input] Continue button on the menu step.
+  continueLabel: "Continue",
+
+  // [input] Back button on the menu step.
+  backLabel: "Back",
+};
+
 export const RSVP_STEPS_COPY = {
   // [input] Labels for the progress dots across the top of the RSVP flow.
   stepLabels: ["Your party", "Menu", "After-party", "Confirm"],

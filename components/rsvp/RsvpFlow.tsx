@@ -19,6 +19,7 @@ import { useRsvpStore, type RsvpStep } from "@/lib/rsvpStore";
 import { RSVP_STEPS_COPY } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import { StepAttendance } from "./StepAttendance";
+import { StepMenu } from "./StepMenu";
 import { StepDeclineConfirm } from "./StepDeclineConfirm";
 import { StepDeclinedThanks } from "./StepDeclinedThanks";
 import { StepPlaceholder } from "./StepPlaceholder";
@@ -108,12 +109,13 @@ function renderStep(step: RsvpStep, group: RsvpGroup, members: RsvpMember[]) {
   switch (step) {
     case "attendance":
       return <StepAttendance group={group} members={members} />;
+    case "menu":
+      return <StepMenu members={members} />;
     case "decline-confirm":
       return <StepDeclineConfirm />;
     case "declined-thanks":
       return <StepDeclinedThanks />;
-    // Stages 3–4 replace these placeholders:
-    case "menu":
+    // Stage 4 replaces these placeholders:
     case "afterparty":
     case "confirm":
     case "thanks":
