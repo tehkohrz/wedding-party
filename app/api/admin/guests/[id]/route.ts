@@ -2,6 +2,13 @@
  * PATCH /api/admin/guests/[id] — edit one guest (rename, regroup, assign a
  * seat, kid flag, or override an RSVP answer). Partial body; Zod-validated.
  *
+ * Regrouping is fully supported:
+ *   - Assigning a group id that doesn't exist yet AUTO-CREATES the group
+ *     (label defaults to the guest's name — rename in Supabase's table
+ *     editor if it matters; a CSV re-seed regenerates labels properly).
+ *   - Changing rsvp_group_id RETARGETS the guest's personal slug(s), so
+ *     /r/their-name always opens their current group's RSVP.
+ *
  * Seat assignment after the RSVP deadline happens here (row_num/section/seat).
  * NOTE: seats are NOT validated against layout.csv — the admin is trusted;
  * the day-of map simply won't highlight a seat outside the layout.
@@ -51,22 +58,69 @@ export async function PATCH(
   if (!parsed.success) {
     return Response.json({ error: "Invalid patch" }, { status: 400 });
   }
+  const patch = parsed.data;
+  const client = db();
 
-  const { data, error } = await db()
+  // Auto-create groups referenced by the patch so the FK never rejects a
+  // regroup. ignoreDuplicates keeps existing labels intact; brand-new
+  // groups get the guest's name as a starter label.
+  const starterLabel = async (): Promise<string> => {
+    const g = await client
+      .from("guests")
+      .select("name")
+      .eq("id", guestId)
+      .maybeSingle();
+    return (g.data?.name as string | undefined) ?? "New group";
+  };
+  if (patch.rsvp_group_id) {
+    const up = await client
+      .from("rsvp_groups")
+      .upsert(
+        { id: patch.rsvp_group_id, label: await starterLabel() },
+        { onConflict: "id", ignoreDuplicates: true }
+      );
+    if (up.error) {
+      return Response.json({ error: "Database error" }, { status: 500 });
+    }
+  }
+  if (patch.seating_group_id) {
+    const up = await client
+      .from("seating_groups")
+      .upsert(
+        { id: patch.seating_group_id, label: await starterLabel() },
+        { onConflict: "id", ignoreDuplicates: true }
+      );
+    if (up.error) {
+      return Response.json({ error: "Database error" }, { status: 500 });
+    }
+  }
+
+  const { data, error } = await client
     .from("guests")
-    .update(parsed.data)
+    .update(patch)
     .eq("id", guestId)
     .select()
     .maybeSingle();
 
   if (error) {
-    // Most likely a foreign-key miss (unknown group id typed in the editor).
-    return Response.json(
-      { error: "Update failed — do the group ids exist?" },
-      { status: 400 }
-    );
+    return Response.json({ error: "Update failed" }, { status: 400 });
   }
   if (!data) return Response.json({ error: "Not found" }, { status: 404 });
+
+  // Keep personal links pointing at the guest's CURRENT rsvp group —
+  // without this, a regrouped guest's /r/slug would open their old group.
+  if (patch.rsvp_group_id) {
+    const slugFix = await client
+      .from("rsvp_slugs")
+      .update({ group_id: patch.rsvp_group_id })
+      .eq("guest_id", guestId);
+    if (slugFix.error) {
+      return Response.json(
+        { error: "Guest saved but link retarget failed — re-save to retry" },
+        { status: 500 }
+      );
+    }
+  }
 
   return Response.json({ guest: data });
 }
