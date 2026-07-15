@@ -1,22 +1,25 @@
 /**
- * Seed the Supabase database from data/guests.csv + data/groups.csv.
+ * Seed the Supabase database from data/guests.csv (the ONLY data file —
+ * groups are derived from the guest list's group_id column).
  *
  * Run: pnpm seed:db
  *
- * - Validates the CSVs with the same Zod schemas as the old build pipeline.
+ * - Validates the CSV with the same Zod schema as the build pipeline.
+ * - Derives groups from distinct group_ids, with auto-generated labels
+ *   ("Sonya & Chris", "Justin, Kim & party") — see scripts/derive-groups.ts.
+ *   Labels are seed defaults; rename in admin/table editor. Solo guests get
+ *   a personal SOLO_<id> group so every guest is reachable by a link.
  * - Generates a kebab-case RSVP slug per guest ("John Tan" → "john-tan"),
  *   deduping collisions ("john-tan-2"). Slugs resolve to the guest's GROUP.
- *   Solo guests (no group) get a personal group created for them
- *   (id: SOLO_<guestId>) so every guest is reachable by a slug.
  * - UPSERTS guests/groups/slugs (idempotent — safe to re-run after editing
- *   the CSVs). Existing RSVP responses on re-seeded guests are PRESERVED
- *   (only identity/seating columns are overwritten).
+ *   the CSV). Existing RSVP responses on re-seeded guests are PRESERVED
+ *   (only identity/seating columns — and group labels — are overwritten).
  *
- * The CSVs are the *initial authoring format*. After seeding, the database
+ * The CSV is the *initial authoring format*. After seeding, the database
  * is the source of truth — edit guests via the admin page (or Supabase's
  * table editor), not by re-running this against a stale CSV.
  *
- * Env: reads SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY from .env.local
+ * Env: reads SUPABASE_URL + SUPABASE_SECRET_KEY from .env.local
  * (parsed manually — standalone tsx scripts don't get Next's env loading).
  */
 import { readFileSync } from "node:fs";
@@ -24,7 +27,8 @@ import { resolve } from "node:path";
 import Papa from "papaparse";
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
-import { GuestSchema, GroupSchema } from "../lib/schema";
+import { GuestSchema } from "../lib/schema";
+import { deriveGroups, groupIdOf } from "./derive-groups";
 
 const ROOT = process.cwd();
 
@@ -46,14 +50,16 @@ function loadEnvLocal(): void {
 loadEnvLocal();
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!SUPABASE_URL || !SERVICE_KEY) {
+// SUPABASE_SECRET_KEY is canonical; old var name accepted as fallback.
+const SECRET_KEY =
+  process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!SUPABASE_URL || !SECRET_KEY) {
   console.error(
-    "✗ Missing SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY in .env.local — see README."
+    "✗ Missing SUPABASE_URL / SUPABASE_SECRET_KEY in .env.local — see README."
   );
   process.exit(1);
 }
-const supabase = createClient(SUPABASE_URL, SERVICE_KEY, {
+const supabase = createClient(SUPABASE_URL, SECRET_KEY, {
   auth: { persistSession: false },
 });
 
@@ -94,28 +100,14 @@ function slugify(name: string): string {
 
 async function main() {
   const guests = parseCsv("guests.csv", GuestSchema);
-  const groups = parseCsv("groups.csv", GroupSchema);
 
-  // Referential check (same as old pipeline).
-  const groupIds = new Set(groups.map((g) => g.id));
-  for (const g of guests) {
-    if (g.group_id && !groupIds.has(g.group_id)) {
-      console.error(`✗ Guest ${g.id} (${g.name}) references unknown group ${g.group_id}`);
-      process.exit(1);
-    }
-  }
-
-  // Solo guests get a personal group so their slug has something to resolve to.
-  const soloGroups = guests
-    .filter((g) => !g.group_id)
-    .map((g) => ({ id: `SOLO_${g.id}`, label: g.name }));
-
-  const groupRows = [
-    ...groups.map((g) => ({ id: g.id, label: g.label })),
-    ...soloGroups,
-  ];
+  // Groups are derived from the guest list itself — every group_id resolves
+  // by construction, and solo guests get personal SOLO_<id> groups.
+  const groupRows = deriveGroups(guests);
 
   // One slug per guest, deduped, resolving to their (possibly solo) group.
+  // guest_id records whose name the slug is — used by the landing search to
+  // route a found guest to their own link.
   const seen = new Map<string, number>();
   const slugRows = guests.map((g) => {
     const base = slugify(g.name) || `guest-${g.id}`;
@@ -123,7 +115,8 @@ async function main() {
     seen.set(base, n);
     return {
       slug: n === 1 ? base : `${base}-${n}`,
-      group_id: g.group_id ?? `SOLO_${g.id}`,
+      group_id: groupIdOf(g),
+      guest_id: g.id,
     };
   });
 
@@ -133,7 +126,8 @@ async function main() {
     name: g.name,
     search_aliases: g.search_aliases.join(";"),
     side: g.side,
-    group_id: g.group_id ?? `SOLO_${g.id}`,
+    group_id: groupIdOf(g),
+    is_kid: g.is_kid,
     row_num: g.row ?? null,
     section: g.section,
     seat: g.seat ?? null,

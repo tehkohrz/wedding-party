@@ -1,10 +1,11 @@
 /**
  * Server-only Supabase client + database row types.
  *
- * SERVER ONLY: this module reads SUPABASE_SERVICE_ROLE_KEY, which bypasses
- * RLS entirely. It must only be imported from route handlers (app/api/*) or
- * server components — never from a "use client" file. The `import "server-only"`
- * guard turns an accidental client import into a build error.
+ * SERVER ONLY: this module reads SUPABASE_SECRET_KEY (the sb_secret_... key;
+ * the legacy service_role JWT also works), which bypasses RLS entirely. It
+ * must only be imported from route handlers (app/api/*) or server components
+ * — never from a "use client" file. The `import "server-only"` guard turns
+ * an accidental client import into a build error.
  *
  * All client-side data access goes through the /api routes; the browser
  * never talks to Supabase directly and never sees any key.
@@ -22,6 +23,7 @@ export interface DbGroup {
 export interface DbRsvpSlug {
   slug: string;
   group_id: string;
+  guest_id: number | null;
 }
 
 export interface DbGuest {
@@ -30,6 +32,7 @@ export interface DbGuest {
   search_aliases: string; // semicolon-separated
   side: "bride" | "groom";
   group_id: string | null;
+  is_kid: boolean;
   row_num: number | null;
   section: string | null;
   seat: number | null;
@@ -57,10 +60,13 @@ export function db(): SupabaseClient {
   if (cached) return cached;
 
   const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // SUPABASE_SECRET_KEY is canonical; the old var name is accepted as a
+  // fallback so existing .env.local files keep working.
+  const key =
+    process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) {
     throw new Error(
-      "Missing SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY env vars. " +
+      "Missing SUPABASE_URL / SUPABASE_SECRET_KEY env vars. " +
         "Copy .env.example to .env.local and fill them in (see README)."
     );
   }

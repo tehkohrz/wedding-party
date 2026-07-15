@@ -27,6 +27,66 @@ export const COUPLE = {
   unionWord: "Happiness",
 };
 
+// ─── RSVP (v2) ────────────────────────────────────────────────────────────────
+
+export const EVENT_DETAILS = {
+  // [input] Event date as shown on the RSVP pages.
+  date: "Saturday, 31 October 2026",
+
+  // [input] Exact event start for the countdown (ISO 8601 with timezone).
+  //         +08:00 = Singapore time. Should match the schedule's first entry.
+  eventStartISO: "2026-10-31T10:30:00+08:00",
+
+  // [input] Shown in place of the countdown once the moment arrives.
+  countdownDoneLabel: "It's wedding day! 🎉",
+
+  // [input] Venue name.
+  venueName: "The Garden Pavilion",
+
+  // [input] Venue address line (shown under the venue name; also used for
+  //         the maps link text). Set to "" to hide.
+  venueAddress: "123 Orchard Boulevard, Singapore",
+
+  // [input] Google Maps share URL for the venue. Set to "" to hide the link.
+  mapsUrl: "",
+
+  // [input] Day-of schedule shown on the RSVP details step. Add/remove rows.
+  schedule: [
+    { time: "10:30", item: "Guests arrive" },
+    { time: "11:00", item: "Solemnization" },
+    { time: "12:00", item: "Lunch" },
+  ],
+
+  // [input] RSVP deadline (ISO date). After this day, submitted responses
+  //         become view-only and the flow shows the deadline notice.
+  rsvpDeadline: "2026-09-30",
+};
+
+export const RSVP_COPY = {
+  // [input] Small line above the couple names on the RSVP landing.
+  eyebrow: "You're invited to the wedding of",
+
+  // [input] Heading above the landing name search.
+  searchHeading: "Find your invitation",
+
+  // [input] Instruction under the search heading.
+  searchInstruction:
+    "Enter your name to find your invitation and RSVP for your party.",
+
+  // [input] Placeholder in the landing search input.
+  searchPlaceholder: "Your name...",
+
+  // [input] Shown when the search matches nobody.
+  noMatches: "We can't find that name — try another spelling, or contact us.",
+
+  // [input] Photo slideshow images, in order. Drop files into public/photos/
+  //         and list them here. Empty list = soft gradient placeholder.
+  photos: [] as string[],
+
+  // [input] Seconds each slideshow photo is shown before crossfading.
+  slideshowIntervalSeconds: 6,
+};
+
 export const WELCOME_COPY = {
   // [input] Greeting headline above the input box.
   greeting: "Welcome!",

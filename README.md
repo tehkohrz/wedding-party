@@ -15,9 +15,12 @@ See `CLAUDE.md` for architecture and `PROGRESS.md` for build status.
 
 1. Create a free project at [supabase.com](https://supabase.com).
 2. Dashboard → **SQL Editor** → paste and run `supabase/schema.sql`.
-3. Dashboard → **Project Settings → API**: copy the **URL** and the
-   **service_role key** into `.env.local` (see `.env.example`).
-4. Seed the guest list from the CSVs: `pnpm seed:db`
+3. Dashboard → **Project Settings → API keys**: copy the project **URL** and
+   the **secret key** (`sb_secret_…`; called `service_role` on older
+   dashboards) into `.env.local` (see `.env.example`). Not the
+   publishable/anon key. Skip Supabase's Next.js quickstart entirely —
+   it's for Supabase-Auth apps; this app uses server-side access only.
+4. Seed the guest list: `pnpm seed:db`
    (idempotent; prints every generated personal RSVP link).
 
 After seeding, the **database is the source of truth** for guests/groups —
@@ -44,7 +47,7 @@ Useful scripts:
 | `pnpm build` | Production build (data regenerated first) |
 | `pnpm start` | Serve the production build locally |
 | `pnpm build:data` | Regenerate `lib/data.json` from `data/*.csv` |
-| `pnpm seed:db` | Seed/refresh Supabase from `data/guests.csv` + `groups.csv` |
+| `pnpm seed:db` | Seed/refresh Supabase from `data/guests.csv` (groups auto-derived) |
 | `pnpm icons` | Regenerate PWA icons from `assets/icon-source.svg` |
 | `pnpm lint` | ESLint |
 
@@ -80,7 +83,7 @@ localhost.
 3. **Set environment variables** in the Vercel project settings (Settings →
    Environment Variables) — `.env.local` is NOT committed, so add:
    - `SUPABASE_URL` = your project URL
-   - `SUPABASE_SERVICE_ROLE_KEY` = the service_role key
+   - `SUPABASE_SECRET_KEY` = the secret key (`sb_secret_…`)
    - `NEXT_PUBLIC_ADMIN_PIN_ENABLED` = `true` (or `false` to skip the PIN)
    - `NEXT_PUBLIC_ADMIN_PIN` = your 4-digit code (e.g. `0000`)
    Then redeploy so the vars take effect.

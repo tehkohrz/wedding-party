@@ -22,8 +22,9 @@
  *   1   = matches anything
  */
 import Fuse from "fuse.js";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { guests } from "@/lib/data";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import type { Guest } from "@/lib/schema";
 
 const MAX_RESULTS = 5;
@@ -56,15 +57,4 @@ export function useGuestSearch(query: string): Guest[] {
   }, [debouncedQuery, fuse]);
 
   return matches;
-}
-
-// ─── Helper: debounced value hook ────────────────────────────────────────────
-// Returns `value` but delayed by `delay` ms. Each new `value` resets the timer.
-function useDebouncedValue<T>(value: T, delay: number): T {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const id = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(id);
-  }, [value, delay]);
-  return debounced;
 }

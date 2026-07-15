@@ -36,6 +36,14 @@ export const GuestSchema = z.object({
   side: SideSchema,
   group_id: nullableString,
   /**
+   * Kid flag — carried to the database so admin food totals can separate
+   * kids' meals for the caterer. CSV cell: "true"/"false" (empty = false).
+   */
+  is_kid: z
+    .string()
+    .optional()
+    .transform((s) => (s ?? "").trim().toLowerCase() === "true"),
+  /**
    * Seat address — one seating (the lunch). NULLABLE since v2: seats are
    * assigned only after the RSVP deadline, so during RSVP season these
    * cells are empty in the CSV / null in the database.

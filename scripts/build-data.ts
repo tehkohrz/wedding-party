@@ -13,10 +13,10 @@ import Papa from "papaparse";
 import { z } from "zod";
 import {
   GuestSchema,
-  GroupSchema,
   LayoutSectionSchema,
   type LayoutSection,
 } from "../lib/schema";
+import { deriveGroups } from "./derive-groups";
 
 const ROOT = process.cwd();
 const DATA_DIR = resolve(ROOT, "data");
@@ -55,21 +55,17 @@ function parseCsv<T>(filename: string, schema: z.ZodType<T>): T[] {
 console.log("Building data...");
 
 const guests = parseCsv("guests.csv", GuestSchema);
-const groups = parseCsv("groups.csv", GroupSchema);
 const layout = parseCsv("layout.csv", LayoutSectionSchema);
+
+// Groups are DERIVED from the guest list's group_id column (there is no
+// groups.csv) — every reference resolves by construction. Labels are
+// auto-generated; see scripts/derive-groups.ts.
+const groups = deriveGroups(guests);
 
 // ---------------------------------------------------------------------------
 // 2) Cross-reference validation — catches data integrity issues that no
 //    single-row schema can catch.
 // ---------------------------------------------------------------------------
-
-// Every guest's group_id must point to a real group.
-const groupIds = new Set(groups.map((g) => g.id));
-for (const g of guests) {
-  if (g.group_id && !groupIds.has(g.group_id)) {
-    fail(`Guest ${g.id} (${g.name}) references unknown group: ${g.group_id}`);
-  }
-}
 
 // Every guest's seat must fall within a layout section's range.
 function findSection(
