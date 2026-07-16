@@ -98,8 +98,10 @@ localhost.
 3. Scroll down, tap **Add to Home Screen**, then **Add**.
 4. The SitWhereAh icon appears on the home screen. Tap it — it opens
    fullscreen with no address bar.
-5. **Open it once while online** so the service worker caches everything.
-   After that it works with no internet.
+5. **Open it once while online** so the service worker caches the app
+   shell. Note: since attendance moved to the shared database (Stage 6),
+   check-in needs the venue WiFi — the cached shell just makes launches
+   instant and survives brief blips.
 
 ### Step 3 — Lock it down for the reception desk (optional but recommended)
 
