@@ -28,12 +28,12 @@ function FixedCourse({
   description: string;
 }) {
   return (
-    <div className="space-y-0.5">
-      <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+    <div className="space-y-1">
+      <p className="font-sans text-lg uppercase tracking-[0.25em] text-muted-foreground">
         {course}
       </p>
-      <p className="font-display text-base leading-tight">{name}</p>
-      <p className="font-sans text-xs text-muted-foreground">{description}</p>
+      <p className="font-display text-2xl leading-tight">{name}</p>
+      <p className="font-sans text-sm text-muted-foreground">{description}</p>
     </div>
   );
 }
@@ -61,46 +61,43 @@ export function StepMenu({ members }: { members: RsvpMember[] }) {
         </p>
       </div>
 
-      {/* Menu preview — the full procession: fixed courses, the mains
-          choice in the middle, then dessert. */}
-      <div className="rounded-card border border-border bg-surface px-5 py-5 space-y-5 text-center">
+      {/* Menu preview — the full procession, OPEN EDITORIAL (no containing
+          box; matches the landing details section). Fixed courses, the
+          mains choice in the middle joined by an italic "or", then dessert. */}
+      <div className="space-y-7 text-center">
         {MENU.coursesBeforeMains.map((c) => (
           <FixedCourse key={c.course} {...c} />
         ))}
 
         {/* The choice */}
-        <div className="space-y-2">
-          <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-primary">
+        <div className="space-y-3">
+          <p className="font-sans text-lg uppercase tracking-[0.25em] text-primary">
             {MENU.mainsChoiceLabel}
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {MENU.mains.map((main) => (
-              <div
-                key={main.id}
-                className="rounded-lg border border-input overflow-hidden"
-              >
-                {main.image && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={main.image}
-                    alt={main.name}
-                    className="w-full h-32 object-cover"
-                  />
-                )}
-                <div className="px-3 py-2.5 space-y-1">
-                  <p className="font-display text-base leading-tight">
-                    <span className="text-muted-foreground mr-1">
-                      {main.id}.
-                    </span>
-                    {main.name}
-                  </p>
-                  <p className="font-sans text-xs text-muted-foreground">
-                    {main.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+          {MENU.mains.map((main, i) => (
+            <div key={main.id} className="space-y-1">
+              {i > 0 && (
+                <p className="font-display italic text-lg text-muted-foreground pb-2">
+                  or
+                </p>
+              )}
+              {main.image && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={main.image}
+                  alt={main.name}
+                  className="w-full max-w-sm mx-auto h-36 object-cover rounded-card"
+                />
+              )}
+              <p className="font-display text-2xl leading-tight">
+                <span className="text-muted-foreground mr-1.5">{main.id}.</span>
+                {main.name}
+              </p>
+              <p className="font-sans text-sm text-muted-foreground">
+                {main.description}
+              </p>
+            </div>
+          ))}
         </div>
 
         {MENU.coursesAfterMains.map((c) => (

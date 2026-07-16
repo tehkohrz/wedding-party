@@ -1,13 +1,22 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, DM_Sans } from "next/font/google";
+import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { WizardShell } from "@/components/WizardShell";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 
-// Display font — wedding/botanical character, used for headings.
-// `variable` name must match the value referenced in app/globals.css's @theme block.
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+// Display font — the "wedding stationery" serif used for names, headings
+// and celebrated content. `variable` must match app/globals.css's @theme.
+//
+// TO TRY A DIFFERENT DISPLAY FONT: swap the import + the const below —
+// nothing else changes (the CSS variable carries it everywhere). Candidates:
+//   import { Playfair_Display } from "next/font/google";
+//   const display = Playfair_Display({ variable: "--font-fraunces", subsets: ["latin"], display: "swap" });
+//   import { Marcellus } from "next/font/google";
+//   const display = Marcellus({ weight: "400", variable: "--font-fraunces", subsets: ["latin"], display: "swap" });
+const display = Cormorant_Garamond({
+  variable: "--font-fraunces", // historical var name — safe to leave
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   subsets: ["latin"],
   display: "swap",
 });
@@ -56,7 +65,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${dmSans.variable} h-full antialiased`}
+      className={`${display.variable} ${dmSans.variable} h-full antialiased`}
     >
       {/* overflow-x-hidden: clips the horizontal slide-in animation so it
           doesn't briefly create a horizontal scrollbar. Vertical scrolling

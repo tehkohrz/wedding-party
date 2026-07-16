@@ -24,7 +24,7 @@ export const COUPLE = {
   // [input] The result of "Bride + Groom = ?" on the welcome screen.
   //         Try: "Happiness", "Forever", "Us", "Family", "Always", "Bliss",
   //         "One", "Home", "Adventure", "Love", "❤".
-  unionWord: "Happiness",
+  unionWord: "Party 🎉",
 };
 
 // ─── RSVP (v2) ────────────────────────────────────────────────────────────────
@@ -79,7 +79,7 @@ export const EVENT_DETAILS = {
 
 export const RSVP_COPY = {
   // [input] Small line above the couple names on the RSVP landing.
-  eyebrow: "You're invited to the wedding of",
+  eyebrow: "You're invited to the wedding party of",
 
   // [input] Heading above the landing name search.
   searchHeading: "Find your invitation",
@@ -113,7 +113,7 @@ export const RSVP_COPY = {
 
 export const MENU = {
   // [input] Heading on the menu step.
-  heading: "The wedding menu",
+  heading: "Menu",
 
   // [input] Instruction under the heading.
   instruction: "Choose a main course for each attending guest.",

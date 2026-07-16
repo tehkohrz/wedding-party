@@ -34,7 +34,7 @@ export default function RsvpLandingPage() {
             {/* Event date + venue + countdown */}
             <div className="space-y-3">
               <div className="space-y-1">
-                <p className="font-sans text-base text-foreground">
+                <p className="font-display italic text-2xl text-foreground">
                   {EVENT_DETAILS.date}
                 </p>
                 <p className="font-sans text-sm text-muted-foreground">
