@@ -17,6 +17,23 @@ import { z } from "zod";
 import { db, type DbGuest, type DbGroup } from "@/lib/db";
 import { rsvpDeadlinePassed } from "@/lib/rsvpDeadline";
 
+// Naive per-instance rate limit — a sanity cap against someone scripting
+// the public submit endpoint, not a security boundary (serverless
+// instances each keep their own window, which is fine at wedding scale).
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX = 10;
+const hits = new Map<string, { count: number; windowStart: number }>();
+function rateLimited(key: string): boolean {
+  const now = Date.now();
+  const h = hits.get(key);
+  if (!h || now - h.windowStart > RATE_WINDOW_MS) {
+    hits.set(key, { count: 1, windowStart: now });
+    return false;
+  }
+  h.count += 1;
+  return h.count > RATE_MAX;
+}
+
 const SubmissionSchema = z.object({
   answers: z
     .array(
@@ -86,6 +103,10 @@ export async function POST(
   }
 
   const { slug } = await params;
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "?";
+  if (rateLimited(`${ip}|${slug.toLowerCase()}`)) {
+    return Response.json({ error: "Too many requests" }, { status: 429 });
+  }
 
   // Validate the body shape before touching the database.
   let body: unknown;

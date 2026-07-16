@@ -55,17 +55,26 @@ export function useDbGuests(): readonly Guest[] | undefined {
 
   useEffect(() => {
     let alive = true;
-    fetch("/api/guests")
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((json: { guests: ApiGuestRow[] }) => {
-        if (!alive) return;
-        setGuests(
-          json.guests.filter((g) => g.attending !== false).map(toGuest)
-        );
-      })
-      .catch(() => {}); // stays undefined; screens show their loading state
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const load = () => {
+      fetch("/api/guests")
+        .then((res) => (res.ok ? res.json() : Promise.reject()))
+        .then((json: { guests: ApiGuestRow[] }) => {
+          if (!alive) return;
+          setGuests(
+            json.guests.filter((g) => g.attending !== false).map(toGuest)
+          );
+        })
+        .catch(() => {
+          // WiFi blip on the kiosk: keep retrying until the list loads —
+          // a check-in iPad with no guest list is useless.
+          if (alive) timer = setTimeout(load, 5000);
+        });
+    };
+    load();
     return () => {
       alive = false;
+      if (timer) clearTimeout(timer);
     };
   }, []);
 

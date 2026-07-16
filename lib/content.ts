@@ -192,7 +192,7 @@ export const MENU = {
   kidsMeal: {
     name: "Kids' Meal",
     courses: [
-      "Nuggets | Fries | Meslcun | Tartar Sauce",
+      "Nuggets | Fries | Mesclun | Tartar Sauce",
       "Cream of Mushroom Soup",
       "Spaghetti Seafood Tomato Sauce",
       "Fried Churros | Chocolate Sauce",
