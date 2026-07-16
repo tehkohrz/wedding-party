@@ -117,23 +117,51 @@ export const MENU = {
   // [input] Instruction under the heading.
   instruction: "Choose a main course for each attending guest.",
 
+  // [input] Courses served to everyone BEFORE the mains, in order.
+  coursesBeforeMains: [
+    {
+      course: "Starter",
+      name: "Seared Hokkaido Scallop and Tiger Prawn",
+      description:
+        "Parsnip Puree | Pickled Shimeji Mushrooms | Allium Crumbs | Truffle Caviar",
+    },
+    {
+      course: "Soup",
+      name: "Cream of Truffle Mushroom Soup",
+      description: "Shimeji Mushrooms | White Truffle Oil | Herb Croutons",
+    },
+  ],
+
+  // [input] Label above the two main choices in the menu preview.
+  mainsChoiceLabel: "Mains — choose one",
+
   // [input] The two mains. id must stay "A"/"B" (stored in the database);
   //         name/description/image are free. image: drop a file in
-  //         public/menu/ and reference it ("/menu/chicken.jpg"), or "" for none.
+  //         public/menu/ and reference it ("/menu/ribeye.jpg"), or "" for none.
   mains: [
     {
       id: "A" as const,
-      name: "Roasted Spring Chicken",
+      name: "Roasted USDA Prime Ribeye",
       description:
-        "With rosemary jus, garlic mash and seasonal greens.",
+        "Celeriac Puree | Ratatouille | Broccolini | Pistachio Crumbs | Bordelaise Sauce",
       image: "",
     },
     {
       id: "B" as const,
-      name: "Pan-seared Barramundi",
+      name: "Roasted Chicken Roulade",
       description:
-        "With lemon beurre blanc, herbed potatoes and asparagus.",
+        "Garlic Mashed Potato | Shallot | Haricot Beans | Red Wine Sauce",
       image: "",
+    },
+  ],
+
+  // [input] Courses served to everyone AFTER the mains, in order.
+  coursesAfterMains: [
+    {
+      course: "Dessert",
+      name: "Yuzu Apricot Mousse",
+      description:
+        "Yuzu Mousse | Apricot Compote | White Sponge | Sable | Yuzu Coulis | Crème Anglaise",
     },
   ],
 

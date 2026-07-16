@@ -17,6 +17,27 @@ import { MENU } from "@/lib/content";
 import { BOUQUET_COLORS } from "@/lib/groups";
 import type { RsvpMember } from "./types";
 
+/** A course everyone receives (starter / soup / dessert) in the preview. */
+function FixedCourse({
+  course,
+  name,
+  description,
+}: {
+  course: string;
+  name: string;
+  description: string;
+}) {
+  return (
+    <div className="space-y-0.5">
+      <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+        {course}
+      </p>
+      <p className="font-display text-base leading-tight">{name}</p>
+      <p className="font-sans text-xs text-muted-foreground">{description}</p>
+    </div>
+  );
+}
+
 export function StepMenu({ members }: { members: RsvpMember[] }) {
   const answers = useRsvpStore((s) => s.answers);
   const setFood = useRsvpStore((s) => s.setFood);
@@ -40,31 +61,50 @@ export function StepMenu({ members }: { members: RsvpMember[] }) {
         </p>
       </div>
 
-      {/* Menu preview — the two mains side by side */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {MENU.mains.map((main) => (
-          <div
-            key={main.id}
-            className="rounded-card border border-border bg-surface overflow-hidden"
-          >
-            {main.image && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={main.image}
-                alt={main.name}
-                className="w-full h-32 object-cover"
-              />
-            )}
-            <div className="px-4 py-3 space-y-1">
-              <p className="font-display text-lg leading-tight">
-                <span className="text-muted-foreground mr-1.5">{main.id}.</span>
-                {main.name}
-              </p>
-              <p className="font-sans text-xs text-muted-foreground">
-                {main.description}
-              </p>
-            </div>
+      {/* Menu preview — the full procession: fixed courses, the mains
+          choice in the middle, then dessert. */}
+      <div className="rounded-card border border-border bg-surface px-5 py-5 space-y-5 text-center">
+        {MENU.coursesBeforeMains.map((c) => (
+          <FixedCourse key={c.course} {...c} />
+        ))}
+
+        {/* The choice */}
+        <div className="space-y-2">
+          <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-primary">
+            {MENU.mainsChoiceLabel}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {MENU.mains.map((main) => (
+              <div
+                key={main.id}
+                className="rounded-lg border border-input overflow-hidden"
+              >
+                {main.image && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={main.image}
+                    alt={main.name}
+                    className="w-full h-32 object-cover"
+                  />
+                )}
+                <div className="px-3 py-2.5 space-y-1">
+                  <p className="font-display text-base leading-tight">
+                    <span className="text-muted-foreground mr-1">
+                      {main.id}.
+                    </span>
+                    {main.name}
+                  </p>
+                  <p className="font-sans text-xs text-muted-foreground">
+                    {main.description}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
+        </div>
+
+        {MENU.coursesAfterMains.map((c) => (
+          <FixedCourse key={c.course} {...c} />
         ))}
       </div>
 
