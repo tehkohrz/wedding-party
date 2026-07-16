@@ -21,10 +21,13 @@ export default function RsvpLandingPage() {
       {/* Photo side — panel width/height are [input] fields in lib/content.ts. */}
       <PhotoSlideshow />
 
-      {/* Content side — scrolls; the hero fills the first screenful. */}
+      {/* Content side — scrolls; the hero fills the first screenful.
+          Structure: the hero content centers itself in the leftover space
+          (my-auto), while the Details anchor pins to the BOTTOM of the
+          fold — so scrolling on reveals the details with no dead gap. */}
       <section className="relative flex-1 overflow-y-auto scroll-smooth bg-background">
-        <div className="min-h-full flex flex-col items-center justify-center px-6 py-8">
-          <div className="text-center space-y-6 max-w-xl w-full">
+        <div className="min-h-full flex flex-col items-center px-6 pt-8 pb-4">
+          <div className="my-auto text-center space-y-6 max-w-xl w-full">
             <p className="font-sans text-xs uppercase tracking-[0.25em] text-muted-foreground">
               {RSVP_COPY.eyebrow}
             </p>
@@ -56,26 +59,26 @@ export default function RsvpLandingPage() {
               </p>
             </div>
             <RsvpNameSearch />
-
-            {/* Invitation to scroll — this anchor IS the section title
-                (the details section below has no heading of its own).
-                animate-bounce is Tailwind's built-in pulse; disabled for
-                reduced-motion users. */}
-            <a
-              href="#details"
-              className="inline-flex flex-col items-center gap-1 pt-4 font-display text-3xl text-foreground hover:text-primary transition-colors"
-            >
-              {EVENT_DETAILS.detailsHeading}
-              <ChevronDown
-                className="size-8 animate-bounce motion-reduce:animate-none"
-                aria-hidden
-              />
-            </a>
           </div>
+
+          {/* Invitation to scroll — pinned to the bottom of the first
+              screenful (my-auto above centers the hero in the remaining
+              space). This anchor IS the details section's title.
+              animate-bounce disabled for reduced-motion users. */}
+          <a
+            href="#details"
+            className="shrink-0 inline-flex flex-col items-center gap-1 pt-6 font-display text-3xl text-foreground hover:text-primary transition-colors"
+          >
+            {EVENT_DETAILS.detailsHeading}
+            <ChevronDown
+              className="size-8 animate-bounce motion-reduce:animate-none"
+              aria-hidden
+            />
+          </a>
         </div>
 
-        {/* Below the fold */}
-        <div className="px-6 pb-16">
+        {/* Below the fold — follows the anchor with only a small gap */}
+        <div className="px-6 pb-16 pt-4">
           <EventDetails />
         </div>
       </section>
