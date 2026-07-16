@@ -8,6 +8,7 @@
  * driven by EVENT_DETAILS.mapQuery, which also powers the directions URL,
  * so pin and directions always agree.
  *
+ * All text centered, matching the hero above it.
  * Server component — no hooks, renders to static HTML.
  */
 import { Clock, Shirt, MapPin, ExternalLink } from "lucide-react";
@@ -19,21 +20,19 @@ export function EventDetails() {
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${q}`;
 
   return (
-    <div id="details" className="scroll-mt-6 max-w-xl mx-auto space-y-4">
-      <h2 className="font-display text-3xl text-center">
-        {EVENT_DETAILS.detailsHeading}
-      </h2>
+    <div id="details" className="scroll-mt-6 max-w-xl mx-auto space-y-4 text-center">
+      <h2 className="font-display text-3xl">{EVENT_DETAILS.detailsHeading}</h2>
 
       {/* Schedule */}
       <div className="rounded-card border border-border bg-surface px-5 py-4">
-        <h3 className="flex items-center gap-2 font-display text-lg mb-2">
+        <h3 className="flex items-center justify-center gap-2 font-display text-lg mb-2">
           <Clock className="size-4 text-primary" /> Schedule
         </h3>
-        <ul className="space-y-1.5">
+        <ul className="space-y-1.5 inline-block">
           {EVENT_DETAILS.schedule.map((row) => (
             <li
               key={row.time}
-              className="flex items-baseline gap-3 font-sans text-sm"
+              className="flex items-baseline gap-3 font-sans text-sm text-left"
             >
               <span className="tabular-nums text-muted-foreground w-12 shrink-0">
                 {row.time}
@@ -46,7 +45,7 @@ export function EventDetails() {
 
       {/* Attire */}
       <div className="rounded-card border border-border bg-surface px-5 py-4">
-        <h3 className="flex items-center gap-2 font-display text-lg mb-1">
+        <h3 className="flex items-center justify-center gap-2 font-display text-lg mb-1">
           <Shirt className="size-4 text-primary" /> Attire
         </h3>
         <p className="font-sans text-sm">{EVENT_DETAILS.attire}</p>
@@ -55,7 +54,7 @@ export function EventDetails() {
       {/* Location */}
       <div className="rounded-card border border-border bg-surface px-5 py-4 space-y-3">
         <div>
-          <h3 className="flex items-center gap-2 font-display text-lg mb-1">
+          <h3 className="flex items-center justify-center gap-2 font-display text-lg mb-1">
             <MapPin className="size-4 text-primary" /> Location
           </h3>
           <p className="font-sans text-sm">{EVENT_DETAILS.venueName}</p>
