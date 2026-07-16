@@ -44,6 +44,8 @@ create table if not exists guests (
   rsvp_group_id    text references rsvp_groups(id) on delete set null,
   seating_group_id text references seating_groups(id) on delete set null,
   is_kid           boolean not null default false,  -- kids' meals counted separately
+  is_plus_one      boolean not null default false,  -- no personal link; main guest
+                                                    -- toggles + names them in the RSVP
 
   -- Seating: nullable until assigned after the RSVP deadline.
   row_num          int,
@@ -52,7 +54,7 @@ create table if not exists guests (
 
   -- RSVP response (all null = no response yet)
   attending        boolean,
-  food_choice      text check (food_choice in ('A','B')),
+  food_choice      text check (food_choice in ('A','B','K')),  -- K = kids meal
   dietary_comment  text,
   after_party      boolean,
   responded_at     timestamptz
@@ -60,6 +62,18 @@ create table if not exists guests (
 
 create index if not exists guests_rsvp_group_idx on guests(rsvp_group_id);
 create index if not exists guests_seating_group_idx on guests(seating_group_id);
+
+-- Migration guard: widen the food_choice constraint on databases created
+-- before the kids meal ('K') existed.
+do $$ begin
+  alter table guests drop constraint if exists guests_food_choice_check;
+  alter table guests add constraint guests_food_choice_check
+    check (food_choice in ('A','B','K'));
+end $$;
+
+-- Migration guard: add is_plus_one on databases created before it existed.
+alter table guests add column if not exists
+  is_plus_one boolean not null default false;
 
 -- ─── Day-of attendance ───────────────────────────────────────────────────────
 create table if not exists attendance (

@@ -35,11 +35,12 @@ export interface DbGuest {
   rsvp_group_id: string | null;
   seating_group_id: string | null;
   is_kid: boolean;
+  is_plus_one: boolean;
   row_num: number | null;
   section: string | null;
   seat: number | null;
   attending: boolean | null;
-  food_choice: "A" | "B" | null;
+  food_choice: "A" | "B" | "K" | null; // K = kids meal
   dietary_comment: string | null;
   after_party: boolean | null;
   responded_at: string | null; // ISO timestamptz

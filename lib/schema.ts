@@ -55,6 +55,16 @@ export const GuestSchema = z.object({
     .optional()
     .transform((s) => (s ?? "").trim().toLowerCase() === "true"),
   /**
+   * Plus-one flag — a placeholder companion row ("Peter's Plus One"). Gets
+   * NO personal link; the main guest toggles whether they're bringing one
+   * (and can fill in the real name) inside their own RSVP.
+   * CSV cell: "true"/"false" (empty = false).
+   */
+  is_plus_one: z
+    .string()
+    .optional()
+    .transform((s) => (s ?? "").trim().toLowerCase() === "true"),
+  /**
    * Seat address — one seating (the lunch). NULLABLE since v2: seats are
    * assigned only after the RSVP deadline, so during RSVP season these
    * cells are empty in the CSV / null in the database.

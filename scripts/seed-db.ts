@@ -7,13 +7,22 @@
  * - Validates the CSV with the same Zod schema as the build pipeline.
  * - Derives groups from distinct group_ids, with auto-generated labels
  *   ("Sonya & Chris", "Justin, Kim & party") — see scripts/derive-groups.ts.
- *   Labels are seed defaults; rename in admin/table editor. Solo guests get
- *   a personal SOLO_<id> group so every guest is reachable by a link.
+ *   EXISTING groups keep their labels (custom names survive re-seeds); only
+ *   new group ids are inserted. Solo guests get a personal SOLO_<id> group
+ *   so every guest is reachable by a link.
+ * - REFUSES to overwrite group assignments that differ from the database
+ *   (admin edits may be newer than the CSV) unless run with --force-groups.
  * - Generates a kebab-case RSVP slug per guest ("John Tan" → "john-tan"),
  *   deduping collisions ("john-tan-2"). Slugs resolve to the guest's GROUP.
  * - UPSERTS guests/groups/slugs (idempotent — safe to re-run after editing
  *   the CSV). Existing RSVP responses on re-seeded guests are PRESERVED
  *   (only identity/seating columns — and group labels — are overwritten).
+ * - PRUNES leftovers from previous seeds: groups no guest belongs to any
+ *   more (e.g. after renumbering group ids in the CSV) and slugs that no
+ *   longer match any current guest name. ⚠ Once links have been SENT,
+ *   renaming a guest in the CSV + re-seeding kills their old link — after
+ *   send-out, rename via the admin page instead (it ADDS a new slug and
+ *   keeps the old one working).
  *
  * The CSV is the *initial authoring format*. After seeding, the database
  * is the source of truth — edit guests via the admin page (or Supabase's
@@ -28,6 +37,7 @@ import Papa from "papaparse";
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
 import { GuestSchema } from "../lib/schema";
+import { slugify } from "../lib/slug";
 import {
   deriveRsvpGroups,
   deriveSeatingGroups,
@@ -92,15 +102,6 @@ function parseCsv<T>(filename: string, schema: z.ZodType<T>): T[] {
   return rows;
 }
 
-/** "John Tan" → "john-tan" (ASCII-ish kebab; non-alphanumerics collapse to -) */
-function slugify(name: string): string {
-  return name
-    .normalize("NFKD")
-    .replace(/[̀-ͯ]/g, "") // strip diacritics
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 async function main() {
   const guests = parseCsv("guests.csv", GuestSchema);
@@ -111,11 +112,11 @@ async function main() {
   const rsvpGroupRows = deriveRsvpGroups(guests);
   const seatingGroupRows = deriveSeatingGroups(guests);
 
-  // One slug per guest, deduped, resolving to their RSVP group.
-  // guest_id records whose name the slug is — used by the landing search to
-  // route a found guest to their own link.
+  // One slug per guest, deduped, resolving to their RSVP group — EXCEPT
+  // plus-ones: they're placeholder rows the main guest answers for, so a
+  // personal link would be meaningless (and the name may change anyway).
   const seen = new Map<string, number>();
-  const slugRows = guests.map((g) => {
+  const slugRows = guests.filter((g) => !g.is_plus_one).map((g) => {
     const base = slugify(g.name) || `guest-${g.id}`;
     const n = (seen.get(base) ?? 0) + 1;
     seen.set(base, n);
@@ -135,17 +136,63 @@ async function main() {
     rsvp_group_id: rsvpGroupIdOf(g),
     seating_group_id: g.seating_group_id,
     is_kid: g.is_kid,
+    is_plus_one: g.is_plus_one,
     row_num: g.row ?? null,
     section: g.section,
     seat: g.seat ?? null,
   }));
 
+  // ─── Divergence guard ────────────────────────────────────────────────────
+  // The database may hold NEWER group assignments than the CSV (the admin
+  // page edits groups live). Re-seeding would silently overwrite them —
+  // exactly how a carefully-split RSVP grouping gets lost. Detect the
+  // mismatch and stop; pass --force-groups only when the CSV is the truth.
+  const force = process.argv.includes("--force-groups");
+  const dbGuests = await supabase
+    .from("guests")
+    .select("id, name, rsvp_group_id, seating_group_id");
+  if (!dbGuests.error && (dbGuests.data ?? []).length > 0) {
+    const byId = new Map(dbGuests.data.map((g) => [g.id as number, g]));
+    const diverged = guestRows.filter((g) => {
+      const cur = byId.get(g.id);
+      return (
+        cur &&
+        (cur.rsvp_group_id !== g.rsvp_group_id ||
+          cur.seating_group_id !== g.seating_group_id)
+      );
+    });
+    if (diverged.length > 0 && !force) {
+      console.error(
+        `✗ ${diverged.length} guest(s) have different group assignments in the DATABASE than in the CSV — the database may be newer (admin edits).`
+      );
+      for (const g of diverged.slice(0, 10)) {
+        const cur = byId.get(g.id)!;
+        console.error(
+          `    #${g.id} ${g.name}: rsvp ${cur.rsvp_group_id} → ${g.rsvp_group_id}, seating ${cur.seating_group_id} → ${g.seating_group_id}`
+        );
+      }
+      if (diverged.length > 10)
+        console.error(`    …and ${diverged.length - 10} more`);
+      console.error(
+        "  If the CSV is correct, re-run with:  pnpm seed:db --force-groups\n  If the database is correct, update the CSV to match first."
+      );
+      process.exit(1);
+    }
+  }
+
   console.log("Seeding Supabase...");
 
-  const up1 = await supabase.from("rsvp_groups").upsert(rsvpGroupRows);
+  // ignoreDuplicates: existing groups KEEP their labels (custom names like
+  // "Lee Party" set in admin/table editor survive a re-seed); only brand-new
+  // group ids are inserted with auto-derived labels.
+  const up1 = await supabase
+    .from("rsvp_groups")
+    .upsert(rsvpGroupRows, { onConflict: "id", ignoreDuplicates: true });
   if (up1.error) fail("rsvp_groups", up1.error.message);
 
-  const up2 = await supabase.from("seating_groups").upsert(seatingGroupRows);
+  const up2 = await supabase
+    .from("seating_groups")
+    .upsert(seatingGroupRows, { onConflict: "id", ignoreDuplicates: true });
   if (up2.error) fail("seating_groups", up2.error.message);
 
   const up3 = await supabase.from("guests").upsert(guestRows);
@@ -156,6 +203,50 @@ async function main() {
 
   console.log(
     `✓ Seeded ${rsvpGroupRows.length} rsvp groups, ${seatingGroupRows.length} seating groups, ${guestRows.length} guests, ${slugRows.length} slugs.`
+  );
+
+  // ─── Prune leftovers from previous seeds ───────────────────────────────
+  // Renumbering group ids or renaming guests in the CSV leaves the OLD
+  // rows behind (upsert never deletes) — duplicate-looking groups with no
+  // members, and slugs for names that no longer exist. Slugs go first
+  // (they hold a foreign key into rsvp_groups). Groups still referenced
+  // by any guest in the DB are kept, so guests that were removed from the
+  // CSV (but kept in the DB) don't lose their group.
+  const keepSlugs = slugRows.map((s) => s.slug);
+  const delSlugs = await supabase
+    .from("rsvp_slugs")
+    .delete()
+    .not("slug", "in", `(${keepSlugs.map((s) => `"${s}"`).join(",")})`)
+    .select("slug");
+  if (delSlugs.error) fail("rsvp_slugs prune", delSlugs.error.message);
+
+  const afterSeed = await supabase
+    .from("guests")
+    .select("rsvp_group_id, seating_group_id");
+  if (afterSeed.error) fail("guests read-back", afterSeed.error.message);
+  const keepRsvp = new Set([
+    ...rsvpGroupRows.map((g) => g.id),
+    ...(afterSeed.data ?? []).map((g) => g.rsvp_group_id).filter(Boolean),
+  ]);
+  const keepSeating = new Set([
+    ...seatingGroupRows.map((g) => g.id),
+    ...(afterSeed.data ?? []).map((g) => g.seating_group_id).filter(Boolean),
+  ]);
+
+  const pruneGroups = async (table: string, keep: Set<string>) => {
+    const res = await supabase
+      .from(table)
+      .delete()
+      .not("id", "in", `(${[...keep].map((s) => `"${s}"`).join(",")})`)
+      .select("id");
+    if (res.error) fail(`${table} prune`, res.error.message);
+    return res.data?.length ?? 0;
+  };
+  const prunedRsvp = await pruneGroups("rsvp_groups", keepRsvp);
+  const prunedSeating = await pruneGroups("seating_groups", keepSeating);
+
+  console.log(
+    `✓ Pruned ${delSlugs.data?.length ?? 0} stale slugs, ${prunedRsvp} stale rsvp groups, ${prunedSeating} stale seating groups.`
   );
   console.log("\nPersonal RSVP links:");
   for (const s of slugRows) console.log(`  /r/${s.slug}`);

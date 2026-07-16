@@ -10,8 +10,9 @@
  *                     Nullable — a guest without one simply checks in alone.
  *
  * Labels are auto-generated from member names and are seed DEFAULTS —
- * rename them anytime in the admin editor or Supabase table editor (note:
- * re-running the seed overwrites labels with these defaults again).
+ * rename them anytime in the admin editor or Supabase table editor. The
+ * seed only inserts labels for NEW group ids, so custom names survive
+ * re-seeds.
  *
  *   1 member  → "Wan Xin"
  *   2 members → "Sonya & Chris"

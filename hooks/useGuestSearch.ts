@@ -24,21 +24,32 @@
 import Fuse from "fuse.js";
 import { useMemo } from "react";
 import { guests } from "@/lib/data";
+import { SEARCH_CONFIG } from "@/lib/content";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import type { Guest } from "@/lib/schema";
 
 const MAX_RESULTS = 5;
 const DEBOUNCE_MS = 150;
 
+/** Guests hidden from the day-of searches (see SEARCH_CONFIG in content). */
+const SEARCHABLE = (guests as Guest[]).filter(
+  (g) =>
+    !SEARCH_CONFIG.hiddenGuestIds.includes(g.id) &&
+    !(
+      g.seating_group_id !== null &&
+      SEARCH_CONFIG.hiddenSeatingGroupIds.includes(g.seating_group_id)
+    )
+);
+
 export function useGuestSearch(query: string): Guest[] {
   // Build the Fuse index once. `guests` is a build-time constant so the
   // dependency array is effectively [] — this runs once on mount.
   const fuse = useMemo(
     () =>
-      new Fuse(guests as Guest[], {
+      new Fuse(SEARCHABLE, {
         keys: ["name", "search_aliases"],
-        threshold: 0.4,
-        minMatchCharLength: 1,
+        threshold: 0.3, // tightened: fewer loose matches
+        minMatchCharLength: 2,
         ignoreLocation: true, // don't penalize matches near end of string
       }),
     []
@@ -50,7 +61,9 @@ export function useGuestSearch(query: string): Guest[] {
   // Run the search. useMemo so we don't rebuild the result array on
   // unrelated re-renders (e.g. parent state changes).
   const matches = useMemo(() => {
-    if (debouncedQuery.length === 0) return [];
+    // Below the minimum, return nothing — stops one-letter queries from
+    // matching half the guest list.
+    if (debouncedQuery.length < SEARCH_CONFIG.minQueryLength) return [];
     return fuse
       .search(debouncedQuery, { limit: MAX_RESULTS })
       .map((r) => r.item);

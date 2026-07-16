@@ -8,6 +8,10 @@
  *     editor if it matters; a CSV re-seed regenerates labels properly).
  *   - Changing rsvp_group_id RETARGETS the guest's personal slug(s), so
  *     /r/their-name always opens their current group's RSVP.
+ *   - Renaming a guest ADDS a slug for the new name (collision-suffixed).
+ *     Old slugs are kept on purpose: a link already sent over WhatsApp
+ *     must keep working. Delete retired slugs in Supabase's table editor
+ *     if they bother you.
  *
  * Seat assignment after the RSVP deadline happens here (row_num/section/seat).
  * NOTE: seats are NOT validated against layout.csv — the admin is trusted;
@@ -16,6 +20,7 @@
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { isAuthed, unauthorized } from "@/lib/adminAuth";
+import { slugify } from "@/lib/slug";
 
 const PatchSchema = z
   .object({
@@ -25,11 +30,12 @@ const PatchSchema = z
     rsvp_group_id: z.string().trim().min(1).nullable(),
     seating_group_id: z.string().trim().min(1).nullable(),
     is_kid: z.boolean(),
+    is_plus_one: z.boolean(),
     row_num: z.number().int().positive().nullable(),
     section: z.string().trim().min(1).nullable(),
     seat: z.number().int().positive().nullable(),
     attending: z.boolean().nullable(),
-    food_choice: z.enum(["A", "B"]).nullable(),
+    food_choice: z.enum(["A", "B", "K"]).nullable(),
     dietary_comment: z.string().trim().max(500).nullable(),
     after_party: z.boolean().nullable(),
     // Set when the admin records a response on a guest's behalf; nulled
@@ -122,6 +128,50 @@ export async function PATCH(
         { error: "Guest saved but link retarget failed — re-save to retry" },
         { status: 500 }
       );
+    }
+  }
+
+  // Renames get a personal link for the NEW name. Existing slugs stay —
+  // links already in guests' hands must never die. (Skipped for a guest
+  // with no rsvp group — slugs must point at one — and for plus-ones,
+  // who never get personal links.)
+  const updated = data as {
+    rsvp_group_id: string | null;
+    is_plus_one: boolean;
+  };
+  const currentGroupId = updated.rsvp_group_id;
+  if (patch.name && currentGroupId && !updated.is_plus_one) {
+    const base = slugify(patch.name) || `guest-${guestId}`;
+    // One query for every slug starting with the base covers both "is the
+    // exact slug taken?" and "which -2/-3 suffix is free?".
+    const existing = await client
+      .from("rsvp_slugs")
+      .select("slug, guest_id")
+      .like("slug", `${base}%`);
+    if (existing.error) {
+      return Response.json(
+        { error: "Guest saved but link regeneration failed" },
+        { status: 500 }
+      );
+    }
+    const taken = new Set(existing.data.map((s) => s.slug));
+    const ownsBase = existing.data.some(
+      (s) => s.guest_id === guestId && (s.slug === base || s.slug.startsWith(`${base}-`))
+    );
+    if (!ownsBase) {
+      let slug = base;
+      for (let n = 2; taken.has(slug); n++) slug = `${base}-${n}`;
+      const ins = await client.from("rsvp_slugs").insert({
+        slug,
+        group_id: currentGroupId,
+        guest_id: guestId,
+      });
+      if (ins.error) {
+        return Response.json(
+          { error: "Guest saved but link regeneration failed" },
+          { status: 500 }
+        );
+      }
     }
   }
 

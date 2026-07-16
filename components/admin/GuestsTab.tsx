@@ -21,7 +21,7 @@
  * Also exports the personal-links CSV (name → absolute URL) for WhatsApp.
  */
 import { useCallback, useEffect, useState } from "react";
-import { Download, Save } from "lucide-react";
+import { Download, RotateCcw, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -35,11 +35,12 @@ interface AdminGuest {
   rsvp_group_id: string | null;
   seating_group_id: string | null;
   is_kid: boolean;
+  is_plus_one: boolean;
   row_num: number | null;
   section: string | null;
   seat: number | null;
   attending: boolean | null;
-  food_choice: "A" | "B" | null;
+  food_choice: "A" | "B" | "K" | null;
   dietary_comment: string | null;
   after_party: boolean | null;
   responded_at: string | null;
@@ -47,7 +48,7 @@ interface AdminGuest {
 
 /** Grid template shared by the header and row line 1. */
 const ROW_GRID =
-  "sm:grid-cols-[2.5rem_1fr_5.5rem_6rem_6rem_4rem_9rem_4.5rem]";
+  "sm:grid-cols-[2.5rem_1fr_5.5rem_6rem_6rem_5.5rem_9rem_4.5rem]";
 
 export function GuestsTab() {
   const [guests, setGuests] = useState<AdminGuest[]>([]);
@@ -121,6 +122,49 @@ export function GuestsTab() {
     }
   }
 
+  /** One click wipes a guest's RSVP answers (back to "no response") —
+      for clearing test submissions without touching identity/seating.
+      Staged (unsaved) edits are discarded too. */
+  async function resetResponse(g: AdminGuest) {
+    // Nothing saved on the server → just drop the staged edits.
+    const hasServerResponse = g.responded_at !== null || g.attending !== null;
+    if (!hasServerResponse) {
+      setEdits((e) => {
+        const next = { ...e };
+        delete next[g.id];
+        return next;
+      });
+      return;
+    }
+    if (!window.confirm(`Reset ${g.name}'s RSVP response?`)) return;
+    setSavingId(g.id);
+    try {
+      const res = await fetch(`/api/admin/guests/${g.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          attending: null,
+          food_choice: null,
+          dietary_comment: null,
+          after_party: null,
+          responded_at: null,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      const { guest } = await res.json();
+      setGuests((gs) => gs.map((x) => (x.id === g.id ? guest : x)));
+      setEdits((e) => {
+        const next = { ...e };
+        delete next[g.id];
+        return next;
+      });
+    } catch {
+      alert("Reset failed — please try again.");
+    } finally {
+      setSavingId(null);
+    }
+  }
+
   async function exportLinks() {
     const res = await fetch("/api/admin/links");
     if (!res.ok) return alert("Couldn't fetch links.");
@@ -159,9 +203,22 @@ export function GuestsTab() {
     );
   }
 
-  const visible = guests.filter((g) =>
-    g.name.toLowerCase().includes(filter.trim().toLowerCase())
+  // A name match pulls in the guest's WHOLE rsvp group — searching "wes"
+  // shows everyone answering on the same invitation.
+  const q = filter.trim().toLowerCase();
+  const matchedGroups = new Set(
+    guests
+      .filter((g) => g.name.toLowerCase().includes(q))
+      .map((g) => g.rsvp_group_id)
+      .filter(Boolean)
   );
+  const visible = q
+    ? guests.filter(
+        (g) =>
+          g.name.toLowerCase().includes(q) ||
+          (g.rsvp_group_id && matchedGroups.has(g.rsvp_group_id))
+      )
+    : guests;
 
   return (
     <div className="h-full min-h-0 flex flex-col">
@@ -181,13 +238,13 @@ export function GuestsTab() {
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-3">
-        <div className="max-w-5xl mx-auto space-y-1.5">
+      <div className="flex-1 overflow-y-auto px-6 pb-3">
+        <div className="max-w-5xl mx-auto space-y-1.5 pt-3 sm:pt-0">
           {/* Column headers for row line 1 — hidden on small screens where
               the grid collapses and stops aligning. */}
           <div
             className={cn(
-              "hidden sm:grid items-end gap-2 px-3 pb-1",
+              "hidden sm:grid items-end gap-2 px-3 pt-3 pb-1",
               ROW_GRID,
               "font-sans text-[10px] uppercase tracking-wider text-muted-foreground",
               "sticky top-0 bg-background z-10"
@@ -198,7 +255,7 @@ export function GuestsTab() {
             <span>Side</span>
             <span>RSVP grp</span>
             <span>Seat grp</span>
-            <span>Kid</span>
+            <span>Kid · +1</span>
             <span>Row · Sec · Seat</span>
             <span className="text-right">Save</span>
           </div>
@@ -261,16 +318,30 @@ export function GuestsTab() {
                     aria-label="Seating group"
                     placeholder="seat grp"
                   />
-                  <label className="flex items-center gap-1.5 font-sans text-xs">
-                    <input
-                      type="checkbox"
-                      checked={merged.is_kid}
-                      onChange={(ev) =>
-                        stage(g.id, { is_kid: ev.target.checked })
-                      }
-                    />
-                    kid
-                  </label>
+                  <div className="flex items-center gap-2">
+                    <label className="flex items-center gap-1 font-sans text-xs">
+                      <input
+                        type="checkbox"
+                        checked={merged.is_kid}
+                        onChange={(ev) =>
+                          stage(g.id, { is_kid: ev.target.checked })
+                        }
+                      />
+                      kid
+                    </label>
+                    {/* Plus-one: no personal link; named by the main guest
+                        inside their RSVP. */}
+                    <label className="flex items-center gap-1 font-sans text-xs">
+                      <input
+                        type="checkbox"
+                        checked={merged.is_plus_one}
+                        onChange={(ev) =>
+                          stage(g.id, { is_plus_one: ev.target.checked })
+                        }
+                      />
+                      +1
+                    </label>
+                  </div>
                   <div className="flex items-center gap-1">
                     <Input
                       value={merged.row_num ?? ""}
@@ -355,6 +426,7 @@ export function GuestsTab() {
                           food_choice: (ev.target.value || null) as
                             | "A"
                             | "B"
+                            | "K"
                             | null,
                         })
                       }
@@ -367,6 +439,7 @@ export function GuestsTab() {
                           {m.id}. {m.name}
                         </option>
                       ))}
+                      <option value="K">{MENU.kidsMeal.name}</option>
                     </select>
                   </label>
 
@@ -415,6 +488,21 @@ export function GuestsTab() {
                       ? `responded ${new Date(merged.responded_at).toLocaleDateString("en-SG")}`
                       : "no response yet"}
                   </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-2 font-sans text-xs"
+                    title="Clear this guest's RSVP response (and any unsaved edits)"
+                    disabled={
+                      savingId === g.id ||
+                      (!dirty &&
+                        g.responded_at === null &&
+                        g.attending === null)
+                    }
+                    onClick={() => resetResponse(g)}
+                  >
+                    <RotateCcw className="size-3" /> Reset
+                  </Button>
                 </div>
               </div>
             );

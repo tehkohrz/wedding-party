@@ -8,6 +8,15 @@
  * Change a value, save, watch it update in dev.
  */
 
+export const SITE = {
+  // [input] Browser-tab title, shown on every page. Emoji welcome.
+  //         (The PWA install name lives in public/manifest.webmanifest.)
+  tabTitle: "J ❤️ DK",
+
+  // [input] One-line description (search engines / link previews).
+  tabDescription: "Jermaine & Dong Kun are getting married — 31 October 2026",
+};
+
 export const COUPLE = {
   // [input] Bride's full display name on the welcome screen.
   brideName: "Jermaine Yeo",
@@ -75,24 +84,36 @@ export const EVENT_DETAILS = {
   // [input] RSVP deadline (ISO date). After this day, submitted responses
   //         become view-only and the flow shows the deadline notice.
   rsvpDeadline: "2026-09-30",
+
+  // ── "Add to Google Calendar" (offered after RSVP confirmation) ──
+  // [input] Event title as it appears in the guest's calendar.
+  calendarTitle: "Jermaine & Dong Kun's Wedding 💍",
+
+  // [input] Event start/end in the venue's LOCAL time, format YYYYMMDDTHHMMSS.
+  calendarStart: "20261031T113000",
+  calendarEnd: "20261031T160000",
+
+  // [input] IANA timezone the times above are in.
+  calendarTimezone: "Asia/Singapore",
+
+  // [input] Description inside the calendar event. Keep it short.
+  calendarDetails: "We can't wait to celebrate with you!",
+
+  // [input] The button label on the thank-you screen.
+  calendarButtonLabel: "Add to Google Calendar",
 };
 
 export const RSVP_COPY = {
   // [input] Small line above the couple names on the RSVP landing.
   eyebrow: "You're invited to the wedding party of",
 
-  // [input] Heading above the landing name search.
-  searchHeading: "Find your invitation",
+  // [input] Shown on the public landing page — guests RSVP only via their
+  //         personal link (no public search; protects responses).
+  linkOnlyHeading: "RSVP by personal invite",
 
-  // [input] Instruction under the search heading.
-  searchInstruction:
-    "Enter your name to find your invitation and RSVP for your party.",
-
-  // [input] Placeholder in the landing search input.
-  searchPlaceholder: "Your name...",
-
-  // [input] Shown when the search matches nobody.
-  noMatches: "We can't find that name — try another spelling, or contact us.",
+  // [input] Instruction under the heading.
+  linkOnlyNote:
+    "Please use the personal RSVP link we sent you — it opens your party's invitation directly. Can't find it? Just message us!",
 
   // [input] Photo slideshow images, in order. Drop files into public/photos/
   //         and list them here. Empty list = soft gradient placeholder.
@@ -166,11 +187,25 @@ export const MENU = {
     },
   ],
 
+  // [input] The kids' meal (children don't pick a main — they toggle this
+  //         instead). One line per course.
+  kidsMeal: {
+    name: "Kids' Meal",
+    courses: [
+      "Nuggets | Fries | Meslcun | Tartar Sauce",
+      "Cream of Mushroom Soup",
+      "Spaghetti Seafood Tomato Sauce",
+      "Fried Churros | Chocolate Sauce",
+    ],
+  },
+
+  // [input] The kids' meal question + choices on the menu step.
+  kidsMealQuestion: "Kids' meal required?",
+  kidsMealYes: "Yes please",
+  kidsMealNo: "Not needed",
+
   // [input] Placeholder for the per-person comment box.
   dietaryPlaceholder: "Allergies or dietary needs? (optional)",
-
-  // [input] Small note shown next to kids' selectors. Set "" to hide.
-  kidsNote: "Kids' portions are prepared smaller — still pick their preference.",
 
   // [input] Continue button on the menu step.
   continueLabel: "Continue",
@@ -218,7 +253,10 @@ export const RSVP_CONFIRM = {
   // [input] Labels used in the summary rows.
   attendingBadge: "Attending",
   decliningBadge: "Not attending",
-  afterPartyBadge: "After-party",
+  afterPartyBadge: "Joining the after-party!",
+  afterPartyNoBadge: "Skipping the after-party",
+  // [input] Badge on a plus-one row when no plus-one is coming.
+  noPlusOneBadge: "No plus one",
 
   // ── Thank-you / responded view ──
   // [input] Heading right after submitting.
@@ -248,6 +286,13 @@ export const RSVP_STEPS_COPY = {
   // [input] Labels for the progress dots across the top of the RSVP flow.
   stepLabels: ["Your party", "Menu", "After-party", "Confirm"],
 
+  // ── Step: intro (the personal link's landing view) ──
+  // [input] Greeting above the RSVP button. {name} = the invited guest.
+  introGreeting: "Hello, {name}!",
+
+  // [input] The big button that starts the RSVP.
+  respondLabel: "RSVP",
+
   // ── Step: attendance ──
   // [input] Heading on the attendance step.
   attendanceHeading: "Will you be joining us?",
@@ -264,6 +309,20 @@ export const RSVP_STEPS_COPY = {
 
   // [input] Continue button (enabled once everyone has an answer).
   continueLabel: "Continue",
+
+  // ── Plus-ones (guest rows marked is_plus_one in the CSV / database) ──
+  // [input] The question on a plus-one row (replaces the placeholder name).
+  plusOneQuestion: "Bringing a plus one?",
+
+  // [input] The yes/no choices on a plus-one row.
+  plusOneYesLabel: "Yes, bringing someone",
+  plusOneNoLabel: "Not this time",
+
+  // [input] Label + placeholder for the (optional) plus-one name field,
+  //         shown once "yes" is picked. Leaving it unchanged keeps the
+  //         placeholder name from the guest list.
+  plusOneNameLabel: "Their name, so we can greet them properly:",
+  plusOneNamePlaceholder: "Name (optional)",
 
   // ── Decline path (everyone said no) ──
   // [input] Heading on the decline confirmation.
@@ -283,6 +342,20 @@ export const RSVP_STEPS_COPY = {
   declinedThanksHeading: "Thank you for letting us know",
   declinedThanksBody:
     "We'll miss celebrating with you — hope to see you soon after the big day! 💛",
+};
+
+export const SEARCH_CONFIG = {
+  // [input] Minimum letters typed before the day-of searches (check-in,
+  //         seating lookup) show results. 2 keeps two-letter guests (DK,
+  //         QY, CY) findable while stopping single-letter noise.
+  minQueryLength: 2,
+
+  // [input] Guest ids hidden from the day-of searches (e.g. the couple —
+  //         you don't check yourselves in at the kiosk).
+  hiddenGuestIds: [1, 2] as number[],
+
+  // [input] Seating-group ids hidden entirely from the day-of searches.
+  hiddenSeatingGroupIds: [] as string[],
 };
 
 export const WELCOME_COPY = {

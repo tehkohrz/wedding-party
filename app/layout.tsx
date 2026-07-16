@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
+import { SITE } from "@/lib/content";
 import { WizardShell } from "@/components/WizardShell";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 
@@ -28,15 +29,16 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
+// Tab title / description are [input] fields in lib/content.ts (SITE).
 export const metadata: Metadata = {
-  title: "SitWhereAh",
-  description: "Wedding seating & attendance",
+  title: SITE.tabTitle,
+  description: SITE.tabDescription,
   // Links the web app manifest (name, icons, standalone display).
   manifest: "/manifest.webmanifest",
   // iOS-specific: enables fullscreen "Add to Home Screen" behavior + names it.
   appleWebApp: {
     capable: true,
-    title: "SitWhereAh",
+    title: SITE.tabTitle,
     statusBarStyle: "default",
   },
   icons: {

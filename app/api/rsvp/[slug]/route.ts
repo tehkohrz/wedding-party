@@ -23,9 +23,12 @@ const SubmissionSchema = z.object({
       z.object({
         guest_id: z.number().int().positive(),
         attending: z.boolean(),
-        food_choice: z.enum(["A", "B"]).nullable(),
+        food_choice: z.enum(["A", "B", "K"]).nullable(),
         dietary_comment: z.string().trim().max(500).nullable(),
         after_party: z.boolean().nullable(),
+        // Only honored for plus-one rows (the main guest names their +1);
+        // silently ignored for everyone else.
+        name: z.string().trim().min(1).max(80).optional(),
       })
     )
     .min(1)
@@ -59,9 +62,7 @@ export async function GET(
     client.from("rsvp_groups").select("id, label").eq("id", groupId).single(),
     client
       .from("guests")
-      .select(
-        "id, name, side, attending, food_choice, dietary_comment, after_party, responded_at"
-      )
+      .select("*")
       .eq("rsvp_group_id", groupId)
       .order("id"),
   ]);
@@ -117,12 +118,19 @@ export async function POST(
 
   const membersRes = await client
     .from("guests")
-    .select("id")
+    .select("*")
     .eq("rsvp_group_id", groupId);
   if (membersRes.error) {
     return Response.json({ error: "Database error" }, { status: 500 });
   }
-  const memberIds = new Set((membersRes.data ?? []).map((m) => m.id as number));
+  const memberRows = membersRes.data ?? [];
+  const memberIds = new Set(memberRows.map((m) => m.id as number));
+  const kidIds = new Set(
+    memberRows.filter((m) => m.is_kid).map((m) => m.id as number)
+  );
+  const plusOneIds = new Set(
+    memberRows.filter((m) => m.is_plus_one).map((m) => m.id as number)
+  );
 
   const answers = parsed.data.answers;
   const answeredIds = new Set(answers.map((a) => a.guest_id));
@@ -136,12 +144,21 @@ export async function POST(
     );
   }
 
-  // Business rules: attendees need a main; decliners carry no food /
-  // after-party (normalized rather than rejected).
+  // Business rules: attending ADULTS need a main (A/B); attending KIDS may
+  // have "K" (kids meal) or null (no meal needed) — never an adult main.
+  // Decliners carry no food/after-party (normalized rather than rejected).
   for (const a of answers) {
-    if (a.attending && a.food_choice === null) {
+    if (!a.attending) continue;
+    const isKid = kidIds.has(a.guest_id);
+    if (!isKid && (a.food_choice === null || a.food_choice === "K")) {
       return Response.json(
-        { error: `Missing food choice for guest ${a.guest_id}` },
+        { error: `Missing main course for guest ${a.guest_id}` },
+        { status: 400 }
+      );
+    }
+    if (isKid && (a.food_choice === "A" || a.food_choice === "B")) {
+      return Response.json(
+        { error: `Guest ${a.guest_id} is a kid — kids meal or none` },
         { status: 400 }
       );
     }
@@ -157,6 +174,9 @@ export async function POST(
         dietary_comment: a.attending ? a.dietary_comment : null,
         after_party: a.attending ? a.after_party : null,
         responded_at: now,
+        // Rename applies to plus-one rows only — a guest can't rename
+        // other real people in their group.
+        ...(plusOneIds.has(a.guest_id) && a.name ? { name: a.name } : {}),
       })
       .eq("id", a.guest_id)
       .eq("rsvp_group_id", groupId) // never write outside this group

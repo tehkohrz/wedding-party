@@ -21,7 +21,7 @@ interface Overview {
     kidsAttending: number;
   };
   side: Record<"bride" | "groom", { total: number; attending: number }>;
-  food: Record<"A" | "B", { adults: number; kids: number }>;
+  food: { A: number; B: number; kidsMeals: number; kidsNoMeal: number };
   afterParty: number;
   groups: Array<{
     id: string;
@@ -30,8 +30,9 @@ interface Overview {
     members: Array<{
       name: string;
       is_kid: boolean;
+      is_plus_one: boolean;
       attending: boolean | null;
-      food_choice: "A" | "B" | null;
+      food_choice: "A" | "B" | "K" | null;
       after_party: boolean | null;
       dietary_comment: string | null;
     }>;
@@ -77,6 +78,7 @@ export function RsvpOverviewTab() {
   const g = data.guests;
   const mainName = (id: "A" | "B") =>
     MENU.mains.find((m) => m.id === id)?.name ?? id;
+
 
   return (
     <div className="h-full overflow-y-auto px-6 py-5">
@@ -133,13 +135,17 @@ export function RsvpOverviewTab() {
             </p>
             {(["A", "B"] as const).map((id) => (
               <p key={id} className="font-sans text-sm">
-                {id}. {mainName(id)}:{" "}
-                <strong>{data.food[id].adults}</strong> adults
-                {data.food[id].kids > 0 && (
-                  <> + <strong>{data.food[id].kids}</strong> kids</>
-                )}
+                {id}. {mainName(id)}: <strong>{data.food[id]}</strong>
               </p>
             ))}
+            <p className="font-sans text-sm">
+              Kids&apos; meals: <strong>{data.food.kidsMeals}</strong>
+              {data.food.kidsNoMeal > 0 && (
+                <span className="text-muted-foreground">
+                  {" "}(+{data.food.kidsNoMeal} kids, no meal)
+                </span>
+              )}
+            </p>
           </div>
         </div>
 
@@ -182,6 +188,7 @@ export function RsvpOverviewTab() {
                     )}
                     <span className="text-foreground">{m.name}</span>
                     {m.is_kid && <span>(kid)</span>}
+                    {m.is_plus_one && <span>(+1)</span>}
                     {m.food_choice && <span>· {m.food_choice}</span>}
                     {m.after_party && <PartyPopper className="size-3" />}
                     {m.dietary_comment && (

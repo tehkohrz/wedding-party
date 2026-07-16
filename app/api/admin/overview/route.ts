@@ -25,9 +25,8 @@ export async function GET(req: Request) {
   const attending = responded.filter((g) => g.attending === true);
   const declined = responded.filter((g) => g.attending === false);
 
-  const foodCount = (choice: "A" | "B", kid: boolean) =>
-    attending.filter((g) => g.food_choice === choice && g.is_kid === kid)
-      .length;
+  const foodCount = (choice: "A" | "B" | "K") =>
+    attending.filter((g) => g.food_choice === choice).length;
 
   const bySide = (side: "bride" | "groom") => ({
     total: guests.filter((g) => g.side === side).length,
@@ -53,8 +52,12 @@ export async function GET(req: Request) {
     },
     side: { bride: bySide("bride"), groom: bySide("groom") },
     food: {
-      A: { adults: foodCount("A", false), kids: foodCount("A", true) },
-      B: { adults: foodCount("B", false), kids: foodCount("B", true) },
+      A: foodCount("A"),
+      B: foodCount("B"),
+      kidsMeals: foodCount("K"),
+      // Attending kids whose party said "no meal needed":
+      kidsNoMeal: attending.filter((g) => g.is_kid && g.food_choice === null)
+        .length,
     },
     afterParty: attending.filter((g) => g.after_party === true).length,
     groups: groups.map((grp) => {
@@ -66,6 +69,7 @@ export async function GET(req: Request) {
         members: members.map((m) => ({
           name: m.name,
           is_kid: m.is_kid,
+          is_plus_one: m.is_plus_one,
           attending: m.attending,
           food_choice: m.food_choice,
           after_party: m.after_party,
