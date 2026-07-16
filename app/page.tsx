@@ -57,16 +57,17 @@ export default function RsvpLandingPage() {
             </div>
             <RsvpNameSearch />
 
-            {/* Invitation to scroll — anchor to the details section.
+            {/* Invitation to scroll — this anchor IS the section title
+                (the details section below has no heading of its own).
                 animate-bounce is Tailwind's built-in pulse; disabled for
                 reduced-motion users. */}
             <a
               href="#details"
-              className="inline-flex flex-col items-center gap-0.5 pt-4 font-sans text-sm text-muted-foreground hover:text-foreground transition"
+              className="inline-flex flex-col items-center gap-1 pt-4 font-display text-3xl text-foreground hover:text-primary transition-colors"
             >
               {EVENT_DETAILS.detailsHeading}
               <ChevronDown
-                className="size-5 animate-bounce motion-reduce:animate-none"
+                className="size-8 animate-bounce motion-reduce:animate-none"
                 aria-hidden
               />
             </a>
