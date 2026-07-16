@@ -41,21 +41,35 @@ export const EVENT_DETAILS = {
   countdownDoneLabel: "It's wedding day! 🎉",
 
   // [input] Venue name.
-  venueName: "The Garden Pavilion",
+  venueName: "Sol & Ora @ The Outpost Hotel",
 
-  // [input] Venue address line (shown under the venue name; also used for
-  //         the maps link text). Set to "" to hide.
-  venueAddress: "123 Orchard Boulevard, Singapore",
+  // [input] Venue address line (shown under the venue name and in the
+  //         Location details card). Set to "" to hide.
+  venueAddress: "10 Artillery Ave, #07-01 Sentosa Island, 099951",
 
-  // [input] Google Maps share URL for the venue. Set to "" to hide the link.
-  mapsUrl: "",
+  // [input] The place searched on Google Maps — powers BOTH the embedded
+  //         map window and the "Get directions" link. Keep it specific
+  //         enough that Maps finds the right pin.
+  mapQuery: "Sol & Ora, The Outpost Hotel, 10 Artillery Ave, Sentosa, Singapore 099951",
 
-  // [input] Day-of schedule shown on the RSVP details step. Add/remove rows.
+  // [input] Google Maps share URL for the venue. Set to "" to hide the
+  //         "Open in Maps" link on the RSVP attendance step.
+  mapsUrl: "https://www.google.com/maps/dir/?api=1&destination=Sol+%26+Ora+The+Outpost+Hotel+Sentosa",
+
+  // [input] Day-of schedule (PLACEHOLDER — update with the real programme).
+  //         Shown in the landing Details section and on the RSVP flow.
   schedule: [
     { time: "10:30", item: "Guests arrive" },
     { time: "11:00", item: "Solemnization" },
     { time: "12:00", item: "Lunch" },
+    { time: "15:00", item: "Send-off" },
   ],
+
+  // [input] Attire line in the landing Details section.
+  attire: "Anything you like!",
+
+  // [input] Title of the details section on the landing page.
+  detailsHeading: "Details",
 
   // [input] RSVP deadline (ISO date). After this day, submitted responses
   //         become view-only and the flow shows the deadline notice.
@@ -214,10 +228,10 @@ export const RSVP_STEPS_COPY = {
     "Let us know for each person — tap an answer for everyone below.",
 
   // [input] The "yes" choice on each member row.
-  attendingLabel: "Joyfully attending",
+  attendingLabel: "Joyfully attending!",
 
   // [input] The "no" choice on each member row.
-  decliningLabel: "Regretfully, decline",
+  decliningLabel: "Regretfully decline :(",
 
   // [input] Continue button (enabled once everyone has an answer).
   continueLabel: "Continue",
