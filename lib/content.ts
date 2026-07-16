@@ -59,14 +59,15 @@ export const EVENT_DETAILS = {
   // [input] Day-of schedule (PLACEHOLDER — update with the real programme).
   //         Shown in the landing Details section and on the RSVP flow.
   schedule: [
-    { time: "10:30", item: "Guests arrive" },
-    { time: "11:00", item: "Solemnization" },
-    { time: "12:00", item: "Lunch" },
+    { time: "11:30", item: "Tea Ceremony" },
+    { time: "12:00", item: "Solemnization" },
+    { time: "12:30", item: "Lunch" },
     { time: "15:00", item: "Send-off" },
+    { time: "15:30", item: "Afterparty!" },
   ],
 
   // [input] Attire line in the landing Details section.
-  attire: "Anything you like!",
+  attire: "The solemnisation is outdoors dress for the weather! Beachwear, underwear or birthday suit - Anything you like!",
 
   // [input] Title of the details section on the landing page.
   detailsHeading: "Details",

@@ -24,18 +24,18 @@ export function EventDetails() {
 
   return (
     <div id="details" className="scroll-mt-10 max-w-xl mx-auto text-center">
-      {/* Schedule */}
-      <SectionLabel icon={<Clock className="size-3.5" />} label="Schedule" />
-      <ul className="inline-block mt-3">
+      {/* Schedule — item text matches the attire treatment (display, xl) */}
+      <SectionLabel icon={<Clock className="size-5" />} label="Schedule" />
+      <ul className="inline-block mt-3 space-y-1">
         {EVENT_DETAILS.schedule.map((row) => (
           <li
             key={row.time}
-            className="flex items-baseline gap-4 font-sans text-base text-left leading-relaxed"
+            className="flex items-baseline gap-4 text-left leading-relaxed"
           >
-            <span className="tabular-nums text-muted-foreground w-14 shrink-0">
+            <span className="font-sans tabular-nums text-xl text-muted-foreground w-16 shrink-0">
               {row.time}
             </span>
-            <span>{row.item}</span>
+            <span className="font-display text-xl">{row.item}</span>
           </li>
         ))}
       </ul>
@@ -43,13 +43,13 @@ export function EventDetails() {
       <DotDivider />
 
       {/* Attire */}
-      <SectionLabel icon={<Shirt className="size-3.5" />} label="Attire" />
+      <SectionLabel icon={<Shirt className="size-5" />} label="Attire" />
       <p className="font-display text-xl mt-3">{EVENT_DETAILS.attire}</p>
 
       <DotDivider />
 
       {/* Location */}
-      <SectionLabel icon={<MapPin className="size-3.5" />} label="Location" />
+      <SectionLabel icon={<MapPin className="size-5" />} label="Location" />
       <div className="mt-3 space-y-1">
         <p className="font-display text-xl">{EVENT_DETAILS.venueName}</p>
         {EVENT_DETAILS.venueAddress && (
@@ -89,7 +89,7 @@ function SectionLabel({
   label: string;
 }) {
   return (
-    <p className="flex items-center justify-center gap-2 font-sans text-xs uppercase tracking-[0.25em] text-muted-foreground">
+    <p className="flex items-center justify-center gap-2.5 font-sans text-lg uppercase tracking-[0.25em] text-muted-foreground">
       <span className="text-primary">{icon}</span>
       {label}
     </p>
