@@ -1,96 +1,105 @@
 /**
- * Attendance store, backed by IndexedDB via Dexie.
+ * Attendance client — Stage 6: arrivals live in the DATABASE (via
+ * /api/attendance), shared across every check-in device. This module kept
+ * the same function names as the old Dexie version so screens barely
+ * changed; Dexie itself is retired.
  *
- * Database name: "sitwhereah"
- * One table: `attendance`, keyed by guest_id.
- * A row exists for a guest iff they have arrived.
+ * Reactivity: useLiveQuery is replaced by hooks/useAttendance (polling +
+ * the local `subscribeAttendance` bus below, which fires immediately after
+ * any write from THIS device so the UI never waits a poll interval).
  *
- * Browser-only: IndexedDB doesn't exist on the server, so this module
- * must only be imported from client components ("use client" files).
- * Importing it into a server component will fail at runtime.
+ * Writes THROW on failure (network down / server error) — callers run
+ * inside user-action handlers and simply won't advance the flow, which is
+ * the right day-of behavior for an online-only kiosk.
  */
-import Dexie, { type Table } from "dexie";
 
 export interface AttendanceRecord {
-  /** References Guest.id from lib/schema.ts. */
+  /** References Guest.id. */
   guest_id: number;
-  /** Epoch milliseconds — Date.now() when marked arrived. */
+  /** Epoch milliseconds. */
   arrived_at: number;
 }
 
-class AttendanceDB extends Dexie {
-  attendance!: Table<AttendanceRecord, number>;
+// ─── Local change bus (this-device reactivity between polls) ────────────────
 
-  constructor() {
-    super("sitwhereah");
-    // The string defines the primary key and any secondary indexes.
-    // "guest_id" alone means guest_id is the primary key (no other indexes
-    // needed — we only ever look up by guest_id or fetch the whole table).
-    this.version(1).stores({
-      attendance: "guest_id",
-    });
-  }
+type Listener = () => void;
+const listeners = new Set<Listener>();
+
+/** Subscribe to "attendance changed on this device" events. */
+export function subscribeAttendance(fn: Listener): () => void {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
 }
 
-/**
- * The singleton DB connection. Exported so React components can use
- * dexie-react-hooks' useLiveQuery to subscribe to live updates.
- */
-export const db = new AttendanceDB();
-
-/** Mark a guest as arrived. Idempotent — calling twice keeps the latest timestamp. */
-export async function markArrived(guestId: number): Promise<void> {
-  await db.attendance.put({
-    guest_id: guestId,
-    arrived_at: Date.now(),
-  });
+function notify(): void {
+  listeners.forEach((fn) => fn());
 }
 
+// ─── Reads ───────────────────────────────────────────────────────────────────
+
+/** Every arrival — stats, map overlay, admin dashboard. */
+export async function getAllArrived(): Promise<AttendanceRecord[]> {
+  const res = await fetch("/api/attendance");
+  if (!res.ok) throw new Error("attendance fetch failed");
+  const json = (await res.json()) as { attendance: AttendanceRecord[] };
+  return json.attendance;
+}
+
+// ─── Writes (check-in devices) ───────────────────────────────────────────────
+
 /**
- * Mark several guests as arrived in one transaction (group check-in).
- * Uses Dexie's bulkPut — one write op instead of N. All share the same
- * timestamp. Idempotent, like markArrived.
+ * Mark several guests as arrived in one request (group check-in).
+ * Idempotent — re-marking refreshes the timestamp.
  */
 export async function markArrivedMany(guestIds: number[]): Promise<void> {
   if (guestIds.length === 0) return;
-  const now = Date.now();
-  await db.attendance.bulkPut(
-    guestIds.map((id) => ({ guest_id: id, arrived_at: now }))
-  );
+  const res = await fetch("/api/attendance", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ guest_ids: guestIds }),
+  });
+  if (!res.ok) throw new Error("mark arrived failed");
+  notify();
 }
 
-/** Remove a guest's arrival record (admin manual override / reset). */
+/** Mark a single guest as arrived. */
+export async function markArrived(guestId: number): Promise<void> {
+  await markArrivedMany([guestId]);
+}
+
+// ─── Writes (admin only — the PIN cookie authorizes these) ──────────────────
+
+/** Remove a guest's arrival record (admin manual override). */
 export async function unmark(guestId: number): Promise<void> {
-  await db.attendance.delete(guestId);
-}
-
-/** Returns the record if the guest has arrived, otherwise undefined. */
-export async function getStatus(
-  guestId: number
-): Promise<AttendanceRecord | undefined> {
-  return db.attendance.get(guestId);
-}
-
-/** Every arrival, useful for stats and the map overlay. */
-export async function getAllArrived(): Promise<AttendanceRecord[]> {
-  return db.attendance.toArray();
+  const res = await fetch("/api/admin/attendance", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ guest_id: guestId }),
+  });
+  if (!res.ok) throw new Error("unmark failed");
+  notify();
 }
 
 /** Wipe everything. Used by admin "Reset all" after double-confirm. */
 export async function resetAll(): Promise<void> {
-  await db.attendance.clear();
+  const res = await fetch("/api/admin/attendance", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ all: true }),
+  });
+  if (!res.ok) throw new Error("reset failed");
+  notify();
 }
 
-/**
- * Replace the entire attendance table with the given records (restore from
- * a backup file). Clears first so the result exactly matches the backup —
- * records added since the backup are removed. Runs in one transaction.
- */
+/** Replace the entire attendance table (restore from a backup file). */
 export async function replaceAllAttendance(
   records: AttendanceRecord[]
 ): Promise<void> {
-  await db.transaction("rw", db.attendance, async () => {
-    await db.attendance.clear();
-    if (records.length > 0) await db.attendance.bulkPut(records);
+  const res = await fetch("/api/admin/attendance", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ attendance: records }),
   });
+  if (!res.ok) throw new Error("restore failed");
+  notify();
 }

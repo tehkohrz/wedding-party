@@ -1,8 +1,9 @@
 /**
  * GET /api/guests — the guest list for the day-of check-in app.
  *
- * Returns every guest with their group + seat. Stage 6 will point the
- * check-in flow's search at this instead of the build-time lib/data.json.
+ * Returns every guest with their group + seat + RSVP attending flag —
+ * the check-in flow's data source since Stage 6 (declined guests are
+ * filtered client-side in hooks/useDbGuests).
  * (Names on a wedding guest list are not sensitive within the event's
  * audience; this endpoint is unauthenticated by design.)
  */
@@ -12,7 +13,7 @@ export async function GET() {
   const { data, error } = await db()
     .from("guests")
     .select(
-      "id, name, search_aliases, side, seating_group_id, row_num, section, seat"
+      "id, name, search_aliases, side, seating_group_id, is_kid, is_plus_one, attending, row_num, section, seat"
     )
     .order("id");
 

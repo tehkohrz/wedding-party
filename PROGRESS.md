@@ -59,7 +59,7 @@ single atomic submit with sessionStorage draft.
 - [x] Stage 3 — Menu + per-attendee food choices + dietary comments  *(2026-07 — MENU const (2 mains, images optional), StepMenu with per-attending selectors + dietary comments, kids note)*
 - [x] Stage 4 — After-party, confirm, atomic submit, edit-until-deadline  *(2026-07 — StepAfterParty per-attendee toggles, SummaryList + StepConfirm single POST (Zod-validated, group-scoped, deadline-enforced), decline path submits too, StepThanks with Edit-until-deadline, sessionStorage draft persistence, confetti on submit)*
 - [x] Stage 5 — Admin v2  *(2026-07 — server-side PIN (ADMIN_PIN + httpOnly cookie via /api/admin/login; NEXT_PUBLIC names still work as fallback), tabbed admin (RSVP overview with food/kids/after-party totals + per-invitation table · Attendance (still local-Dexie until Stage 6) · Guest list editor with seat assignment + RSVP overrides), links CSV export. E2E-tested: login 401/200, overview live-updates on submit, foreign-guest submit rejected, PATCH works.)*
-- [ ] Stage 6 — Day-of check-in on the database (retire Dexie)
+- [x] Stage 6 — Day-of check-in on the database *(2026-07 — arrivals in Supabase via /api/attendance (kiosk, unauthenticated) + /api/admin/attendance (unmark/reset/restore, PIN'd); useAttendance polling hook (4s) + this-device change bus replaces useLiveQuery; guest list from /api/guests via useDbGuests (declined guests filtered out, admin edits + plus-one renames live on the iPads); lib/groups helpers take the guest list explicitly; Dexie removed. E2E-tested: search → group check-in (4 arrivals written) → lunch map.)*
 - [ ] Stage 7 — Hardening + full dry run
 
 ---

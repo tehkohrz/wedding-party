@@ -9,7 +9,7 @@
  *
  * Path B (Figma SVG background) is deferred — see PROGRESS.md.
  */
-import { useLiveQuery } from "dexie-react-hooks";
+import { useMemo } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { Check } from "lucide-react";
@@ -19,8 +19,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { guests, groups, layout } from "@/lib/data";
-import { db } from "@/lib/attendance";
+import { groups, layout } from "@/lib/data";
+import { useDbGuests } from "@/hooks/useDbGuests";
+import { useAttendance } from "@/hooks/useAttendance";
 import type { Guest, Group, LayoutSection } from "@/lib/schema";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -39,20 +40,13 @@ export interface SeatRef {
   seat: number;
 }
 
-// ─── Module-level lookups (built once on import) ─────────────────────────────
+// ─── Lookups ─────────────────────────────────────────────────────────────────
 
 function seatKey(row: number, section: string | null, seat: number): string {
   return `${row}|${section ?? ""}|${seat}`;
 }
 
-const GUEST_BY_SEAT_KEY = new Map<string, Guest>();
-for (const g of guests) {
-  // Seats are nullable since v2 (assigned after the RSVP deadline) —
-  // unseated guests simply have no seat to be looked up from.
-  if (g.row === null || g.seat === null) continue;
-  GUEST_BY_SEAT_KEY.set(seatKey(g.row, g.section, g.seat), g);
-}
-
+// Seating-group labels stay build-time (layout.csv pipeline).
 const GROUP_BY_ID = new Map<string, Group>();
 for (const grp of groups) {
   GROUP_BY_ID.set(grp.id, grp);
@@ -86,8 +80,22 @@ export function SeatingMap({
     highlightMap.set(seatKey(h.row, h.section, h.seat), h);
   }
 
+  // Guests from the database (Stage 6): seat assignments and renames made
+  // in admin are live here. Seat → guest lookup rebuilt when the list lands.
+  const dbGuests = useDbGuests();
+  const guestBySeatKey = useMemo(() => {
+    const map = new Map<string, Guest>();
+    for (const g of dbGuests ?? []) {
+      // Seats are nullable (assigned after the RSVP deadline) — unseated
+      // guests simply have no seat to be looked up from.
+      if (g.row === null || g.seat === null) continue;
+      map.set(seatKey(g.row, g.section, g.seat), g);
+    }
+    return map;
+  }, [dbGuests]);
+
   // Live attendance — drives the ✓ in the popover.
-  const arrived = useLiveQuery(() => db.attendance.toArray());
+  const arrived = useAttendance();
   const arrivedIds = new Set((arrived ?? []).map((r) => r.guest_id));
 
   // Pulse lookup — Set of seat keys that should pulse on mount.
@@ -120,6 +128,7 @@ export function SeatingMap({
                   key={`${rowNum}-${section.section ?? "_"}`}
                   section={section}
                   highlightMap={highlightMap}
+                  guestBySeatKey={guestBySeatKey}
                   arrivedIds={arrivedIds}
                   pulseSet={pulseSet}
                   showSeatInfo={showSeatInfo}
@@ -160,12 +169,14 @@ export function SeatingMap({
 function SectionBlock({
   section,
   highlightMap,
+  guestBySeatKey,
   arrivedIds,
   pulseSet,
   showSeatInfo,
 }: {
   section: LayoutSection;
   highlightMap: Map<string, SeatHighlight>;
+  guestBySeatKey: Map<string, Guest>;
   arrivedIds: Set<number>;
   pulseSet: Set<string>;
   showSeatInfo: boolean;
@@ -184,7 +195,7 @@ function SectionBlock({
               number={n}
               keyStr={key}
               highlight={highlightMap.get(key)}
-              guest={GUEST_BY_SEAT_KEY.get(key)}
+              guest={guestBySeatKey.get(key)}
               arrivedIds={arrivedIds}
               pulse={pulseSet.has(key)}
               showInfo={showSeatInfo}

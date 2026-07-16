@@ -24,6 +24,7 @@ import {
   type SeatRef,
 } from "@/components/SeatingMap";
 import { useRequireGuest } from "@/hooks/useRequireGuest";
+import { useDbGuests } from "@/hooks/useDbGuests";
 import { useWizardStore } from "@/lib/store";
 import { getMemberColorAssignments } from "@/lib/groups";
 import { celebrate } from "@/lib/confetti";
@@ -32,6 +33,7 @@ import { cn } from "@/lib/utils";
 
 export default function LunchPage() {
   const guest = useRequireGuest();
+  const allGuests = useDbGuests();
   const checkedInThisRound = useWizardStore((s) => s.checkedInThisRound);
   const reduceMotion = useReducedMotion();
 
@@ -49,7 +51,7 @@ export default function LunchPage() {
   const thisRound = new Set(checkedInThisRound);
 
   // Stable color per member (current guest first, companions in CSV order).
-  const assignments = getMemberColorAssignments(guest);
+  const assignments = getMemberColorAssignments(guest, allGuests ?? [guest]);
   const isGroup = assignments.length > 1;
 
   // Sort: this-round first (stable sort preserves CSV order within each

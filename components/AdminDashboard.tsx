@@ -3,26 +3,27 @@
 /**
  * Admin dashboard — live attendance overview + manual override.
  *
- * Reads guests from the build-time data and attendance from Dexie via
- * useLiveQuery, so stats and statuses update in real time as guests check
- * in on the same iPad. Tapping a guest row toggles their arrival (for
- * corrections / marking someone who couldn't use the iPad).
+ * Stage 6: guests AND attendance come from the database — arrivals from
+ * every check-in device appear here (polled every few seconds). Tapping a
+ * guest row toggles their arrival (for corrections / marking someone who
+ * couldn't use the iPad).
  */
 import { useMemo, useState } from "react";
-import { useLiveQuery } from "dexie-react-hooks";
 import { Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { guests } from "@/lib/data";
-import { db, markArrived, unmark } from "@/lib/attendance";
+import { useDbGuests } from "@/hooks/useDbGuests";
+import { useAttendance } from "@/hooks/useAttendance";
+import { markArrived, unmark } from "@/lib/attendance";
 import { ADMIN_COPY } from "@/lib/content";
 import { AdminDataControls } from "@/components/AdminDataControls";
 
 type Filter = "all" | "arrived" | "pending";
 
 export function AdminDashboard() {
-  const arrived = useLiveQuery(() => db.attendance.toArray());
+  const guests = useDbGuests() ?? [];
+  const arrived = useAttendance();
   const arrivedMap = useMemo(() => {
     const m = new Map<number, number>(); // guest_id → arrived_at
     for (const r of arrived ?? []) m.set(r.guest_id, r.arrived_at);

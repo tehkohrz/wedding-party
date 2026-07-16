@@ -6,8 +6,11 @@
  * Groups aren't a separate lookup at runtime: a guest belongs to a group
  * iff their `seating_group_id` matches. These helpers do that filtering in
  * one place so screens don't each reimplement it.
+ *
+ * Since Stage 6 the guest list comes from the database (hooks/useDbGuests),
+ * so every helper takes the list explicitly instead of importing the old
+ * build-time data.
  */
-import { guests } from "@/lib/data";
 import type { Guest } from "@/lib/schema";
 
 /**
@@ -16,19 +19,24 @@ import type { Guest } from "@/lib/schema";
  * A guest without a seating group returns just [guest].
  * Order follows the guest list (CSV order).
  */
-export function getGroupMembers(guest: Guest): Guest[] {
+export function getGroupMembers(
+  guest: Guest,
+  all: readonly Guest[]
+): Guest[] {
   if (!guest.seating_group_id) return [guest];
-  return guests.filter(
+  const members = all.filter(
     (g) => g.seating_group_id === guest.seating_group_id
   );
+  // Guard: `guest` may come from a stale store snapshot not in `all`.
+  return members.some((g) => g.id === guest.id) ? members : [guest];
 }
 
 /**
  * True if the guest has at least one OTHER person in their group —
  * i.e. the Group check-in screen would have something to show.
  */
-export function hasGroupmates(guest: Guest): boolean {
-  return getGroupMembers(guest).length > 1;
+export function hasGroupmates(guest: Guest, all: readonly Guest[]): boolean {
+  return getGroupMembers(guest, all).length > 1;
 }
 
 // ─── Bouquet color assignment ────────────────────────────────────────────────
@@ -57,9 +65,10 @@ export type BouquetColor = (typeof BOUQUET_COLORS)[number];
  * a solo guest this is just `[{ guest, color: BOUQUET_COLORS[0] }]`.
  */
 export function getMemberColorAssignments(
-  guest: Guest
+  guest: Guest,
+  all: readonly Guest[]
 ): Array<{ guest: Guest; color: BouquetColor }> {
-  const others = getGroupMembers(guest).filter((m) => m.id !== guest.id);
+  const others = getGroupMembers(guest, all).filter((m) => m.id !== guest.id);
   const result: Array<{ guest: Guest; color: BouquetColor }> = [
     { guest, color: BOUQUET_COLORS[0] },
   ];

@@ -10,17 +10,18 @@
  * useLiveQuery subscribes to the table — anywhere in the app that writes
  * to db.attendance will trigger this component to re-render with fresh data.
  */
-import { useLiveQuery } from "dexie-react-hooks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { guests } from "@/lib/data";
-import { db, markArrived, unmark, resetAll } from "@/lib/attendance";
+import { useDbGuests } from "@/hooks/useDbGuests";
+import { useAttendance } from "@/hooks/useAttendance";
+import { markArrived, unmark, resetAll } from "@/lib/attendance";
 
 export function AttendanceDemo() {
   // useLiveQuery returns:
   //   - undefined while the query is loading (first render only)
   //   - the result, and re-runs whenever the table changes
-  const arrived = useLiveQuery(() => db.attendance.toArray()) ?? [];
+  const guests = useDbGuests() ?? [];
+  const arrived = useAttendance() ?? [];
   const arrivedIds = new Set(arrived.map((r) => r.guest_id));
 
   return (

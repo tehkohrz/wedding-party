@@ -12,14 +12,15 @@
  * Layout: fixed header + footer, scrollable member list in between — so a
  * large group never breaks the locked viewport.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useLiveQuery } from "dexie-react-hooks";
 import { motion, useReducedMotion } from "motion/react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { db, markArrivedMany } from "@/lib/attendance";
+import { markArrivedMany } from "@/lib/attendance";
+import { useAttendance } from "@/hooks/useAttendance";
+import { useDbGuests } from "@/hooks/useDbGuests";
 import {
   getGroupMembers,
   getMemberColorAssignments,
@@ -37,30 +38,45 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
     (s) => s.setCheckedInThisRound
   );
 
+  // Guest list from the database (Stage 6) — falls back to just the
+  // current guest until it loads.
+  const allGuests = useDbGuests();
+
   // Everyone in the group except the current guest.
   const others = useMemo(
-    () => getGroupMembers(guest).filter((m) => m.id !== guest.id),
-    [guest]
+    () =>
+      getGroupMembers(guest, allGuests ?? [guest]).filter(
+        (m) => m.id !== guest.id
+      ),
+    [guest, allGuests]
   );
 
   // Stable color per member (matches the lunch screen's name boxes + seat
   // highlights so each person has one color across the whole flow).
   const colorByGuestId = useMemo(() => {
     const map = new Map<number, BouquetColor>();
-    for (const { guest: g, color } of getMemberColorAssignments(guest)) {
+    for (const { guest: g, color } of getMemberColorAssignments(
+      guest,
+      allGuests ?? [guest]
+    )) {
       map.set(g.id, color);
     }
     return map;
-  }, [guest]);
+  }, [guest, allGuests]);
 
   // Live attendance — undefined on first render, then the rows.
-  const arrived = useLiveQuery(() => db.attendance.toArray());
+  const arrived = useAttendance();
   const arrivedIds = new Set((arrived ?? []).map((r) => r.guest_id));
 
-  // Which companions are toggled on. Default: all of them.
+  // Which companions are toggled on. Default: all of them. The list
+  // arrives async from the DB, so re-default when it lands (fires before
+  // any realistic user interaction; useDbGuests fetches once per mount).
   const [selected, setSelected] = useState<Set<number>>(
     () => new Set(others.map((m) => m.id))
   );
+  const othersKey = others.map((m) => m.id).join(",");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => setSelected(new Set(others.map((m) => m.id))), [othersKey]);
 
   function toggle(id: number) {
     setSelected((prev) => {

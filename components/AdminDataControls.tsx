@@ -8,7 +8,6 @@
  * (built from CSV), so a backup only needs the attendance records.
  */
 import { useRef, useState } from "react";
-import { useLiveQuery } from "dexie-react-hooks";
 import { Download, Upload, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,18 +18,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { guests } from "@/lib/data";
+import { useDbGuests } from "@/hooks/useDbGuests";
 import {
-  db,
   resetAll,
   replaceAllAttendance,
   type AttendanceRecord,
 } from "@/lib/attendance";
+import { useAttendance } from "@/hooks/useAttendance";
 import { AttendanceExportSchema } from "@/lib/schema";
 import { ADMIN_COPY } from "@/lib/content";
 
 export function AdminDataControls() {
-  const arrived = useLiveQuery(() => db.attendance.toArray());
+  const guests = useDbGuests() ?? [];
+  const arrived = useAttendance();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [resetOpen, setResetOpen] = useState(false);

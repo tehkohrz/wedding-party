@@ -23,7 +23,6 @@
  */
 import Fuse from "fuse.js";
 import { useMemo } from "react";
-import { guests } from "@/lib/data";
 import { SEARCH_CONFIG } from "@/lib/content";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import type { Guest } from "@/lib/schema";
@@ -31,29 +30,30 @@ import type { Guest } from "@/lib/schema";
 const MAX_RESULTS = 5;
 const DEBOUNCE_MS = 150;
 
-/** Guests hidden from the day-of searches (see SEARCH_CONFIG in content). */
-const SEARCHABLE = (guests as Guest[]).filter(
-  (g) =>
-    !SEARCH_CONFIG.hiddenGuestIds.includes(g.id) &&
-    !(
-      g.seating_group_id !== null &&
-      SEARCH_CONFIG.hiddenSeatingGroupIds.includes(g.seating_group_id)
-    )
-);
-
-export function useGuestSearch(query: string): Guest[] {
-  // Build the Fuse index once. `guests` is a build-time constant so the
-  // dependency array is effectively [] — this runs once on mount.
-  const fuse = useMemo(
-    () =>
-      new Fuse(SEARCHABLE, {
-        keys: ["name", "search_aliases"],
-        threshold: 0.3, // tightened: fewer loose matches
-        minMatchCharLength: 2,
-        ignoreLocation: true, // don't penalize matches near end of string
-      }),
-    []
-  );
+export function useGuestSearch(
+  query: string,
+  // Since Stage 6 the guest list comes from the database (useDbGuests) —
+  // pass it in; undefined-while-loading simply yields no matches.
+  guests: readonly Guest[] | undefined
+): Guest[] {
+  // Guests hidden from the day-of searches (see SEARCH_CONFIG in content),
+  // then the Fuse index — rebuilt only when the list itself changes.
+  const fuse = useMemo(() => {
+    const searchable = (guests ?? []).filter(
+      (g) =>
+        !SEARCH_CONFIG.hiddenGuestIds.includes(g.id) &&
+        !(
+          g.seating_group_id !== null &&
+          SEARCH_CONFIG.hiddenSeatingGroupIds.includes(g.seating_group_id)
+        )
+    );
+    return new Fuse(searchable, {
+      keys: ["name", "search_aliases"],
+      threshold: 0.3, // tightened: fewer loose matches
+      minMatchCharLength: 2,
+      ignoreLocation: true, // don't penalize matches near end of string
+    });
+  }, [guests]);
 
   // Debounce the query so Fuse runs after the user pauses.
   const debouncedQuery = useDebouncedValue(query.trim(), DEBOUNCE_MS);

@@ -13,12 +13,12 @@
  * Back/Home buttons + the WizardShell idle timer apply (it's in WIZARD_PATHS).
  */
 import { useState } from "react";
-import { useLiveQuery } from "dexie-react-hooks";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { SeatingMap, type SeatHighlight } from "@/components/SeatingMap";
 import { useGuestSearch } from "@/hooks/useGuestSearch";
-import { db } from "@/lib/attendance";
+import { useDbGuests } from "@/hooks/useDbGuests";
+import { useAttendance } from "@/hooks/useAttendance";
 import { getMemberColorAssignments } from "@/lib/groups";
 import { LOOKUP_COPY } from "@/lib/content";
 import { cn } from "@/lib/utils";
@@ -28,8 +28,9 @@ export default function FindPage() {
   const [query, setQuery] = useState("");
   const [viewing, setViewing] = useState<Guest | null>(null);
 
-  const matches = useGuestSearch(query);
-  const arrived = useLiveQuery(() => db.attendance.toArray());
+  const allGuests = useDbGuests();
+  const matches = useGuestSearch(query, allGuests);
+  const arrived = useAttendance();
   const arrivedIds = new Set((arrived ?? []).map((r) => r.guest_id));
 
   // Typing a new query clears the currently-viewed guest so the results
@@ -49,7 +50,9 @@ export default function FindPage() {
   // person, stable across screens. Members without an assigned seat (nullable
   // since v2 — seats are assigned after the RSVP deadline) can't be shown on
   // the map, so they're filtered from the highlights.
-  const assignments = viewing ? getMemberColorAssignments(viewing) : [];
+  const assignments = viewing
+    ? getMemberColorAssignments(viewing, allGuests ?? [viewing])
+    : [];
   const highlights: SeatHighlight[] = assignments
     .filter(({ guest: m }) => m.row !== null && m.seat !== null)
     .map(({ guest: m, color }) => ({

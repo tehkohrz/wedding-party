@@ -17,6 +17,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useGuestSearch } from "@/hooks/useGuestSearch";
+import { useDbGuests } from "@/hooks/useDbGuests";
 import { useWizardStore } from "@/lib/store";
 import { hasGroupmates } from "@/lib/groups";
 import { markArrived } from "@/lib/attendance";
@@ -32,13 +33,16 @@ export function NameSearch() {
   );
 
   const [query, setQuery] = useState("");
-  const matches = useGuestSearch(query);
+  // The searchable list comes from the DATABASE (Stage 6) — admin edits
+  // and plus-one renames are live on the check-in iPad.
+  const allGuests = useDbGuests();
+  const matches = useGuestSearch(query, allGuests);
   const reduceMotion = useReducedMotion();
 
   async function handleSelect(guest: Guest) {
     setCurrentGuest(guest);
     setDirection("forward");
-    if (hasGroupmates(guest)) {
+    if (hasGroupmates(guest, allGuests ?? [guest])) {
       // Grouped: Confirm on the group screen populates checkedInThisRound.
       // Clear it now so the lunch screen never inherits a stale prior round.
       setCheckedInThisRound([]);
