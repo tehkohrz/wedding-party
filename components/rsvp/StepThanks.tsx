@@ -8,10 +8,12 @@
  * Edit re-enters the stepper at step 1 with everything prefilled — allowed
  * until the RSVP deadline, after which the summary is view-only.
  */
+import { CalendarPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SummaryList } from "./SummaryList";
 import { useRsvpStore } from "@/lib/rsvpStore";
-import { RSVP_CONFIRM } from "@/lib/content";
+import { EVENT_DETAILS, RSVP_CONFIRM } from "@/lib/content";
+import { googleCalendarUrl } from "@/lib/calendarLink";
 import { rsvpDeadlinePassed, rsvpDeadlineLabel } from "@/lib/rsvpDeadline";
 import type { RsvpMember } from "./types";
 
@@ -36,6 +38,15 @@ export function StepThanks({
       </div>
 
       <SummaryList members={members} />
+
+      {/* Handy shortcut: drop the wedding into their calendar. Event
+          fields are [input]s in lib/content.ts (EVENT_DETAILS.calendar*). */}
+      <Button asChild variant="outline" className="w-full h-11 rounded-pill">
+        <a href={googleCalendarUrl()} target="_blank" rel="noreferrer">
+          <CalendarPlus className="size-4" />
+          {EVENT_DETAILS.calendarButtonLabel}
+        </a>
+      </Button>
 
       {closed ? (
         <p className="font-sans text-xs text-muted-foreground text-center">

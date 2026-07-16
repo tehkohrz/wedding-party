@@ -45,7 +45,10 @@ export function StepAfterParty({ members }: { members: RsvpMember[] }) {
       <div className="space-y-2">
         {attending.map((m, i) => {
           const color = BOUQUET_COLORS[i % BOUQUET_COLORS.length];
-          const going = (answers[m.id] ?? EMPTY_ANSWER).afterParty;
+          const a = answers[m.id] ?? EMPTY_ANSWER;
+          const going = a.afterParty;
+          // Plus-ones may have been renamed on the attendance step.
+          const displayName = (a.name ?? "").trim() || m.name;
           return (
             <div
               key={m.id}
@@ -58,8 +61,8 @@ export function StepAfterParty({ members }: { members: RsvpMember[] }) {
                   className="size-2.5 rounded-full shrink-0"
                   style={{ backgroundColor: `hsl(var(--${color}))` }}
                 />
-                <span className="font-display text-lg leading-none">
-                  {m.name}
+                <span className="font-display text-2xl leading-none">
+                  {displayName}
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-2">

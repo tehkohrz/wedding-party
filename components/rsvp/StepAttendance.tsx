@@ -15,20 +15,17 @@
 import { Check, X } from "lucide-react";
 import { ChoiceChip } from "./ChoiceChip";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useRsvpStore, EMPTY_ANSWER } from "@/lib/rsvpStore";
-import { EVENT_DETAILS, RSVP_STEPS_COPY } from "@/lib/content";
+import { RSVP_STEPS_COPY } from "@/lib/content";
+import { ScheduleBlock } from "@/components/ScheduleBlock";
 import { BOUQUET_COLORS } from "@/lib/groups";
-import type { RsvpGroup, RsvpMember } from "./types";
+import type { RsvpMember } from "./types";
 
-export function StepAttendance({
-  group,
-  members,
-}: {
-  group: RsvpGroup;
-  members: RsvpMember[];
-}) {
+export function StepAttendance({ members }: { members: RsvpMember[] }) {
   const answers = useRsvpStore((s) => s.answers);
   const setAttending = useRsvpStore((s) => s.setAttending);
+  const setName = useRsvpStore((s) => s.setName);
   const goTo = useRsvpStore((s) => s.goTo);
 
   const allAnswered = members.every(
@@ -44,31 +41,12 @@ export function StepAttendance({
 
   return (
     <div className="space-y-6">
-      {/* Schedule */}
-      <div className="rounded-card border border-border bg-surface px-5 py-4">
-        <ul className="space-y-1.5">
-          {EVENT_DETAILS.schedule.map((row) => (
-            <li
-              key={row.time}
-              className="flex items-baseline gap-3 font-sans text-sm"
-            >
-              <span className="tabular-nums text-muted-foreground w-12 shrink-0">
-                {row.time}
-              </span>
-              <span>{row.item}</span>
-            </li>
-          ))}
-        </ul>
-        {EVENT_DETAILS.mapsUrl && (
-          <a
-            href={EVENT_DETAILS.mapsUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-block font-sans text-xs text-primary hover:underline mt-2"
-          >
-            Open in Maps →
-          </a>
-        )}
+      {/* Schedule — same styling as the landing page (shared component),
+          no maps link here (the intro view carries the full location).
+          Hidden on phones: the party list is the point of this screen,
+          and the intro one tap away still carries the full schedule. */}
+      <div className="hidden sm:block">
+        <ScheduleBlock />
       </div>
 
       {/* Heading */}
@@ -92,7 +70,8 @@ export function StepAttendance({
             BOUQUET_COLORS[
               BOUQUET_COLORS.length - 1 - (i % BOUQUET_COLORS.length)
             ];
-          const attending = (answers[m.id] ?? EMPTY_ANSWER).attending;
+          const answer = answers[m.id] ?? EMPTY_ANSWER;
+          const attending = answer.attending;
           return (
             <div
               key={m.id}
@@ -111,8 +90,10 @@ export function StepAttendance({
                   className="size-2.5 rounded-full shrink-0"
                   style={{ backgroundColor: `hsl(var(--${color}))` }}
                 />
-                <span className="font-display text-lg leading-none">
-                  {m.name}
+                <span className="font-display text-2xl leading-none">
+                  {/* Plus-one rows ask a question instead of naming the
+                      placeholder ("Peter's Plus One"). */}
+                  {m.is_plus_one ? RSVP_STEPS_COPY.plusOneQuestion : m.name}
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -120,17 +101,41 @@ export function StepAttendance({
                   selected={attending === true}
                   onSelect={() => setAttending(m.id, true)}
                   icon={<Check className="size-4" />}
-                  label={RSVP_STEPS_COPY.attendingLabel}
+                  label={
+                    m.is_plus_one
+                      ? RSVP_STEPS_COPY.plusOneYesLabel
+                      : RSVP_STEPS_COPY.attendingLabel
+                  }
                   accentColor={chipColor}
                 />
                 <ChoiceChip
                   selected={attending === false}
                   onSelect={() => setAttending(m.id, false)}
                   icon={<X className="size-4" />}
-                  label={RSVP_STEPS_COPY.decliningLabel}
+                  label={
+                    m.is_plus_one
+                      ? RSVP_STEPS_COPY.plusOneNoLabel
+                      : RSVP_STEPS_COPY.decliningLabel
+                  }
                   muted
                 />
               </div>
+              {/* A coming plus-one can be given their real name (optional —
+                  leaving it keeps the placeholder from the guest list). */}
+              {m.is_plus_one && attending === true && (
+                <label className="block space-y-1 pt-1">
+                  <span className="font-sans text-xs text-muted-foreground">
+                    {RSVP_STEPS_COPY.plusOneNameLabel}
+                  </span>
+                  <Input
+                    value={answer.name ?? ""}
+                    onChange={(ev) => setName(m.id, ev.target.value)}
+                    placeholder={RSVP_STEPS_COPY.plusOneNamePlaceholder}
+                    maxLength={80}
+                    className="h-11"
+                  />
+                </label>
+              )}
             </div>
           );
         })}
@@ -144,10 +149,6 @@ export function StepAttendance({
       >
         {RSVP_STEPS_COPY.continueLabel}
       </Button>
-
-      <p className="font-sans text-xs text-muted-foreground text-center">
-        Responding for {group.label}
-      </p>
     </div>
   );
 }

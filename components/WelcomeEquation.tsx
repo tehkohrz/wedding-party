@@ -50,27 +50,27 @@ export function WelcomeEquation() {
 
   return (
     <motion.h1 className="font-display leading-tight" {...motionProps}>
-      <motion.span variants={lineVariants} className="block text-7xl">
+      <motion.span variants={lineVariants} className="block text-4xl sm:text-7xl">
         {COUPLE.brideName}
       </motion.span>
       <motion.span
         variants={lineVariants}
-        className="block text-5xl font-bold text-marigold py-2"
+        className="block text-2xl sm:text-5xl font-bold text-marigold py-0.5 sm:py-2"
       >
         +
       </motion.span>
-      <motion.span variants={lineVariants} className="block text-7xl">
+      <motion.span variants={lineVariants} className="block text-4xl sm:text-7xl">
         {COUPLE.groomName}
       </motion.span>
       <motion.span
         variants={lineVariants}
-        className="block text-5xl font-bold text-marigold py-2"
+        className="block text-2xl sm:text-5xl font-bold text-marigold py-0.5 sm:py-2"
       >
         =
       </motion.span>
       <motion.span
         variants={lineVariants}
-        className="block text-7xl italic text-lavender"
+        className="block text-4xl sm:text-7xl italic text-lavender"
       >
         {COUPLE.unionWord}
       </motion.span>

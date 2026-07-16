@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Live countdown to the event — four tiles (days / hours / mins / secs)
- * ticking every second. Sits under the date on the RSVP pages.
+ * Live countdown to the event — three tiles (days / hours / mins).
+ * Sits under the date on the RSVP pages.
  *
  * Hydration note: the server can't know the client's "now", so rendering
  * real numbers during SSR would mismatch the first client render (React
@@ -44,7 +44,8 @@ export function EventCountdown() {
     setMounted(true);
     const tick = () => setRemaining(remainingUntil(targetMs) ?? "done");
     tick();
-    const id = setInterval(tick, 1000);
+    // No seconds tile — a 15s tick keeps the minutes fresh enough.
+    const id = setInterval(tick, 15_000);
     return () => clearInterval(id);
   }, [targetMs]);
 
@@ -61,7 +62,6 @@ export function EventCountdown() {
     { value: fmt(r?.days), label: "days" },
     { value: fmt(r?.hours), label: "hours" },
     { value: fmt(r?.minutes), label: "mins" },
-    { value: fmt(r?.seconds), label: "secs" },
   ];
 
   return (
@@ -73,12 +73,12 @@ export function EventCountdown() {
       {tiles.map((t) => (
         <div
           key={t.label}
-          className="flex flex-col items-center rounded-card bg-muted/60 px-3 py-2 min-w-[3.5rem]"
+          className="flex flex-col items-center rounded-card bg-muted/60 px-3 py-2 min-w-[3.75rem] sm:px-5 sm:py-3 sm:min-w-[5rem]"
         >
-          <span className="font-display text-2xl leading-none tabular-nums">
+          <span className="font-display text-2xl sm:text-4xl leading-none tabular-nums">
             {t.value}
           </span>
-          <span className="font-sans text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
+          <span className="font-sans text-[10px] sm:text-xs uppercase tracking-widest text-muted-foreground mt-1 sm:mt-1.5">
             {t.label}
           </span>
         </div>

@@ -10,8 +10,9 @@ export interface RsvpMember {
   id: number;
   name: string;
   is_kid: boolean;
+  is_plus_one: boolean;
   attending: boolean | null;
-  food_choice: "A" | "B" | null;
+  food_choice: "A" | "B" | "K" | null; // K = kids' meal
   dietary_comment: string | null;
   after_party: boolean | null;
   responded_at: string | null;

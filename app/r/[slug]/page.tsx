@@ -5,14 +5,15 @@
 // RSVP stepper (components/rsvp/RsvpFlow) with the data as props.
 // Unknown slugs render Next's not-found page.
 //
+// The page itself is just the photo/content split — the stepper renders
+// the whole content side, opening on an intro view that mirrors the public
+// landing page (hero + countdown + RSVP button + details).
+//
 // Next 16: `params` is a Promise — must be awaited.
 
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { db } from "@/lib/db";
-import { EVENT_DETAILS, RSVP_COPY } from "@/lib/content";
 import { PhotoSlideshow } from "@/components/PhotoSlideshow";
-import { EventCountdown } from "@/components/EventCountdown";
 import { RsvpFlow } from "@/components/rsvp/RsvpFlow";
 import type { RsvpGroup, RsvpMember } from "@/components/rsvp/types";
 
@@ -39,9 +40,9 @@ export default async function PersonalRsvpPage({
     client.from("rsvp_groups").select("id, label").eq("id", groupId).single(),
     client
       .from("guests")
-      .select(
-        "id, name, is_kid, attending, food_choice, dietary_comment, after_party, responded_at"
-      )
+      // "*" keeps this working on a DB that predates newer columns
+      // (e.g. is_plus_one) — missing fields arrive as undefined.
+      .select("*")
       .eq("rsvp_group_id", groupId)
       .order("id"),
   ]);
@@ -53,46 +54,19 @@ export default async function PersonalRsvpPage({
   const linkGuest = members.find((m) => m.id === linkGuestId);
 
   return (
-    <div className="min-h-dvh w-screen flex flex-col landscape:flex-row landscape:h-dvh landscape:overflow-hidden">
+    // Same shell as the public landing page (app/page.tsx): photo panel +
+    // an internally-scrolling content side.
+    <div className="h-dvh w-screen overflow-hidden flex flex-col landscape:flex-row">
       {/* Panel width/height are [input] fields in lib/content.ts. */}
       <PhotoSlideshow />
 
-      {/* Content side — scrollable: the attendance step can be taller than
-          the viewport for big groups. */}
-      <section className="relative flex-1 landscape:overflow-y-auto bg-background px-6 py-8">
-        <div className="max-w-xl mx-auto space-y-6">
-          {/* Compact header (the landing page has the full hero) */}
-          <header className="text-center space-y-3">
-            <p className="font-sans text-xs uppercase tracking-[0.25em] text-muted-foreground">
-              {RSVP_COPY.eyebrow}
-            </p>
-            <h1 className="font-display text-4xl leading-tight">
-              {linkGuest ? `Hello, ${linkGuest.name}!` : "Hello!"}
-            </h1>
-            <div className="space-y-1">
-              <p className="font-display italic text-2xl text-foreground">
-                {EVENT_DETAILS.date}
-              </p>
-              <p className="font-sans text-sm text-muted-foreground">
-                {EVENT_DETAILS.venueName}
-                {EVENT_DETAILS.venueAddress &&
-                  ` · ${EVENT_DETAILS.venueAddress}`}
-              </p>
-            </div>
-            <EventCountdown />
-          </header>
-
-          <RsvpFlow slug={slug.toLowerCase()} group={group} members={members} />
-
-          <div className="text-center">
-            <Link
-              href="/"
-              className="inline-block font-sans text-xs text-muted-foreground hover:text-foreground transition"
-            >
-              ← Not you? Search again
-            </Link>
-          </div>
-        </div>
+      <section className="relative flex-1 overflow-y-auto scroll-smooth bg-background">
+        <RsvpFlow
+          slug={slug.toLowerCase()}
+          group={group}
+          members={members}
+          greeting={linkGuest?.name}
+        />
       </section>
     </div>
   );

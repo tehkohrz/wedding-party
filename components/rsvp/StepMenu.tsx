@@ -3,11 +3,13 @@
 /**
  * RSVP step 2 of 4 — menu & food choices.
  *
- * Menu preview up top (the two mains from MENU in lib/content.ts), then a
- * selector card for each ATTENDING member: pick main A or B + an optional
- * dietary comment. Declined members never appear here.
+ * Menu preview up top (full procession from MENU in lib/content.ts), then a
+ * selector card for each ATTENDING member: adults pick main A or B; KIDS
+ * instead answer whether a kids' meal is required (stored as food "K", or
+ * "NO_MEAL" → null at submit). Everyone gets an optional dietary comment.
+ * Declined members never appear here.
  *
- * Continue enables once every attending member has a main chosen.
+ * Continue enables once every attending member has an answer.
  */
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +18,45 @@ import { useRsvpStore, EMPTY_ANSWER } from "@/lib/rsvpStore";
 import { MENU } from "@/lib/content";
 import { BOUQUET_COLORS } from "@/lib/groups";
 import type { RsvpMember } from "./types";
+
+/** One food option pill (adult mains, or the kids'-meal yes/no). */
+function FoodOption({
+  selected,
+  onSelect,
+  label,
+  color,
+}: {
+  selected: boolean;
+  onSelect: () => void;
+  label: string;
+  color: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      onClick={onSelect}
+      className={cn(
+        "rounded-pill border px-3 py-2.5 font-sans text-sm transition-colors outline-none",
+        "focus-visible:ring-2 focus-visible:ring-ring",
+        selected
+          ? "font-semibold"
+          : "bg-surface border-input text-muted-foreground hover:bg-muted"
+      )}
+      style={
+        selected
+          ? {
+              backgroundColor: `hsl(var(--${color}) / 0.18)`,
+              borderColor: `hsl(var(--${color}))`,
+            }
+          : undefined
+      }
+    >
+      {label}
+    </button>
+  );
+}
 
 /** A course everyone receives (starter / soup / dessert) in the preview. */
 function FixedCourse({
@@ -29,10 +70,10 @@ function FixedCourse({
 }) {
   return (
     <div className="space-y-1">
-      <p className="font-sans text-lg uppercase tracking-[0.25em] text-muted-foreground">
+      <p className="font-sans text-base uppercase tracking-[0.25em] text-muted-foreground">
         {course}
       </p>
-      <p className="font-display text-2xl leading-tight">{name}</p>
+      <p className="font-display text-xl leading-tight">{name}</p>
       <p className="font-sans text-sm text-muted-foreground">{description}</p>
     </div>
   );
@@ -71,31 +112,37 @@ export function StepMenu({ members }: { members: RsvpMember[] }) {
 
         {/* The choice */}
         <div className="space-y-3">
-          <p className="font-sans text-lg uppercase tracking-[0.25em] text-primary">
+          <p className="font-sans text-base uppercase tracking-[0.25em] text-primary">
             {MENU.mainsChoiceLabel}
           </p>
           {MENU.mains.map((main, i) => (
-            <div key={main.id} className="space-y-1">
+            <div key={main.id} className="space-y-3">
               {i > 0 && (
-                <p className="font-display italic text-lg text-muted-foreground pb-2">
+                <p className="font-display italic text-base text-muted-foreground">
                   or
                 </p>
               )}
-              {main.image && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={main.image}
-                  alt={main.name}
-                  className="w-full max-w-sm mx-auto h-36 object-cover rounded-card"
-                />
-              )}
-              <p className="font-display text-2xl leading-tight">
-                <span className="text-muted-foreground mr-1.5">{main.id}.</span>
-                {main.name}
-              </p>
-              <p className="font-sans text-sm text-muted-foreground">
-                {main.description}
-              </p>
+              {/* Each choice sits in its own soft bubble — the one part of
+                  the menu guests act on, gently lifted off the page. */}
+              <div className="rounded-card border border-primary/40 bg-surface/70 px-5 py-4 space-y-1 max-w-md mx-auto">
+                {main.image && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={main.image}
+                    alt={main.name}
+                    className="w-full max-w-sm mx-auto h-36 object-cover rounded-card"
+                  />
+                )}
+                <p className="font-display text-xl leading-tight">
+                  <span className="text-muted-foreground mr-1.5">
+                    {main.id}.
+                  </span>
+                  {main.name}
+                </p>
+                <p className="font-sans text-sm text-muted-foreground">
+                  {main.description}
+                </p>
+              </div>
             </div>
           ))}
         </div>
@@ -103,6 +150,21 @@ export function StepMenu({ members }: { members: RsvpMember[] }) {
         {MENU.coursesAfterMains.map((c) => (
           <FixedCourse key={c.course} {...c} />
         ))}
+
+        {/* Kids' meal note */}
+        <div className="space-y-1">
+          <p className="font-sans text-base uppercase tracking-[0.25em] text-muted-foreground">
+            For the kids
+          </p>
+          <p className="font-display text-xl leading-tight">
+            {MENU.kidsMeal.name}
+          </p>
+          {MENU.kidsMeal.courses.map((line) => (
+            <p key={line} className="font-sans text-sm text-muted-foreground">
+              {line}
+            </p>
+          ))}
+        </div>
       </div>
 
       {/* Per-attending-member selectors */}
@@ -110,6 +172,8 @@ export function StepMenu({ members }: { members: RsvpMember[] }) {
         {attending.map((m, i) => {
           const color = BOUQUET_COLORS[i % BOUQUET_COLORS.length];
           const answer = answers[m.id] ?? EMPTY_ANSWER;
+          // Plus-ones may have been renamed on the attendance step.
+          const displayName = (answer.name ?? "").trim() || m.name;
           return (
             <div
               key={m.id}
@@ -122,51 +186,58 @@ export function StepMenu({ members }: { members: RsvpMember[] }) {
                   className="size-2.5 rounded-full shrink-0"
                   style={{ backgroundColor: `hsl(var(--${color}))` }}
                 />
-                <span className="font-display text-lg leading-none">
-                  {m.name}
+                <span className="font-display text-2xl leading-none">
+                  {displayName}
                 </span>
-                {m.is_kid && MENU.kidsNote && (
-                  <span className="font-sans text-[10px] text-muted-foreground">
-                    {MENU.kidsNote}
+                {m.is_kid && (
+                  <span className="font-sans text-[10px] uppercase tracking-wider text-muted-foreground">
+                    kid
                   </span>
                 )}
               </div>
 
-              <div
-                className="grid grid-cols-2 gap-2"
-                role="radiogroup"
-                aria-label={`Main course for ${m.name}`}
-              >
-                {MENU.mains.map((main) => {
-                  const selected = answer.food === main.id;
-                  return (
-                    <button
+              {m.is_kid ? (
+                /* Kids don't pick a main — they answer the kids'-meal question. */
+                <div className="space-y-1.5">
+                  <p className="font-sans text-xs text-muted-foreground">
+                    {MENU.kidsMealQuestion}
+                  </p>
+                  <div
+                    className="grid grid-cols-2 gap-2"
+                    role="radiogroup"
+                    aria-label={`Kids' meal for ${displayName}`}
+                  >
+                    <FoodOption
+                      selected={answer.food === "K"}
+                      onSelect={() => setFood(m.id, "K")}
+                      label={MENU.kidsMealYes}
+                      color={color}
+                    />
+                    <FoodOption
+                      selected={answer.food === "NO_MEAL"}
+                      onSelect={() => setFood(m.id, "NO_MEAL")}
+                      label={MENU.kidsMealNo}
+                      color={color}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className="grid grid-cols-2 gap-2"
+                  role="radiogroup"
+                  aria-label={`Main course for ${displayName}`}
+                >
+                  {MENU.mains.map((main) => (
+                    <FoodOption
                       key={main.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={selected}
-                      onClick={() => setFood(m.id, main.id)}
-                      className={cn(
-                        "rounded-pill border px-3 py-2.5 font-sans text-sm transition-colors outline-none",
-                        "focus-visible:ring-2 focus-visible:ring-ring",
-                        selected
-                          ? "font-semibold"
-                          : "bg-surface border-input text-muted-foreground hover:bg-muted"
-                      )}
-                      style={
-                        selected
-                          ? {
-                              backgroundColor: `hsl(var(--${color}) / 0.18)`,
-                              borderColor: `hsl(var(--${color}))`,
-                            }
-                          : undefined
-                      }
-                    >
-                      {main.id}. {main.name}
-                    </button>
-                  );
-                })}
-              </div>
+                      selected={answer.food === main.id}
+                      onSelect={() => setFood(m.id, main.id)}
+                      label={`${main.id}. ${main.name}`}
+                      color={color}
+                    />
+                  ))}
+                </div>
+              )}
 
               <Input
                 value={answer.comment}

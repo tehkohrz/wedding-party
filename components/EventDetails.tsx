@@ -14,8 +14,9 @@
  *
  * Server component — no hooks, renders to static HTML.
  */
-import { Clock, Shirt, MapPin, ExternalLink } from "lucide-react";
+import { Shirt, MapPin, ExternalLink } from "lucide-react";
 import { EVENT_DETAILS } from "@/lib/content";
+import { ScheduleBlock } from "@/components/ScheduleBlock";
 
 export function EventDetails() {
   const q = encodeURIComponent(EVENT_DETAILS.mapQuery);
@@ -24,21 +25,8 @@ export function EventDetails() {
 
   return (
     <div id="details" className="scroll-mt-10 max-w-xl mx-auto text-center">
-      {/* Schedule — item text matches the attire treatment (display, xl) */}
-      <SectionLabel icon={<Clock className="size-5" />} label="Schedule" />
-      <ul className="inline-block mt-3 space-y-1">
-        {EVENT_DETAILS.schedule.map((row) => (
-          <li
-            key={row.time}
-            className="flex items-baseline gap-4 text-left leading-relaxed"
-          >
-            <span className="font-sans tabular-nums text-xl text-muted-foreground w-16 shrink-0">
-              {row.time}
-            </span>
-            <span className="font-display text-xl">{row.item}</span>
-          </li>
-        ))}
-      </ul>
+      {/* Schedule — shared with the RSVP flow (components/ScheduleBlock) */}
+      <ScheduleBlock />
 
       <DotDivider />
 

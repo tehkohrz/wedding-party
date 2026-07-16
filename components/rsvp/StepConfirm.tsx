@@ -38,12 +38,20 @@ export function StepConfirm({
       const payload = {
         answers: members.map((m) => {
           const a = answers[m.id] ?? EMPTY_ANSWER;
+          // "NO_MEAL" is client-side only; the database stores null
+          // (kid attending, no meal needed).
+          const food = a.food === "NO_MEAL" ? null : a.food;
           return {
             guest_id: m.id,
             attending: a.attending === true,
-            food_choice: a.attending ? a.food : null,
+            food_choice: a.attending ? food : null,
             dietary_comment: a.attending && a.comment ? a.comment : null,
             after_party: a.attending ? a.afterParty : null,
+            // Plus-ones can be renamed in the flow; the API ignores name
+            // for everyone else.
+            ...(m.is_plus_one
+              ? { name: (a.name ?? "").trim() || m.name }
+              : {}),
           };
         }),
       };

@@ -8,9 +8,12 @@
  * atomic submit" decision from the plan — no half-responses can ever poison
  * the food totals.
  *
- * PERSISTENCE: the draft lives in sessionStorage (zustand persist), so an
- * accidental tab-close / phone-lock resumes in place. sessionStorage clears
- * when the tab closes for good — drafts don't haunt shared devices forever.
+ * PERSISTENCE: the draft ANSWERS live in sessionStorage (zustand persist),
+ * so an accidental reload / phone-lock keeps what was typed — but the STEP
+ * is deliberately NOT persisted: every page load starts back on the intro
+ * (cleaner than dropping a guest into the middle of the flow), with their
+ * answers prefilled once they tap RSVP. sessionStorage clears when the tab
+ * closes for good — drafts don't haunt shared devices forever.
  *
  * PREFILL: init() seeds answers from the members' existing database values,
  * so revisiting a responded link enters edit mode with everything filled in.
@@ -18,13 +21,17 @@
  * (summary) view rather than step 1.
  *
  * Steps:
- *   attendance → menu → afterparty → confirm → thanks
- *        └→ decline-confirm → declined-thanks   (when everyone said no)
+ *   intro → attendance → menu → afterparty → confirm → thanks
+ *              └→ decline-confirm → declined-thanks  (when everyone said no)
+ *
+ * Food values: "A"/"B" adult mains · "K" kids' meal · "NO_MEAL" the explicit
+ * "kid needs no meal" answer (maps to null at submit) · null = unanswered.
  */
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 export type RsvpStep =
+  | "intro"
   | "attendance"
   | "menu"
   | "afterparty"
@@ -33,11 +40,16 @@ export type RsvpStep =
   | "decline-confirm"
   | "declined-thanks";
 
+export type FoodAnswer = "A" | "B" | "K" | "NO_MEAL" | null;
+
 export interface MemberAnswer {
   attending: boolean | null; // null = not answered yet
-  food: "A" | "B" | null;
+  food: FoodAnswer;
   comment: string;
   afterParty: boolean | null;
+  /** Display name — editable only for plus-ones ("Peter's Plus One" → the
+      real name); everyone else keeps their guest-list name. */
+  name: string;
 }
 
 export const EMPTY_ANSWER: MemberAnswer = {
@@ -45,13 +57,16 @@ export const EMPTY_ANSWER: MemberAnswer = {
   food: null,
   comment: "",
   afterParty: null,
+  name: "",
 };
 
 /** The subset of member fields init() needs (RsvpMember satisfies this). */
 export interface InitMember {
   id: number;
+  name: string;
+  is_kid: boolean;
   attending: boolean | null;
-  food_choice: "A" | "B" | null;
+  food_choice: "A" | "B" | "K" | null;
   dietary_comment: string | null;
   after_party: boolean | null;
   responded_at: string | null;
@@ -68,8 +83,9 @@ interface RsvpState {
 
   init: (groupId: string, members: InitMember[]) => void;
   setAttending: (guestId: number, attending: boolean) => void;
-  setFood: (guestId: number, food: "A" | "B") => void;
+  setFood: (guestId: number, food: FoodAnswer) => void;
   setComment: (guestId: number, comment: string) => void;
+  setName: (guestId: number, name: string) => void;
   setAfterParty: (guestId: number, going: boolean) => void;
   markSubmitted: () => void;
   goTo: (step: RsvpStep, direction?: 1 | -1) => void;
@@ -93,7 +109,7 @@ export const useRsvpStore = create<RsvpState>()(
   persist(
     (set, get) => ({
       groupId: null,
-      step: "attendance",
+      step: "intro",
       direction: 1,
       answers: {},
       submitted: false,
@@ -105,28 +121,33 @@ export const useRsvpStore = create<RsvpState>()(
 
         const answers: Record<number, MemberAnswer> = {};
         for (const m of members) {
+          // A responded, attending kid with no food_choice answered
+          // "no meal needed" — restore that explicit state for edit mode.
+          const food: MemberAnswer["food"] =
+            m.responded_at !== null &&
+            m.is_kid &&
+            m.attending === true &&
+            m.food_choice === null
+              ? "NO_MEAL"
+              : m.food_choice;
           answers[m.id] = {
             attending: m.attending,
-            food: m.food_choice,
+            food,
             comment: m.dietary_comment ?? "",
             afterParty: m.after_party,
+            name: m.name,
           };
         }
         const responded = members.some((m) => m.responded_at !== null);
-        const allDeclined =
-          responded && members.every((m) => m.attending === false);
         set({
           groupId,
           answers,
           submitted: responded,
           direction: 1,
-          // Responded groups open on their summary (or decline note),
-          // not back at step 1.
-          step: responded
-            ? allDeclined
-              ? "declined-thanks"
-              : "thanks"
-            : "attendance",
+          // EVERY visit starts on the intro (the main-page look) — the
+          // RSVP button routes responded groups to their summary from
+          // there (see RsvpFlow/StepIntro).
+          step: "intro",
         });
       },
 
@@ -134,6 +155,7 @@ export const useRsvpStore = create<RsvpState>()(
         set((s) => updateAnswer(s, id, { attending })),
       setFood: (id, food) => set((s) => updateAnswer(s, id, { food })),
       setComment: (id, comment) => set((s) => updateAnswer(s, id, { comment })),
+      setName: (id, name) => set((s) => updateAnswer(s, id, { name })),
       setAfterParty: (id, going) =>
         set((s) => updateAnswer(s, id, { afterParty: going })),
 
@@ -142,7 +164,7 @@ export const useRsvpStore = create<RsvpState>()(
       reset: () =>
         set({
           groupId: null,
-          step: "attendance",
+          step: "intro",
           direction: 1,
           answers: {},
           submitted: false,
@@ -151,6 +173,13 @@ export const useRsvpStore = create<RsvpState>()(
     {
       name: "swa-rsvp-draft",
       storage: createJSONStorage(() => sessionStorage),
+      // Persist the draft, not the position: step/direction stay out, so
+      // a revisit always opens on the intro page.
+      partialize: (s) => ({
+        groupId: s.groupId,
+        answers: s.answers,
+        submitted: s.submitted,
+      }),
     }
   )
 );
