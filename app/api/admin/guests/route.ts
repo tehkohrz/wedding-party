@@ -30,6 +30,10 @@ const CreateSchema = z.object({
   seating_group_id: z.string().trim().min(1).nullable().optional(),
   is_kid: z.boolean().optional(),
   is_plus_one: z.boolean().optional(),
+  search_aliases: z.string().optional(),
+  row_num: z.number().int().positive().nullable().optional(),
+  section: z.string().trim().min(1).nullable().optional(),
+  seat: z.number().int().positive().nullable().optional(),
 });
 
 export async function POST(req: Request) {
@@ -77,12 +81,15 @@ export async function POST(req: Request) {
 
   const row = {
     name: g.name,
-    search_aliases: "",
+    search_aliases: g.search_aliases ?? "",
     side: g.side,
     rsvp_group_id: g.rsvp_group_id ?? null,
     seating_group_id: g.seating_group_id ?? null,
     is_kid: g.is_kid ?? false,
     is_plus_one: g.is_plus_one ?? false,
+    row_num: g.row_num ?? null,
+    section: g.section ?? null,
+    seat: g.seat ?? null,
   };
 
   // The id comes from the guests.id identity sequence. Fallback for a

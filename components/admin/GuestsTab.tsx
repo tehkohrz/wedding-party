@@ -47,6 +47,33 @@ interface AdminGuest {
   responded_at: string | null;
 }
 
+/** The in-progress "new guest" row before it's saved to the database. */
+interface GuestDraft {
+  name: string;
+  side: "bride" | "groom";
+  rsvp_group_id: string;
+  seating_group_id: string;
+  is_kid: boolean;
+  is_plus_one: boolean;
+  search_aliases: string;
+  row_num: number | null;
+  section: string | null;
+  seat: number | null;
+}
+
+const EMPTY_DRAFT: GuestDraft = {
+  name: "",
+  side: "bride",
+  rsvp_group_id: "",
+  seating_group_id: "",
+  is_kid: false,
+  is_plus_one: false,
+  search_aliases: "",
+  row_num: null,
+  section: null,
+  seat: null,
+};
+
 /** Grid template shared by the header and row line 1. */
 const ROW_GRID =
   "sm:grid-cols-[2.5rem_1fr_5.5rem_6rem_6rem_5.5rem_9rem_4.5rem]";
@@ -58,10 +85,8 @@ export function GuestsTab() {
   const [filter, setFilter] = useState("");
   const [edits, setEdits] = useState<Record<number, Partial<AdminGuest>>>({});
   const [savingId, setSavingId] = useState<number | null>(null);
-  const [newName, setNewName] = useState("");
-  const [newSide, setNewSide] = useState<"bride" | "groom">("bride");
-  const [newKid, setNewKid] = useState(false);
-  const [newPlusOne, setNewPlusOne] = useState(false);
+  // Draft "new guest" row at the bottom of the list (null = button shown).
+  const [draft, setDraft] = useState<GuestDraft | null>(null);
   const [adding, setAdding] = useState(false);
 
   const load = useCallback(() => {
@@ -175,31 +200,33 @@ export function GuestsTab() {
     }
   }
 
-  /** Create a guest with just name + side; everything else (groups, kid
-      flag, seat) is edited on the new row afterwards. The API assigns the
-      next id, auto-creates a SOLO group, and generates the personal link. */
-  async function addGuest() {
-    const name = newName.trim();
-    if (!name) return;
+  /** POST the draft row. The database assigns the id; the API auto-creates
+      any groups, gives solo guests a SOLO group, and generates the
+      personal link (unless the new guest is a plus-one). */
+  async function saveDraft() {
+    if (!draft || !draft.name.trim()) return;
     setAdding(true);
     try {
       const res = await fetch("/api/admin/guests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name,
-          side: newSide,
-          is_kid: newKid,
-          is_plus_one: newPlusOne,
+          name: draft.name.trim(),
+          side: draft.side,
+          rsvp_group_id: draft.rsvp_group_id.trim() || null,
+          seating_group_id: draft.seating_group_id.trim() || null,
+          is_kid: draft.is_kid,
+          is_plus_one: draft.is_plus_one,
+          search_aliases: draft.search_aliases,
+          row_num: draft.row_num,
+          section: draft.section,
+          seat: draft.seat,
         }),
       });
       if (!res.ok) throw new Error();
       const { guest } = await res.json();
       setGuests((gs) => [...gs, guest]);
-      setNewName("");
-      setNewKid(false);
-      setNewPlusOne(false);
-      setFilter(name); // jump straight to the new row for further editing
+      setDraft(null);
     } catch {
       alert("Couldn't add the guest — please try again.");
     } finally {
@@ -298,44 +325,6 @@ export function GuestsTab() {
           {visible.length} of {guests.length}
         </span>
         <div className="flex-1" />
-        {/* Quick-add: name + side; refine the row after it appears. */}
-        <div className="flex items-center gap-1.5">
-          <Input
-            placeholder="New guest name…"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && addGuest()}
-            className="h-10 w-40"
-          />
-          <select
-            value={newSide}
-            onChange={(e) => setNewSide(e.target.value as "bride" | "groom")}
-            className="h-10 rounded-lg border border-input bg-surface px-2 font-sans text-sm"
-            aria-label="Side of the new guest"
-          >
-            <option value="bride">bride</option>
-            <option value="groom">groom</option>
-          </select>
-          <label className="flex items-center gap-1 font-sans text-xs">
-            <input
-              type="checkbox"
-              checked={newKid}
-              onChange={(e) => setNewKid(e.target.checked)}
-            />
-            kid
-          </label>
-          <label className="flex items-center gap-1 font-sans text-xs">
-            <input
-              type="checkbox"
-              checked={newPlusOne}
-              onChange={(e) => setNewPlusOne(e.target.checked)}
-            />
-            +1
-          </label>
-          <Button size="sm" disabled={!newName.trim() || adding} onClick={addGuest}>
-            <Plus /> Add
-          </Button>
-        </div>
         <Button variant="outline" size="sm" onClick={exportLinks}>
           <Download /> Links CSV
         </Button>
@@ -662,6 +651,151 @@ export function GuestsTab() {
               </div>
             );
           })}
+
+          {/* ── Add guest: button → editable draft row → Save inserts ── */}
+          {draft ? (
+            <div className="rounded-card border border-primary px-3 py-2 space-y-2">
+              <div
+                className={cn("grid gap-2 items-center grid-cols-2", ROW_GRID)}
+              >
+                <span className="font-sans text-xs text-muted-foreground">
+                  new
+                </span>
+                <Input
+                  autoFocus
+                  value={draft.name}
+                  onChange={(ev) =>
+                    setDraft({ ...draft, name: ev.target.value })
+                  }
+                  placeholder="Guest name…"
+                  className="h-9 text-sm"
+                  aria-label="New guest name"
+                />
+                <select
+                  value={draft.side}
+                  onChange={(ev) =>
+                    setDraft({
+                      ...draft,
+                      side: ev.target.value as "bride" | "groom",
+                    })
+                  }
+                  className="h-9 rounded-lg border border-input bg-surface px-2 font-sans text-sm"
+                  aria-label="Side"
+                >
+                  <option value="bride">bride</option>
+                  <option value="groom">groom</option>
+                </select>
+                <Input
+                  value={draft.rsvp_group_id}
+                  onChange={(ev) =>
+                    setDraft({ ...draft, rsvp_group_id: ev.target.value })
+                  }
+                  className="h-9 text-sm"
+                  aria-label="RSVP group"
+                  placeholder="rsvp grp"
+                />
+                <Input
+                  value={draft.seating_group_id}
+                  onChange={(ev) =>
+                    setDraft({ ...draft, seating_group_id: ev.target.value })
+                  }
+                  className="h-9 text-sm"
+                  aria-label="Seating group"
+                  placeholder="seat grp"
+                />
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-1 font-sans text-xs">
+                    <input
+                      type="checkbox"
+                      checked={draft.is_kid}
+                      onChange={(ev) =>
+                        setDraft({ ...draft, is_kid: ev.target.checked })
+                      }
+                    />
+                    kid
+                  </label>
+                  <label className="flex items-center gap-1 font-sans text-xs">
+                    <input
+                      type="checkbox"
+                      checked={draft.is_plus_one}
+                      onChange={(ev) =>
+                        setDraft({ ...draft, is_plus_one: ev.target.checked })
+                      }
+                    />
+                    +1
+                  </label>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Input
+                    value={draft.row_num ?? ""}
+                    onChange={(ev) =>
+                      setDraft({
+                        ...draft,
+                        row_num: ev.target.value
+                          ? Number(ev.target.value)
+                          : null,
+                      })
+                    }
+                    className="h-9 w-12 text-sm text-center"
+                    aria-label="Row"
+                    placeholder="R"
+                  />
+                  <Input
+                    value={draft.section ?? ""}
+                    onChange={(ev) =>
+                      setDraft({ ...draft, section: ev.target.value || null })
+                    }
+                    className="h-9 w-12 text-sm text-center"
+                    aria-label="Section"
+                    placeholder="Sec"
+                  />
+                  <Input
+                    value={draft.seat ?? ""}
+                    onChange={(ev) =>
+                      setDraft({
+                        ...draft,
+                        seat: ev.target.value ? Number(ev.target.value) : null,
+                      })
+                    }
+                    className="h-9 w-12 text-sm text-center"
+                    aria-label="Seat"
+                    placeholder="S"
+                  />
+                </div>
+                <div className="flex justify-end gap-1">
+                  <Button
+                    size="sm"
+                    disabled={!draft.name.trim() || adding}
+                    onClick={saveDraft}
+                    aria-label="Save new guest"
+                  >
+                    <Save />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={adding}
+                    onClick={() => setDraft(null)}
+                    aria-label="Cancel new guest"
+                  >
+                    <Trash2 />
+                  </Button>
+                </div>
+              </div>
+              <p className="font-sans text-[10px] text-muted-foreground px-1">
+                Save inserts the guest — the id and personal link are
+                generated automatically (plus-ones get no link).
+              </p>
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={() => setDraft(EMPTY_DRAFT)}
+              className="w-full h-11 rounded-card border-dashed"
+            >
+              <Plus /> Add guest
+            </Button>
+          )}
         </div>
       </div>
     </div>
