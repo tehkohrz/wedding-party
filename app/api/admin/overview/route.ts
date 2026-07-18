@@ -58,6 +58,7 @@ export async function GET(req: Request) {
       // Attending kids whose party said "no meal needed":
       kidsNoMeal: attending.filter((g) => g.is_kid && g.food_choice === null)
         .length,
+      babySeats: attending.filter((g) => g.baby_seat === true).length,
     },
     afterParty: attending.filter((g) => g.after_party === true).length,
     groups: groups.map((grp) => {
@@ -73,6 +74,7 @@ export async function GET(req: Request) {
           attending: m.attending,
           food_choice: m.food_choice,
           after_party: m.after_party,
+          baby_seat: m.baby_seat,
           dietary_comment: m.dietary_comment,
         })),
       };

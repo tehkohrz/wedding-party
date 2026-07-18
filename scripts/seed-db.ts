@@ -198,6 +198,16 @@ async function main() {
   const up3 = await supabase.from("guests").upsert(guestRows);
   if (up3.error) fail("guests", up3.error.message);
 
+  // Explicit CSV ids bypass the id sequence — resync it so admin
+  // "Add guest" keeps getting collision-free auto ids after a re-seed.
+  const bump = await supabase.rpc("bump_guests_id_seq");
+  if (bump.error) {
+    console.warn(
+      "⚠ couldn't bump the guests id sequence (run the latest schema.sql):",
+      bump.error.message
+    );
+  }
+
   const up4 = await supabase.from("rsvp_slugs").upsert(slugRows);
   if (up4.error) fail("rsvp_slugs", up4.error.message);
 

@@ -4,7 +4,7 @@
  * Per-member summary cards — used on the confirm step AND the
  * responded/thank-you view, so the two can never drift apart.
  */
-import { Check, X, PartyPopper } from "lucide-react";
+import { Baby, Check, X, PartyPopper } from "lucide-react";
 import { useRsvpStore, EMPTY_ANSWER } from "@/lib/rsvpStore";
 import { MENU, RSVP_CONFIRM } from "@/lib/content";
 import { BOUQUET_COLORS } from "@/lib/groups";
@@ -65,6 +65,12 @@ export function SummaryList({ members }: { members: RsvpMember[] }) {
                 {foodLabel && <p>{foodLabel}</p>}
                 {a.comment && (
                   <p className="text-muted-foreground italic">“{a.comment}”</p>
+                )}
+                {m.is_kid && a.babySeat === true && (
+                  <p className="flex items-center gap-1 text-xs">
+                    <Baby className="size-3.5" />
+                    {RSVP_CONFIRM.babySeatBadge}
+                  </p>
                 )}
                 {/* After-party: show the answer BOTH ways — a silent "no"
                     looked like a missing answer on the confirm step. */}

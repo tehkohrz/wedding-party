@@ -82,15 +82,18 @@ function FixedCourse({
 export function StepMenu({ members }: { members: RsvpMember[] }) {
   const answers = useRsvpStore((s) => s.answers);
   const setFood = useRsvpStore((s) => s.setFood);
+  const setBabySeat = useRsvpStore((s) => s.setBabySeat);
   const setComment = useRsvpStore((s) => s.setComment);
   const goTo = useRsvpStore((s) => s.goTo);
 
   const attending = members.filter(
     (m) => (answers[m.id] ?? EMPTY_ANSWER).attending === true
   );
-  const allChosen = attending.every(
-    (m) => (answers[m.id] ?? EMPTY_ANSWER).food !== null
-  );
+  // Adults: a main chosen. Kids: kids-meal AND baby-seat answered.
+  const allChosen = attending.every((m) => {
+    const a = answers[m.id] ?? EMPTY_ANSWER;
+    return a.food !== null && (!m.is_kid || a.babySeat !== null);
+  });
 
   return (
     <div className="space-y-6">
@@ -197,7 +200,8 @@ export function StepMenu({ members }: { members: RsvpMember[] }) {
               </div>
 
               {m.is_kid ? (
-                /* Kids don't pick a main — they answer the kids'-meal question. */
+                /* Kids don't pick a main — they answer the kids'-meal and
+                   baby-seat questions instead. */
                 <div className="space-y-1.5">
                   <p className="font-sans text-xs text-muted-foreground">
                     {MENU.kidsMealQuestion}
@@ -217,6 +221,27 @@ export function StepMenu({ members }: { members: RsvpMember[] }) {
                       selected={answer.food === "NO_MEAL"}
                       onSelect={() => setFood(m.id, "NO_MEAL")}
                       label={MENU.kidsMealNo}
+                      color={color}
+                    />
+                  </div>
+                  <p className="font-sans text-xs text-muted-foreground pt-1">
+                    {MENU.babySeatQuestion}
+                  </p>
+                  <div
+                    className="grid grid-cols-2 gap-2"
+                    role="radiogroup"
+                    aria-label={`Baby seat for ${displayName}`}
+                  >
+                    <FoodOption
+                      selected={answer.babySeat === true}
+                      onSelect={() => setBabySeat(m.id, true)}
+                      label={MENU.babySeatYes}
+                      color={color}
+                    />
+                    <FoodOption
+                      selected={answer.babySeat === false}
+                      onSelect={() => setBabySeat(m.id, false)}
+                      label={MENU.babySeatNo}
                       color={color}
                     />
                   </div>

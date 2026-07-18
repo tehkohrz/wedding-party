@@ -47,6 +47,8 @@ export interface MemberAnswer {
   food: FoodAnswer;
   comment: string;
   afterParty: boolean | null;
+  /** Kids only: baby seat / high chair needed? null = unanswered. */
+  babySeat: boolean | null;
   /** Display name — editable only for plus-ones ("Peter's Plus One" → the
       real name); everyone else keeps their guest-list name. */
   name: string;
@@ -57,6 +59,7 @@ export const EMPTY_ANSWER: MemberAnswer = {
   food: null,
   comment: "",
   afterParty: null,
+  babySeat: null,
   name: "",
 };
 
@@ -69,6 +72,7 @@ export interface InitMember {
   food_choice: "A" | "B" | "K" | null;
   dietary_comment: string | null;
   after_party: boolean | null;
+  baby_seat?: boolean | null;
   responded_at: string | null;
 }
 
@@ -87,6 +91,7 @@ interface RsvpState {
   setComment: (guestId: number, comment: string) => void;
   setName: (guestId: number, name: string) => void;
   setAfterParty: (guestId: number, going: boolean) => void;
+  setBabySeat: (guestId: number, needed: boolean) => void;
   markSubmitted: () => void;
   goTo: (step: RsvpStep, direction?: 1 | -1) => void;
   reset: () => void;
@@ -135,6 +140,7 @@ export const useRsvpStore = create<RsvpState>()(
             food,
             comment: m.dietary_comment ?? "",
             afterParty: m.after_party,
+            babySeat: m.baby_seat ?? null,
             name: m.name,
           };
         }
@@ -158,6 +164,8 @@ export const useRsvpStore = create<RsvpState>()(
       setName: (id, name) => set((s) => updateAnswer(s, id, { name })),
       setAfterParty: (id, going) =>
         set((s) => updateAnswer(s, id, { afterParty: going })),
+      setBabySeat: (id, needed) =>
+        set((s) => updateAnswer(s, id, { babySeat: needed })),
 
       markSubmitted: () => set({ submitted: true }),
       goTo: (step, direction = 1) => set({ step, direction }),

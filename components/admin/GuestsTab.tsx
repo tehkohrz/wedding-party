@@ -21,7 +21,7 @@
  * Also exports the personal-links CSV (name → absolute URL) for WhatsApp.
  */
 import { useCallback, useEffect, useState } from "react";
-import { Download, RotateCcw, Save } from "lucide-react";
+import { Download, Plus, RotateCcw, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -43,6 +43,7 @@ interface AdminGuest {
   food_choice: "A" | "B" | "K" | null;
   dietary_comment: string | null;
   after_party: boolean | null;
+  baby_seat: boolean | null;
   responded_at: string | null;
 }
 
@@ -57,6 +58,11 @@ export function GuestsTab() {
   const [filter, setFilter] = useState("");
   const [edits, setEdits] = useState<Record<number, Partial<AdminGuest>>>({});
   const [savingId, setSavingId] = useState<number | null>(null);
+  const [newName, setNewName] = useState("");
+  const [newSide, setNewSide] = useState<"bride" | "groom">("bride");
+  const [newKid, setNewKid] = useState(false);
+  const [newPlusOne, setNewPlusOne] = useState(false);
+  const [adding, setAdding] = useState(false);
 
   const load = useCallback(() => {
     setError(false);
@@ -83,6 +89,7 @@ export function GuestsTab() {
         food_choice: null,
         dietary_comment: null,
         after_party: null,
+        baby_seat: null,
         responded_at: null,
       });
       return;
@@ -91,7 +98,9 @@ export function GuestsTab() {
     stage(g.id, {
       attending,
       // Declining clears attendee-only fields.
-      ...(attending ? {} : { food_choice: null, after_party: null }),
+      ...(attending
+        ? {}
+        : { food_choice: null, after_party: null, baby_seat: null }),
       // Recording a response on a never-responded guest stamps the time.
       ...(g.responded_at ? {} : { responded_at: new Date().toISOString() }),
     });
@@ -147,6 +156,7 @@ export function GuestsTab() {
           food_choice: null,
           dietary_comment: null,
           after_party: null,
+          baby_seat: null,
           responded_at: null,
         }),
       });
@@ -160,6 +170,61 @@ export function GuestsTab() {
       });
     } catch {
       alert("Reset failed — please try again.");
+    } finally {
+      setSavingId(null);
+    }
+  }
+
+  /** Create a guest with just name + side; everything else (groups, kid
+      flag, seat) is edited on the new row afterwards. The API assigns the
+      next id, auto-creates a SOLO group, and generates the personal link. */
+  async function addGuest() {
+    const name = newName.trim();
+    if (!name) return;
+    setAdding(true);
+    try {
+      const res = await fetch("/api/admin/guests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          side: newSide,
+          is_kid: newKid,
+          is_plus_one: newPlusOne,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      const { guest } = await res.json();
+      setGuests((gs) => [...gs, guest]);
+      setNewName("");
+      setNewKid(false);
+      setNewPlusOne(false);
+      setFilter(name); // jump straight to the new row for further editing
+    } catch {
+      alert("Couldn't add the guest — please try again.");
+    } finally {
+      setAdding(false);
+    }
+  }
+
+  /** Remove a guest entirely — their personal link, attendance and (if
+      they were the last member) their RSVP group go with them. */
+  async function deleteGuest(g: AdminGuest) {
+    if (
+      !window.confirm(
+        `Delete ${g.name}? This removes their personal link and any response.`
+      )
+    )
+      return;
+    setSavingId(g.id);
+    try {
+      const res = await fetch(`/api/admin/guests/${g.id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error();
+      setGuests((gs) => gs.filter((x) => x.id !== g.id));
+    } catch {
+      alert("Delete failed — please try again.");
     } finally {
       setSavingId(null);
     }
@@ -233,6 +298,44 @@ export function GuestsTab() {
           {visible.length} of {guests.length}
         </span>
         <div className="flex-1" />
+        {/* Quick-add: name + side; refine the row after it appears. */}
+        <div className="flex items-center gap-1.5">
+          <Input
+            placeholder="New guest name…"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && addGuest()}
+            className="h-10 w-40"
+          />
+          <select
+            value={newSide}
+            onChange={(e) => setNewSide(e.target.value as "bride" | "groom")}
+            className="h-10 rounded-lg border border-input bg-surface px-2 font-sans text-sm"
+            aria-label="Side of the new guest"
+          >
+            <option value="bride">bride</option>
+            <option value="groom">groom</option>
+          </select>
+          <label className="flex items-center gap-1 font-sans text-xs">
+            <input
+              type="checkbox"
+              checked={newKid}
+              onChange={(e) => setNewKid(e.target.checked)}
+            />
+            kid
+          </label>
+          <label className="flex items-center gap-1 font-sans text-xs">
+            <input
+              type="checkbox"
+              checked={newPlusOne}
+              onChange={(e) => setNewPlusOne(e.target.checked)}
+            />
+            +1
+          </label>
+          <Button size="sm" disabled={!newName.trim() || adding} onClick={addGuest}>
+            <Plus /> Add
+          </Button>
+        </div>
         <Button variant="outline" size="sm" onClick={exportLinks}>
           <Download /> Links CSV
         </Button>
@@ -379,7 +482,7 @@ export function GuestsTab() {
                       placeholder="S"
                     />
                   </div>
-                  <div className="flex justify-end">
+                  <div className="flex justify-end gap-1">
                     <Button
                       size="sm"
                       disabled={!dirty || savingId === g.id}
@@ -387,6 +490,15 @@ export function GuestsTab() {
                       aria-label={`Save ${g.name}`}
                     >
                       <Save />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={savingId === g.id}
+                      onClick={() => deleteGuest(g)}
+                      aria-label={`Delete ${g.name}`}
+                    >
+                      <Trash2 />
                     </Button>
                   </div>
                 </div>
@@ -469,6 +581,49 @@ export function GuestsTab() {
                       <option value="no">no</option>
                     </select>
                   </label>
+
+                  <label className="flex items-center gap-1.5 font-sans text-xs text-muted-foreground">
+                    Aliases
+                    <Input
+                      value={merged.search_aliases}
+                      onChange={(ev) =>
+                        stage(g.id, { search_aliases: ev.target.value })
+                      }
+                      placeholder="nicknames; a;b"
+                      title="Extra names the day-of search matches (semicolon-separated)"
+                      className="h-8 text-xs w-36"
+                      aria-label="Search aliases"
+                    />
+                  </label>
+
+                  {merged.is_kid && (
+                    <label className="flex items-center gap-1.5 font-sans text-xs text-muted-foreground">
+                      Baby seat
+                      <select
+                        value={
+                          merged.baby_seat === true
+                            ? "yes"
+                            : merged.baby_seat === false
+                              ? "no"
+                              : ""
+                        }
+                        onChange={(ev) =>
+                          stage(g.id, {
+                            baby_seat:
+                              ev.target.value === ""
+                                ? null
+                                : ev.target.value === "yes",
+                          })
+                        }
+                        disabled={merged.attending !== true}
+                        className="h-8 rounded-lg border border-input bg-surface px-2 font-sans text-xs text-foreground disabled:opacity-40"
+                      >
+                        <option value="">—</option>
+                        <option value="yes">yes</option>
+                        <option value="no">no</option>
+                      </select>
+                    </label>
+                  )}
 
                   <Input
                     value={merged.dietary_comment ?? ""}

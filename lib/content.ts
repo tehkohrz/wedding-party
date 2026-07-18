@@ -204,6 +204,11 @@ export const MENU = {
   kidsMealYes: "Yes please",
   kidsMealNo: "Not needed",
 
+  // [input] The baby-seat question + choices (asked per kid, menu step).
+  babySeatQuestion: "Baby seat needed?",
+  babySeatYes: "Yes please",
+  babySeatNo: "Not needed",
+
   // [input] Placeholder for the per-person comment box.
   dietaryPlaceholder: "Allergies or dietary needs? (optional)",
 
@@ -257,6 +262,8 @@ export const RSVP_CONFIRM = {
   afterPartyNoBadge: "Skipping the after-party",
   // [input] Badge on a plus-one row when no plus-one is coming.
   noPlusOneBadge: "No plus one",
+  // [input] Badge on a kid's summary row when a baby seat was requested.
+  babySeatBadge: "Baby seat requested",
 
   // ── Thank-you / responded view ──
   // [input] Heading right after submitting.

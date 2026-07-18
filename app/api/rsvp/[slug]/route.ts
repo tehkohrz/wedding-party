@@ -43,6 +43,8 @@ const SubmissionSchema = z.object({
         food_choice: z.enum(["A", "B", "K"]).nullable(),
         dietary_comment: z.string().trim().max(500).nullable(),
         after_party: z.boolean().nullable(),
+        // Kids only (high chair request); ignored for adults.
+        baby_seat: z.boolean().nullable().optional(),
         // Only honored for plus-one rows (the main guest names their +1);
         // silently ignored for everyone else.
         name: z.string().trim().min(1).max(80).optional(),
@@ -194,6 +196,9 @@ export async function POST(
         food_choice: a.attending ? a.food_choice : null,
         dietary_comment: a.attending ? a.dietary_comment : null,
         after_party: a.attending ? a.after_party : null,
+        // Baby seat applies to attending kids only.
+        baby_seat:
+          a.attending && kidIds.has(a.guest_id) ? (a.baby_seat ?? null) : null,
         responded_at: now,
         // Rename applies to plus-one rows only — a guest can't rename
         // other real people in their group.

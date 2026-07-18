@@ -47,6 +47,7 @@ export function StepConfirm({
             food_choice: a.attending ? food : null,
             dietary_comment: a.attending && a.comment ? a.comment : null,
             after_party: a.attending ? a.afterParty : null,
+            baby_seat: m.is_kid && a.attending ? a.babySeat : null,
             // Plus-ones can be renamed in the flow; the API ignores name
             // for everyone else.
             ...(m.is_plus_one

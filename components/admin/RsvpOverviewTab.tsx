@@ -21,7 +21,13 @@ interface Overview {
     kidsAttending: number;
   };
   side: Record<"bride" | "groom", { total: number; attending: number }>;
-  food: { A: number; B: number; kidsMeals: number; kidsNoMeal: number };
+  food: {
+    A: number;
+    B: number;
+    kidsMeals: number;
+    kidsNoMeal: number;
+    babySeats: number;
+  };
   afterParty: number;
   groups: Array<{
     id: string;
@@ -34,6 +40,7 @@ interface Overview {
       attending: boolean | null;
       food_choice: "A" | "B" | "K" | null;
       after_party: boolean | null;
+      baby_seat: boolean | null;
       dietary_comment: string | null;
     }>;
   }>;
@@ -146,6 +153,9 @@ export function RsvpOverviewTab() {
                 </span>
               )}
             </p>
+            <p className="font-sans text-sm">
+              Baby seats: <strong>{data.food.babySeats}</strong>
+            </p>
           </div>
         </div>
 
@@ -190,6 +200,7 @@ export function RsvpOverviewTab() {
                     {m.is_kid && <span>(kid)</span>}
                     {m.is_plus_one && <span>(+1)</span>}
                     {m.food_choice && <span>· {m.food_choice}</span>}
+                    {m.baby_seat && <span>· baby seat</span>}
                     {m.after_party && <PartyPopper className="size-3" />}
                     {m.dietary_comment && (
                       <span className="italic truncate">

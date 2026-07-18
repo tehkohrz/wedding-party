@@ -43,6 +43,7 @@ export interface DbGuest {
   food_choice: "A" | "B" | "K" | null; // K = kids meal
   dietary_comment: string | null;
   after_party: boolean | null;
+  baby_seat: boolean | null;
   responded_at: string | null; // ISO timestamptz
 }
 

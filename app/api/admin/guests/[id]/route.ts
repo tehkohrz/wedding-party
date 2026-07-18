@@ -38,6 +38,7 @@ const PatchSchema = z
     food_choice: z.enum(["A", "B", "K"]).nullable(),
     dietary_comment: z.string().trim().max(500).nullable(),
     after_party: z.boolean().nullable(),
+    baby_seat: z.boolean().nullable(),
     // Set when the admin records a response on a guest's behalf; nulled
     // when the admin resets a response entirely.
     responded_at: z.string().nullable(),
@@ -176,4 +177,58 @@ export async function PATCH(
   }
 
   return Response.json({ guest: data });
+}
+
+/**
+ * DELETE /api/admin/guests/[id] — remove a guest entirely.
+ *
+ * FKs cascade the guest's personal links and attendance row. If their
+ * RSVP group is left empty, the group (and any links still pointing at
+ * it) is removed too, so the overview never shows ghost invitations.
+ */
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!isAuthed(req)) return unauthorized();
+
+  const { id } = await params;
+  const guestId = Number(id);
+  if (!Number.isInteger(guestId)) {
+    return Response.json({ error: "Bad id" }, { status: 400 });
+  }
+  const client = db();
+
+  const guest = await client
+    .from("guests")
+    .select("rsvp_group_id")
+    .eq("id", guestId)
+    .maybeSingle();
+  if (guest.error) {
+    return Response.json({ error: "Database error" }, { status: 500 });
+  }
+  if (!guest.data) {
+    return Response.json({ error: "Not found" }, { status: 404 });
+  }
+  const groupId = guest.data.rsvp_group_id as string | null;
+
+  const del = await client.from("guests").delete().eq("id", guestId);
+  if (del.error) {
+    return Response.json({ error: "Delete failed" }, { status: 500 });
+  }
+
+  // Empty group left behind? Remove it and its remaining links.
+  if (groupId) {
+    const rest = await client
+      .from("guests")
+      .select("id")
+      .eq("rsvp_group_id", groupId)
+      .limit(1);
+    if (!rest.error && (rest.data ?? []).length === 0) {
+      await client.from("rsvp_slugs").delete().eq("group_id", groupId);
+      await client.from("rsvp_groups").delete().eq("id", groupId);
+    }
+  }
+
+  return Response.json({ ok: true });
 }
