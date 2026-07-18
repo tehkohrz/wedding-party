@@ -171,7 +171,10 @@ export default function FindPage() {
         </section>
       )}
 
-      <main className="flex-1 overflow-hidden grid place-items-center px-6 py-2">
+      {/* overflow-auto (not hidden): on phones the map is wider than the
+          screen — guests pan to their section. On tablets it still fits
+          and centers. */}
+      <main className="flex-1 overflow-auto grid place-items-center px-6 py-2">
         <SeatingMap highlights={highlights} />
       </main>
     </div>

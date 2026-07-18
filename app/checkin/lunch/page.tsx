@@ -180,7 +180,10 @@ export default function LunchPage() {
       </section>
 
       {/* The map — only this-round members' seats are highlighted and pulse */}
-      <main className="flex-1 overflow-hidden grid place-items-center px-6 py-2">
+      {/* overflow-auto (not hidden): on phones the map is wider than the
+          screen — guests pan to their section. On tablets it still fits
+          and centers. */}
+      <main className="flex-1 overflow-auto grid place-items-center px-6 py-2">
         <SeatingMap highlights={highlights} pulseAt={pulseAt} />
       </main>
 
