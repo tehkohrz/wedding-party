@@ -55,7 +55,7 @@ export function StepDeclineConfirm({
   return (
     <div className="space-y-6 text-center">
       <div className="space-y-2">
-        <h2 className="font-display text-3xl">
+        <h2 className="font-display font-bold text-3xl">
           {RSVP_STEPS_COPY.declineHeading}
         </h2>
         <p className="font-sans text-sm text-muted-foreground max-w-md mx-auto">

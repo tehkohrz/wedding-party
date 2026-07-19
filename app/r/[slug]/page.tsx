@@ -60,13 +60,19 @@ export default async function PersonalRsvpPage({
       {/* Panel width/height are [input] fields in lib/content.ts. */}
       <PhotoSlideshow />
 
-      <section className="relative flex-1 overflow-y-auto scroll-smooth bg-background">
-        <RsvpFlow
-          slug={slug.toLowerCase()}
-          group={group}
-          members={members}
-          greeting={linkGuest?.name}
-        />
+      <section className="relative flex-1 overflow-y-auto scroll-smooth invite-stripes">
+        <div className="p-3 sm:p-6 min-h-full flex flex-col">
+          <div className="invite-card p-1.5 sm:p-2 flex-1 flex flex-col">
+            <div className="invite-card-inner flex-1">
+              <RsvpFlow
+                slug={slug.toLowerCase()}
+                group={group}
+                members={members}
+                greeting={linkGuest?.name}
+              />
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   );

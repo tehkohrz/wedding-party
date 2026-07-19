@@ -73,9 +73,9 @@ export function EventCountdown() {
       {tiles.map((t) => (
         <div
           key={t.label}
-          className="flex flex-col items-center rounded-card bg-muted/60 px-3 py-2 min-w-[3.75rem] sm:px-5 sm:py-3 sm:min-w-[5rem]"
+          className="flex flex-col items-center rounded-card bg-muted/60 px-3 py-2 min-w-[3.75rem] sm:px-6 sm:py-4 sm:min-w-[6rem]"
         >
-          <span className="font-display text-2xl sm:text-4xl leading-none tabular-nums">
+          <span className="font-display text-2xl sm:text-5xl leading-none tabular-nums">
             {t.value}
           </span>
           <span className="font-sans text-[10px] sm:text-xs uppercase tracking-widest text-muted-foreground mt-1 sm:mt-1.5">

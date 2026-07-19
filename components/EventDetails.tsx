@@ -17,6 +17,7 @@
 import { Shirt, MapPin, ExternalLink } from "lucide-react";
 import { EVENT_DETAILS } from "@/lib/content";
 import { ScheduleBlock } from "@/components/ScheduleBlock";
+import { PigeonSignoff } from "@/components/PigeonSignoff";
 
 export function EventDetails() {
   const q = encodeURIComponent(EVENT_DETAILS.mapQuery);
@@ -32,16 +33,16 @@ export function EventDetails() {
 
       {/* Attire */}
       <SectionLabel icon={<Shirt className="size-5" />} label="Dress Code" />
-      <p className="font-display text-xl mt-3">{EVENT_DETAILS.attire}</p>
+      <p className="font-display text-2xl sm:text-3xl mt-3">{EVENT_DETAILS.attire}</p>
 
       <DotDivider />
 
       {/* Location */}
       <SectionLabel icon={<MapPin className="size-5" />} label="Location" />
       <div className="mt-3 space-y-1">
-        <p className="font-display text-xl">{EVENT_DETAILS.venueName}</p>
+        <p className="font-display text-2xl sm:text-3xl">{EVENT_DETAILS.venueName}</p>
         {EVENT_DETAILS.venueAddress && (
-          <p className="font-sans text-sm text-muted-foreground">
+          <p className="font-display uppercase tracking-[0.15em] text-base sm:text-lg text-muted-foreground">
             {EVENT_DETAILS.venueAddress}
           </p>
         )}
@@ -60,10 +61,13 @@ export function EventDetails() {
         href={directionsUrl}
         target="_blank"
         rel="noreferrer"
-        className="inline-flex items-center gap-1.5 font-sans text-sm text-primary hover:underline mt-3"
+        className="inline-flex items-center gap-1.5 font-sans text-base text-primary hover:underline mt-3"
       >
         <ExternalLink className="size-3.5" /> Get directions
       </a>
+
+      {/* The pigeon pair signs off the invitation content. */}
+      <PigeonSignoff />
     </div>
   );
 }
@@ -77,8 +81,11 @@ function SectionLabel({
   label: string;
 }) {
   return (
-    <p className="flex items-center justify-center gap-2.5 font-sans text-lg uppercase tracking-[0.25em] text-muted-foreground">
-      <span className="text-primary">{icon}</span>
+    <p
+      className="flex items-center justify-center gap-2.5 font-display font-bold text-xl sm:text-2xl uppercase tracking-[0.25em]"
+      style={{ color: "hsl(var(--invite-olive-text))" }}
+    >
+      {icon}
       {label}
     </p>
   );

@@ -22,15 +22,18 @@ export default function RsvpLandingPage() {
           Structure: the hero content centers itself in the leftover space
           (my-auto), while the Details anchor pins to the BOTTOM of the
           fold — so scrolling on reveals the details with no dead gap. */}
-      <section className="relative flex-1 overflow-y-auto scroll-smooth bg-background">
-        <div className="min-h-full flex flex-col items-center px-6 pt-5 sm:pt-8 pb-3 sm:pb-4">
+      <section className="relative flex-1 overflow-y-auto scroll-smooth invite-stripes">
+        <div className="p-3 sm:p-6">
+          <div className="invite-card p-1.5 sm:p-2">
+            <div className="invite-card-inner">
+        <div className="invite-fold flex flex-col items-center px-6 pt-5 sm:pt-8 pb-3 sm:pb-4">
           <div className="my-auto text-center space-y-3 sm:space-y-6 max-w-xl w-full">
             <HeroTitle />
 
             {/* Event date + venue + countdown */}
             <div className="space-y-3">
               <div className="space-y-1">
-                <p className="font-display italic text-2xl sm:text-4xl text-balance text-foreground">
+                <p className="font-display italic text-2xl sm:text-5xl text-balance text-foreground">
                   {EVENT_DETAILS.date}
                 </p>
               </div>
@@ -55,7 +58,7 @@ export default function RsvpLandingPage() {
               animate-bounce disabled for reduced-motion users. */}
           <a
             href="#details"
-            className="shrink-0 inline-flex flex-col items-center gap-1 pt-3 sm:pt-6 font-display text-2xl sm:text-3xl text-foreground hover:text-primary transition-colors"
+            className="shrink-0 inline-flex flex-col items-center gap-1 pt-3 sm:pt-6 font-display text-2xl sm:text-4xl text-foreground hover:text-primary transition-colors"
           >
             {EVENT_DETAILS.detailsHeading}
             <ChevronDown
@@ -66,8 +69,11 @@ export default function RsvpLandingPage() {
         </div>
 
         {/* Below the fold — follows the anchor with only a small gap */}
-        <div className="px-6 pb-16 pt-4">
+        <div className="px-6 pb-16 pt-12">
           <EventDetails />
+        </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>

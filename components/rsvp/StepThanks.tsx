@@ -30,7 +30,7 @@ export function StepThanks({
   return (
     <div className="space-y-6">
       <div className="text-center space-y-1">
-        <h2 className="font-display text-3xl">
+        <h2 className="font-display font-bold text-3xl">
           {justSubmitted
             ? RSVP_CONFIRM.thanksHeading
             : RSVP_CONFIRM.respondedHeading}

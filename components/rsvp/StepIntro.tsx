@@ -33,14 +33,14 @@ export function StepIntro({
     <>
       {/* First screenful — hero centered (my-auto), Details anchor pinned
           to the fold bottom, exactly like the public landing page. */}
-      <div className="min-h-full flex flex-col items-center px-6 pt-5 sm:pt-8 pb-3 sm:pb-4">
+      <div className="invite-fold flex flex-col items-center px-6 pt-5 sm:pt-8 pb-3 sm:pb-4">
         <div className="my-auto text-center space-y-3 sm:space-y-6 max-w-xl w-full">
           <HeroTitle />
 
           {/* Event date + venue + countdown */}
           <div className="space-y-3">
             <div className="space-y-1">
-              <p className="font-display italic text-2xl sm:text-4xl text-balance text-foreground">
+              <p className="font-display italic text-2xl sm:text-5xl text-balance text-foreground">
                 {EVENT_DETAILS.date}
               </p>
             </div>
@@ -51,18 +51,34 @@ export function StepIntro({
               the personal link greets the guest and offers the button. */}
           <div className="space-y-3 pt-2">
             {greeting && (
-              <h2 className="font-display italic text-2xl sm:text-4xl">
-                {RSVP_STEPS_COPY.introGreeting.replace("{name}", greeting)}
+              <h2 className="font-display font-bold uppercase tracking-[0.28em] text-lg sm:text-2xl text-foreground">
+                {/* The template splits around {name} so the guest's name
+                    takes the highlight pink while the rest stays ink. */}
+                {RSVP_STEPS_COPY.introGreeting
+                  .split("{name}")
+                  .map((part, i) => (
+                    <span key={i}>
+                      {i > 0 && (
+                        <span style={{ color: "hsl(var(--invite-pink))" }}>
+                          {greeting}
+                        </span>
+                      )}
+                      {part}
+                    </span>
+                  ))}
               </h2>
             )}
             <Button
               onClick={() => goTo(nextStep, 1)}
-              className="mx-auto inline-flex h-12 sm:h-14 rounded-pill px-10 sm:px-12 text-lg"
+              className="mx-auto inline-flex h-12 sm:h-16 rounded-pill px-10 sm:px-14 font-display font-bold tracking-[0.25em] text-lg sm:text-2xl"
             >
               {RSVP_STEPS_COPY.respondLabel}
               <ChevronRight className="size-5" />
             </Button>
-            <p className="font-sans text-xs sm:text-sm text-muted-foreground">
+            <p
+              className="font-display uppercase tracking-[0.2em] text-sm sm:text-base"
+              style={{ color: "hsl(var(--invite-olive-text))" }}
+            >
               {RSVP_STEPS_COPY.rsvpByNote.replace("{deadline}", rsvpDeadlineLabel())}
             </p>
           </div>
@@ -71,7 +87,7 @@ export function StepIntro({
         {/* Invitation to scroll — this anchor IS the details title. */}
         <a
           href="#details"
-          className="shrink-0 inline-flex flex-col items-center gap-1 pt-3 sm:pt-6 font-display text-2xl sm:text-3xl text-foreground hover:text-primary transition-colors"
+          className="shrink-0 inline-flex flex-col items-center gap-1 pt-3 sm:pt-6 font-display text-2xl sm:text-4xl text-foreground hover:text-primary transition-colors"
         >
           {EVENT_DETAILS.detailsHeading}
           <ChevronDown
@@ -82,7 +98,7 @@ export function StepIntro({
       </div>
 
       {/* Below the fold */}
-      <div className="px-6 pb-16 pt-4">
+      <div className="px-6 pb-16 pt-12">
         <EventDetails />
       </div>
     </>

@@ -12,7 +12,7 @@ export function StepDeclinedThanks() {
   return (
     <div className="space-y-4 text-center py-8">
       <Heart className="size-10 mx-auto text-rose" strokeWidth={1.5} />
-      <h2 className="font-display text-3xl">
+      <h2 className="font-display font-bold text-3xl">
         {RSVP_STEPS_COPY.declinedThanksHeading}
       </h2>
       <p className="font-sans text-sm text-muted-foreground max-w-md mx-auto">

@@ -71,7 +71,6 @@ export const EVENT_DETAILS = {
     { time: "12:00", item: "Guest Arrival" },
     { time: "12:05", item: "Solemnization" },
     { time: "12:30", item: "Lunch" },
-    { time: "15:30", item: "Afterparty!" },
   ],
 
   // [input] Attire line in the landing Details section.
@@ -103,9 +102,10 @@ export const EVENT_DETAILS = {
 };
 
 export const RSVP_COPY = {
-  // [input] The hero title, two lines: the names line (display serif) and
-  //         the flourish line (script font, accent color).
-  heroTitleNames: "Dong Kun & Jermaine",
+  // [input] The hero title: the name lines render in the pink script, one
+  //         per line ("&" lines render smaller), then the flourish line in
+  //         olive small caps.
+  heroTitleLines: ["Jermaine", "&", "Dong Kun"] as string[],
   heroTitleFlourish: "are getting married!",
 
   // [input] Shown on the public landing page — guests RSVP only via their
@@ -126,7 +126,7 @@ export const RSVP_COPY = {
   // [input] Width of the photo panel in landscape/desktop, as a percentage
   //         of the page (the content side gets the rest). Has no effect on
   //         portrait phones (photo becomes a top banner).
-  photoPanelWidthPercent: 33,
+  photoPanelWidthPercent: 50,
 
   // [input] Height of the photo banner on portrait phones (vh = % of the
   //         screen height).
@@ -291,8 +291,11 @@ export const RSVP_CONFIRM = {
 };
 
 export const RSVP_STEPS_COPY = {
-  // [input] Labels for the progress dots across the top of the RSVP flow.
+  // [input] Labels for the progress pills across the top of the RSVP flow.
+  //         afterPartyStepLabel must match its entry in stepLabels — it's
+  //         hidden for groups with nobody invited to the after-party.
   stepLabels: ["Your party", "Menu", "After-party", "Confirm"],
+  afterPartyStepLabel: "After-party",
 
   // ── Step: intro (the personal link's landing view) ──
   // [input] Greeting above the RSVP button. {name} = the invited guest.
@@ -322,6 +325,9 @@ export const RSVP_STEPS_COPY = {
   // [input] Continue button (enabled once everyone has an answer).
   continueLabel: "Continue",
 
+  // [input] Back link on the first form step — returns to the invitation.
+  attendanceBackLabel: "Back to the invitation",
+
   // ── Plus-ones (guest rows marked is_plus_one in the CSV / database) ──
   // [input] The question on a plus-one row (replaces the placeholder name).
   plusOneQuestion: "Bringing a plus one?",
@@ -329,6 +335,10 @@ export const RSVP_STEPS_COPY = {
   // [input] The yes/no choices on a plus-one row.
   plusOneYesLabel: "Yes, bringing someone",
   plusOneNoLabel: "Not this time",
+
+  // [input] Shown wherever an unnamed plus one needs a label (menu step,
+  //         summary) — the database placeholder name is never displayed.
+  plusOneFallbackName: "Plus one",
 
   // [input] Label + placeholder for the (optional) plus-one name field,
   //         shown once "yes" is picked. Leaving it unchanged keeps the

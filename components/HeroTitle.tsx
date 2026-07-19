@@ -3,8 +3,9 @@
 /**
  * The RSVP hero title — replaces the v1 "equation" on the landing pages:
  *
- *     Dong Kun and Jermaine        ← display serif (Cormorant Garamond)
- *     are getting married!         ← script flourish (Great Vibes), accent
+ *     Jermaine / & / Dong Kun      ← script (Great Vibes), e-invite pink,
+ *                                     one line each ("&" smaller)
+ *     are getting married!         ← small caps (Cormorant), e-invite olive
  *
  * Both lines are [input]s in lib/content.ts (RSVP_COPY.heroTitle*).
  * Lines fade/rise in one after the other, like the old equation did.
@@ -40,16 +41,30 @@ export function HeroTitle() {
 
   return (
     <motion.h1 className="text-balance" {...motionProps}>
+      {RSVP_COPY.heroTitleLines.map((line) => (
+        <motion.span
+          key={line}
+          variants={lineVariants}
+          className={
+            line === "&"
+              ? "block text-4xl sm:text-6xl leading-tight"
+              : "block text-6xl sm:text-8xl leading-tight"
+          }
+          style={{
+            fontFamily: "var(--font-script)",
+            color:
+              line === "&"
+                ? "hsl(var(--invite-blue))"
+                : "hsl(var(--invite-pink))",
+          }}
+        >
+          {line}
+        </motion.span>
+      ))}
       <motion.span
         variants={lineVariants}
-        className="block font-display text-5xl sm:text-6xl leading-tight"
-      >
-        {RSVP_COPY.heroTitleNames}
-      </motion.span>
-      <motion.span
-        variants={lineVariants}
-        className="block text-5xl sm:text-6xl leading-snug text-lavender pt-2"
-        style={{ fontFamily: "var(--font-script)" }}
+        className="block font-display uppercase tracking-[0.28em] text-lg sm:text-2xl pt-4"
+        style={{ color: "hsl(var(--invite-olive-text))" }}
       >
         {RSVP_COPY.heroTitleFlourish}
       </motion.span>

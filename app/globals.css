@@ -110,3 +110,54 @@ body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
 }
+
+/* ─── Invitation look (RSVP content section) ────────────────────────────────
+   Striped "wallpaper" background + cream card with a hand-drawn wavy olive
+   double frame, modeled on the couple's paper invite. Colors are scoped
+   tokens so a theme file can override them without touching components. */
+:root {
+  --invite-stripe-a: 39 53% 93%; /* cream stripe */
+  --invite-stripe-b: 211 50% 86%; /* powder-blue stripe */
+  --invite-card: 48 71% 97%; /* card cream */
+  --invite-frame: 69 35% 55%; /* olive outer frame */
+  --invite-frame-soft: 69 40% 67%; /* lighter inner frame */
+  --invite-pink: 340 60% 58%; /* script names (e-invite dusty pink) */
+  --invite-olive-text: 73 34% 37%; /* small-caps accent lines */
+  --invite-blue: 211 42% 52%; /* deeper cousin of the stripe blue (the "&") */
+}
+
+.invite-stripes {
+  background: repeating-linear-gradient(
+    90deg,
+    hsl(var(--invite-stripe-a)) 0 16px,
+    hsl(var(--invite-stripe-b)) 16px 32px
+  );
+}
+
+/* The uneven border-radii give the frame its hand-drawn wobble. */
+.invite-card {
+  background: hsl(var(--invite-card));
+  border: 3px solid hsl(var(--invite-frame));
+  border-radius: 42px 58px 46px 62px / 58px 44px 64px 48px;
+}
+.invite-card-inner {
+  border: 1.5px solid hsl(var(--invite-frame-soft));
+  border-radius: 36px 50px 40px 54px / 50px 38px 56px 42px;
+}
+
+/* First-screenful height for the hero fold, inside the framed card.
+   100dvh minus the section padding + card chrome; portrait subtracts the
+   photo banner too (28vh — keep in sync with RSVP_COPY.photoBannerHeightVh). */
+.invite-fold {
+  /* 100dvh minus the striped padding + card chrome above/below the fold
+     (p-6 wrapper + p-2 card + frame borders ≈ 4.5rem total) — sized so the
+     Details anchor lands exactly at the screen bottom with nothing from
+     the next section peeking. */
+  min-height: calc(100dvh - 4rem);
+}
+@media (orientation: portrait) {
+  .invite-fold {
+    /* photo banner (28vh) + slimmer mobile chrome (p-3 + p-1.5 ≈ 2.8rem) */
+    min-height: calc(72dvh - 2.5rem);
+  }
+}
