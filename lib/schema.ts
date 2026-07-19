@@ -65,6 +65,15 @@ export const GuestSchema = z.object({
     .optional()
     .transform((s) => (s ?? "").trim().toLowerCase() === "true"),
   /**
+   * After-party invite flag — the after-party is invite-only; guests
+   * without it never see the after-party step or its progress pill.
+   * CSV cell: "true"/"false" (empty = false).
+   */
+  after_party_invited: z
+    .string()
+    .optional()
+    .transform((s) => (s ?? "").trim().toLowerCase() === "true"),
+  /**
    * Seat address — one seating (the lunch). NULLABLE since v2: seats are
    * assigned only after the RSVP deadline, so during RSVP season these
    * cells are empty in the CSV / null in the database.

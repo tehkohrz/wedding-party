@@ -36,6 +36,7 @@ interface AdminGuest {
   seating_group_id: string | null;
   is_kid: boolean;
   is_plus_one: boolean;
+  after_party_invited: boolean;
   row_num: number | null;
   section: string | null;
   seat: number | null;
@@ -55,6 +56,7 @@ interface GuestDraft {
   seating_group_id: string;
   is_kid: boolean;
   is_plus_one: boolean;
+  after_party_invited: boolean;
   search_aliases: string;
   row_num: number | null;
   section: string | null;
@@ -68,6 +70,7 @@ const EMPTY_DRAFT: GuestDraft = {
   seating_group_id: "",
   is_kid: false,
   is_plus_one: false,
+  after_party_invited: false,
   search_aliases: "",
   row_num: null,
   section: null,
@@ -76,7 +79,7 @@ const EMPTY_DRAFT: GuestDraft = {
 
 /** Grid template shared by the header and row line 1. */
 const ROW_GRID =
-  "sm:grid-cols-[2.5rem_1fr_5.5rem_6rem_6rem_5.5rem_9rem_4.5rem]";
+  "sm:grid-cols-[2.5rem_1fr_5.5rem_6rem_6rem_7.5rem_9rem_4.5rem]";
 
 export function GuestsTab() {
   const [guests, setGuests] = useState<AdminGuest[]>([]);
@@ -217,6 +220,7 @@ export function GuestsTab() {
           seating_group_id: draft.seating_group_id.trim() || null,
           is_kid: draft.is_kid,
           is_plus_one: draft.is_plus_one,
+          after_party_invited: draft.after_party_invited,
           search_aliases: draft.search_aliases,
           row_num: draft.row_num,
           section: draft.section,
@@ -347,7 +351,7 @@ export function GuestsTab() {
             <span>Side</span>
             <span>RSVP grp</span>
             <span>Seat grp</span>
-            <span>Kid · +1</span>
+            <span>Kid · +1 · AP</span>
             <span>Row · Sec · Seat</span>
             <span className="text-right">Save</span>
           </div>
@@ -432,6 +436,23 @@ export function GuestsTab() {
                         }
                       />
                       +1
+                    </label>
+                    {/* After-party is invite-only — this flag shows the
+                        guest the after-party step in their RSVP. */}
+                    <label
+                      className="flex items-center gap-1 font-sans text-xs"
+                      title="Invited to the after-party"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={merged.after_party_invited}
+                        onChange={(ev) =>
+                          stage(g.id, {
+                            after_party_invited: ev.target.checked,
+                          })
+                        }
+                      />
+                      AP
                     </label>
                   </div>
                   <div className="flex items-center gap-1">
@@ -723,6 +744,22 @@ export function GuestsTab() {
                       }
                     />
                     +1
+                  </label>
+                  <label
+                    className="flex items-center gap-1 font-sans text-xs"
+                    title="Invited to the after-party"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={draft.after_party_invited}
+                      onChange={(ev) =>
+                        setDraft({
+                          ...draft,
+                          after_party_invited: ev.target.checked,
+                        })
+                      }
+                    />
+                    AP
                   </label>
                 </div>
                 <div className="flex items-center gap-1">

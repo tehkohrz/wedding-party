@@ -6,7 +6,7 @@
  */
 import { Baby, Check, X, PartyPopper } from "lucide-react";
 import { useRsvpStore, EMPTY_ANSWER } from "@/lib/rsvpStore";
-import { MENU, RSVP_CONFIRM } from "@/lib/content";
+import { MENU, RSVP_CONFIRM, RSVP_STEPS_COPY } from "@/lib/content";
 import { BOUQUET_COLORS } from "@/lib/groups";
 import type { RsvpMember } from "./types";
 
@@ -18,8 +18,16 @@ export function SummaryList({ members }: { members: RsvpMember[] }) {
       {members.map((m, i) => {
         const color = BOUQUET_COLORS[i % BOUQUET_COLORS.length];
         const a = answers[m.id] ?? EMPTY_ANSWER;
-        // Plus-ones can be renamed during the RSVP — prefer the draft name.
-        const displayName = (a.name ?? "").trim() || m.name;
+        // Plus-ones: typed name, else a generic label — the DB placeholder
+        // is never shown. A declined plus-one renders as a plain
+        // "No plus one" row with no badge at all.
+        const declinedPlusOne = m.is_plus_one && a.attending !== true;
+        const displayName = declinedPlusOne
+          ? RSVP_CONFIRM.noPlusOneBadge
+          : (a.name ?? "").trim() ||
+            (m.is_plus_one
+              ? RSVP_STEPS_COPY.plusOneFallbackName
+              : m.name);
         const main = MENU.mains.find((x) => x.id === a.food);
         const foodLabel =
           a.food === "K"
@@ -50,12 +58,9 @@ export function SummaryList({ members }: { members: RsvpMember[] }) {
                 <span className="flex items-center gap-1 font-sans text-xs text-arrived shrink-0">
                   <Check className="size-3.5" /> {RSVP_CONFIRM.attendingBadge}
                 </span>
-              ) : (
+              ) : declinedPlusOne ? null : (
                 <span className="flex items-center gap-1 font-sans text-xs text-muted-foreground shrink-0">
-                  <X className="size-3.5" />{" "}
-                  {m.is_plus_one
-                    ? RSVP_CONFIRM.noPlusOneBadge
-                    : RSVP_CONFIRM.decliningBadge}
+                  <X className="size-3.5" /> {RSVP_CONFIRM.decliningBadge}
                 </span>
               )}
             </div>

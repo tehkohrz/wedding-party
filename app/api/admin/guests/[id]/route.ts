@@ -31,6 +31,7 @@ const PatchSchema = z
     seating_group_id: z.string().trim().min(1).nullable(),
     is_kid: z.boolean(),
     is_plus_one: z.boolean(),
+    after_party_invited: z.boolean(),
     row_num: z.number().int().positive().nullable(),
     section: z.string().trim().min(1).nullable(),
     seat: z.number().int().positive().nullable(),

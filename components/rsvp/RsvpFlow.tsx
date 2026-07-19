@@ -22,10 +22,10 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { useRsvpStore, type RsvpStep } from "@/lib/rsvpStore";
-import { EVENT_DETAILS, RSVP_STEPS_COPY, RSVP_CONFIRM } from "@/lib/content";
+import { RSVP_STEPS_COPY, RSVP_CONFIRM } from "@/lib/content";
 import { rsvpDeadlinePassed } from "@/lib/rsvpDeadline";
 import { cn } from "@/lib/utils";
-import { EventCountdown } from "@/components/EventCountdown";
+import { PigeonSignoff } from "@/components/PigeonSignoff";
 import { StepIntro } from "./StepIntro";
 import { StepAttendance } from "./StepAttendance";
 import { StepMenu } from "./StepMenu";
@@ -36,17 +36,23 @@ import { StepDeclineConfirm } from "./StepDeclineConfirm";
 import { StepDeclinedThanks } from "./StepDeclinedThanks";
 import type { RsvpGroup, RsvpMember } from "./types";
 
-/** Which progress dot lights up for each step (null = dots hidden). */
-const DOT_INDEX: Record<RsvpStep, number | null> = {
-  intro: null,
-  attendance: 0,
-  menu: 1,
-  afterparty: 2,
-  confirm: 3,
-  thanks: null,
-  "decline-confirm": null,
-  "declined-thanks": null,
-};
+/** Which pill lights up for each step (null = pills hidden). The
+    after-party is INVITE-ONLY: groups with no invited member skip that
+    step entirely, so their pill row is one shorter and confirm shifts up. */
+function dotIndexFor(step: RsvpStep, hasAfterParty: boolean): number | null {
+  switch (step) {
+    case "attendance":
+      return 0;
+    case "menu":
+      return 1;
+    case "afterparty":
+      return 2;
+    case "confirm":
+      return hasAfterParty ? 3 : 2;
+    default:
+      return null;
+  }
+}
 
 export function RsvpFlow({
   slug,
@@ -118,41 +124,30 @@ export function RsvpFlow({
     );
   }
 
-  const dotIndex = DOT_INDEX[step];
+  // Any invited member in the group → the after-party step + pill exist.
+  const hasAfterParty = members.some((m) => m.after_party_invited === true);
+  const stepLabels = RSVP_STEPS_COPY.stepLabels.filter(
+    (label) => hasAfterParty || label !== RSVP_STEPS_COPY.afterPartyStepLabel
+  );
+  const dotIndex = dotIndexFor(step, hasAfterParty);
   const enterX = reduceMotion ? 0 : direction * 48;
 
   return (
     <div ref={shellRef} className="w-full max-w-xl mx-auto space-y-6 px-6 py-8">
-      {/* Compact header — the intro carries the full hero. On phones the
-          date + countdown hide so the step's actual content (party list,
-          menu…) owns the screen. */}
-      <header className="text-center space-y-2 sm:space-y-3">
-        <h1 className="font-display text-3xl sm:text-4xl leading-tight">
-          {greeting
-            ? RSVP_STEPS_COPY.introGreeting.replace("{name}", greeting)
-            : EVENT_DETAILS.date}
-        </h1>
-        {greeting && (
-          <p className="hidden sm:block font-display italic text-2xl text-foreground">
-            {EVENT_DETAILS.date}
-          </p>
-        )}
-        <div className="hidden sm:block">
-          <EventCountdown />
-        </div>
-      </header>
+      {/* No header here — the intro carries the hero; the steps lead with
+          the progress pills so the form itself owns the screen. */}
       {/* Progress dots */}
       {dotIndex !== null && (
         <ol
           className="flex items-center justify-center gap-2"
           aria-label="RSVP steps"
         >
-          {RSVP_STEPS_COPY.stepLabels.map((label, i) => (
+          {stepLabels.map((label, i) => (
             <li key={label} className="flex items-center gap-2">
               <span
                 aria-current={i === dotIndex ? "step" : undefined}
                 className={cn(
-                  "flex items-center gap-1.5 font-sans text-xs rounded-pill px-2.5 py-1 transition-colors",
+                  "flex items-center gap-1.5 font-sans text-sm sm:text-base rounded-pill px-3.5 py-1.5 sm:px-4 sm:py-2 transition-colors",
                   i === dotIndex
                     ? "bg-primary text-primary-foreground font-semibold"
                     : i < dotIndex
@@ -182,6 +177,10 @@ export function RsvpFlow({
       >
         {renderStep()}
       </motion.div>
+
+      {/* Every step signs off with the pigeons, like the landing page —
+          smaller here so the form stays the focus. */}
+      <PigeonSignoff small />
     </div>
   );
 

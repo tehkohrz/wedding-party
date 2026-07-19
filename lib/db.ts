@@ -36,6 +36,7 @@ export interface DbGuest {
   seating_group_id: string | null;
   is_kid: boolean;
   is_plus_one: boolean;
+  after_party_invited: boolean;
   row_num: number | null;
   section: string | null;
   seat: number | null;

@@ -10,7 +10,7 @@ import { PartyPopper, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ChoiceChip } from "./ChoiceChip";
 import { useRsvpStore, EMPTY_ANSWER } from "@/lib/rsvpStore";
-import { AFTER_PARTY } from "@/lib/content";
+import { AFTER_PARTY, RSVP_STEPS_COPY } from "@/lib/content";
 import { BOUQUET_COLORS } from "@/lib/groups";
 import type { RsvpMember } from "./types";
 
@@ -19,8 +19,12 @@ export function StepAfterParty({ members }: { members: RsvpMember[] }) {
   const setAfterParty = useRsvpStore((s) => s.setAfterParty);
   const goTo = useRsvpStore((s) => s.goTo);
 
+  // Invite-only: the step reaches here only if someone is invited, and
+  // only invited members get the question.
   const attending = members.filter(
-    (m) => (answers[m.id] ?? EMPTY_ANSWER).attending === true
+    (m) =>
+      m.after_party_invited === true &&
+      (answers[m.id] ?? EMPTY_ANSWER).attending === true
   );
   const allAnswered = attending.every(
     (m) => (answers[m.id] ?? EMPTY_ANSWER).afterParty !== null
@@ -29,7 +33,7 @@ export function StepAfterParty({ members }: { members: RsvpMember[] }) {
   return (
     <div className="space-y-6">
       <div className="text-center space-y-1">
-        <h2 className="font-display text-3xl">{AFTER_PARTY.heading}</h2>
+        <h2 className="font-display font-bold text-3xl">{AFTER_PARTY.heading}</h2>
       </div>
 
       <div className="rounded-card border border-border bg-surface px-5 py-4">
@@ -47,8 +51,11 @@ export function StepAfterParty({ members }: { members: RsvpMember[] }) {
           const color = BOUQUET_COLORS[i % BOUQUET_COLORS.length];
           const a = answers[m.id] ?? EMPTY_ANSWER;
           const going = a.afterParty;
-          // Plus-ones may have been renamed on the attendance step.
-          const displayName = (a.name ?? "").trim() || m.name;
+          // Typed plus-one name, else a generic label (never the DB
+          // placeholder).
+          const displayName =
+            (a.name ?? "").trim() ||
+            (m.is_plus_one ? RSVP_STEPS_COPY.plusOneFallbackName : m.name);
           return (
             <div
               key={m.id}

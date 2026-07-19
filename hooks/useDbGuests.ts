@@ -25,6 +25,7 @@ interface ApiGuestRow {
   seating_group_id: string | null;
   is_kid?: boolean;
   is_plus_one?: boolean;
+  after_party_invited?: boolean;
   attending?: boolean | null;
   row_num: number | null;
   section: string | null;
@@ -44,6 +45,7 @@ function toGuest(r: ApiGuestRow): Guest {
     seating_group_id: r.seating_group_id,
     is_kid: r.is_kid ?? false,
     is_plus_one: r.is_plus_one ?? false,
+    after_party_invited: r.after_party_invited ?? false,
     row: r.row_num,
     section: r.section,
     seat: r.seat,

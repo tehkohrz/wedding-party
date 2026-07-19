@@ -11,6 +11,7 @@ export interface RsvpMember {
   name: string;
   is_kid: boolean;
   is_plus_one: boolean;
+  after_party_invited?: boolean;
   attending: boolean | null;
   food_choice: "A" | "B" | "K" | null; // K = kids' meal
   dietary_comment: string | null;

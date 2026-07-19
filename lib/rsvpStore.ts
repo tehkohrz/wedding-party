@@ -68,6 +68,7 @@ export interface InitMember {
   id: number;
   name: string;
   is_kid: boolean;
+  is_plus_one?: boolean;
   attending: boolean | null;
   food_choice: "A" | "B" | "K" | null;
   dietary_comment: string | null;
@@ -141,7 +142,13 @@ export const useRsvpStore = create<RsvpState>()(
             comment: m.dietary_comment ?? "",
             afterParty: m.after_party,
             babySeat: m.baby_seat ?? null,
-            name: m.name,
+            // Plus-one rows start with an EMPTY name box (their DB row
+            // holds a placeholder we never show); once a response exists
+            // the saved (possibly real) name is restored for editing.
+            name:
+              m.is_plus_one === true && m.responded_at === null
+                ? ""
+                : m.name,
           };
         }
         const responded = members.some((m) => m.responded_at !== null);

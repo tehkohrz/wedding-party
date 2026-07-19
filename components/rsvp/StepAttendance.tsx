@@ -51,7 +51,7 @@ export function StepAttendance({ members }: { members: RsvpMember[] }) {
 
       {/* Heading */}
       <div className="text-center space-y-1">
-        <h2 className="font-display text-3xl">
+        <h2 className="font-display font-bold text-3xl">
           {RSVP_STEPS_COPY.attendanceHeading}
         </h2>
         <p className="font-sans text-sm text-muted-foreground">
@@ -148,6 +148,15 @@ export function StepAttendance({ members }: { members: RsvpMember[] }) {
         className="w-full h-13 rounded-pill text-base"
       >
         {RSVP_STEPS_COPY.continueLabel}
+      </Button>
+
+      {/* Escape hatch back to the invitation page (intro). */}
+      <Button
+        variant="ghost"
+        onClick={() => goTo("intro", -1)}
+        className="w-full h-11 rounded-pill"
+      >
+        {RSVP_STEPS_COPY.attendanceBackLabel}
       </Button>
     </div>
   );

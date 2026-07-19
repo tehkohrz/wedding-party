@@ -137,6 +137,7 @@ async function main() {
     seating_group_id: g.seating_group_id,
     is_kid: g.is_kid,
     is_plus_one: g.is_plus_one,
+    after_party_invited: g.after_party_invited,
     row_num: g.row ?? null,
     section: g.section,
     seat: g.seat ?? null,

@@ -154,6 +154,11 @@ export async function POST(
   const plusOneIds = new Set(
     memberRows.filter((m) => m.is_plus_one).map((m) => m.id as number)
   );
+  const afterPartyIds = new Set(
+    memberRows
+      .filter((m) => m.after_party_invited === true)
+      .map((m) => m.id as number)
+  );
 
   const answers = parsed.data.answers;
   const answeredIds = new Set(answers.map((a) => a.guest_id));
@@ -195,7 +200,9 @@ export async function POST(
         attending: a.attending,
         food_choice: a.attending ? a.food_choice : null,
         dietary_comment: a.attending ? a.dietary_comment : null,
-        after_party: a.attending ? a.after_party : null,
+        // Invite-only: uninvited members can never carry an answer.
+        after_party:
+          a.attending && afterPartyIds.has(a.guest_id) ? a.after_party : null,
         // Baby seat applies to attending kids only.
         baby_seat:
           a.attending && kidIds.has(a.guest_id) ? (a.baby_seat ?? null) : null,

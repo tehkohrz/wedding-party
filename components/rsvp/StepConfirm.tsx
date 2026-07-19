@@ -48,10 +48,10 @@ export function StepConfirm({
             dietary_comment: a.attending && a.comment ? a.comment : null,
             after_party: a.attending ? a.afterParty : null,
             baby_seat: m.is_kid && a.attending ? a.babySeat : null,
-            // Plus-ones can be renamed in the flow; the API ignores name
-            // for everyone else.
-            ...(m.is_plus_one
-              ? { name: (a.name ?? "").trim() || m.name }
+            // Plus-ones: send the typed name only — left blank, the DB
+            // keeps its placeholder (which the UI never displays).
+            ...(m.is_plus_one && (a.name ?? "").trim()
+              ? { name: (a.name ?? "").trim() }
               : {}),
           };
         }),
@@ -76,7 +76,7 @@ export function StepConfirm({
   return (
     <div className="space-y-6">
       <div className="text-center space-y-1">
-        <h2 className="font-display text-3xl">{RSVP_CONFIRM.heading}</h2>
+        <h2 className="font-display font-bold text-3xl">{RSVP_CONFIRM.heading}</h2>
         <p className="font-sans text-sm text-muted-foreground">
           {RSVP_CONFIRM.instruction}
         </p>
@@ -100,7 +100,18 @@ export function StepConfirm({
         </Button>
         <Button
           variant="ghost"
-          onClick={() => goTo("afterparty", -1)}
+          onClick={() =>
+            goTo(
+              members.some(
+                (m) =>
+                  m.after_party_invited === true &&
+                  answers[m.id]?.attending === true
+              )
+                ? "afterparty"
+                : "menu",
+              -1
+            )
+          }
           disabled={submitting}
           className="w-full h-11 rounded-pill"
         >

@@ -46,6 +46,8 @@ create table if not exists guests (
   is_kid           boolean not null default false,  -- kids' meals counted separately
   is_plus_one      boolean not null default false,  -- no personal link; main guest
                                                     -- toggles + names them in the RSVP
+  after_party_invited boolean not null default false, -- after-party is invite-only:
+                                                    -- uninvited guests never see the step
 
   -- Seating: nullable until assigned after the RSVP deadline.
   row_num          int,
@@ -78,6 +80,10 @@ alter table guests add column if not exists
 
 -- Migration guard: add baby_seat on databases created before it existed.
 alter table guests add column if not exists baby_seat boolean;
+
+-- Migration guard: add the invite-only after-party flag.
+alter table guests add column if not exists
+  after_party_invited boolean not null default false;
 
 -- Migration guard: guests.id auto-assigns on insert (admin "Add guest").
 -- BY DEFAULT (not ALWAYS) so the CSV seed can still insert explicit ids.

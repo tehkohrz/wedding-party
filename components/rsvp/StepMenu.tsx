@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useRsvpStore, EMPTY_ANSWER } from "@/lib/rsvpStore";
-import { MENU } from "@/lib/content";
+import { MENU, RSVP_STEPS_COPY } from "@/lib/content";
 import { BOUQUET_COLORS } from "@/lib/groups";
 import type { RsvpMember } from "./types";
 
@@ -99,7 +99,7 @@ export function StepMenu({ members }: { members: RsvpMember[] }) {
     <div className="space-y-6">
       {/* Heading */}
       <div className="text-center space-y-1">
-        <h2 className="font-display text-3xl">{MENU.heading}</h2>
+        <h2 className="font-display font-bold text-3xl">{MENU.heading}</h2>
         <p className="font-sans text-sm text-muted-foreground">
           {MENU.instruction}
         </p>
@@ -175,8 +175,13 @@ export function StepMenu({ members }: { members: RsvpMember[] }) {
         {attending.map((m, i) => {
           const color = BOUQUET_COLORS[i % BOUQUET_COLORS.length];
           const answer = answers[m.id] ?? EMPTY_ANSWER;
-          // Plus-ones may have been renamed on the attendance step.
-          const displayName = (answer.name ?? "").trim() || m.name;
+          // Plus-ones show the typed name, else a generic label — the DB
+          // placeholder name is never displayed.
+          const displayName =
+            (answer.name ?? "").trim() ||
+            (m.is_plus_one
+              ? RSVP_STEPS_COPY.plusOneFallbackName
+              : m.name);
           return (
             <div
               key={m.id}
@@ -279,7 +284,18 @@ export function StepMenu({ members }: { members: RsvpMember[] }) {
       {/* Nav */}
       <div className="space-y-2">
         <Button
-          onClick={() => goTo("afterparty", 1)}
+          onClick={() =>
+            goTo(
+              members.some(
+                (m) =>
+                  m.after_party_invited === true &&
+                  (answers[m.id] ?? EMPTY_ANSWER).attending === true
+              )
+                ? "afterparty"
+                : "confirm",
+              1
+            )
+          }
           disabled={!allChosen}
           className="w-full h-13 rounded-pill text-base"
         >
