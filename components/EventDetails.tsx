@@ -31,7 +31,7 @@ export function EventDetails() {
       <DotDivider />
 
       {/* Attire */}
-      <SectionLabel icon={<Shirt className="size-5" />} label="Attire" />
+      <SectionLabel icon={<Shirt className="size-5" />} label="Dress Code" />
       <p className="font-display text-xl mt-3">{EVENT_DETAILS.attire}</p>
 
       <DotDivider />

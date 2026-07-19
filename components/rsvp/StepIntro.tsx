@@ -13,8 +13,9 @@
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRsvpStore, type RsvpStep } from "@/lib/rsvpStore";
-import { EVENT_DETAILS, RSVP_COPY, RSVP_STEPS_COPY } from "@/lib/content";
-import { WelcomeEquation } from "@/components/WelcomeEquation";
+import { rsvpDeadlineLabel } from "@/lib/rsvpDeadline";
+import { EVENT_DETAILS, RSVP_STEPS_COPY } from "@/lib/content";
+import { HeroTitle } from "@/components/HeroTitle";
 import { EventCountdown } from "@/components/EventCountdown";
 import { EventDetails } from "@/components/EventDetails";
 
@@ -34,11 +35,7 @@ export function StepIntro({
           to the fold bottom, exactly like the public landing page. */}
       <div className="min-h-full flex flex-col items-center px-6 pt-5 sm:pt-8 pb-3 sm:pb-4">
         <div className="my-auto text-center space-y-3 sm:space-y-6 max-w-xl w-full">
-          <p className="font-sans text-xs uppercase tracking-[0.25em] text-muted-foreground">
-            {RSVP_COPY.eyebrow}
-          </p>
-
-          <WelcomeEquation />
+          <HeroTitle />
 
           {/* Event date + venue + countdown */}
           <div className="space-y-3">
@@ -65,6 +62,9 @@ export function StepIntro({
               {RSVP_STEPS_COPY.respondLabel}
               <ChevronRight className="size-5" />
             </Button>
+            <p className="font-sans text-xs sm:text-sm text-muted-foreground">
+              {RSVP_STEPS_COPY.rsvpByNote.replace("{deadline}", rsvpDeadlineLabel())}
+            </p>
           </div>
         </div>
 

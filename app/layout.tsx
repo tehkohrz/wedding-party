@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import { Cormorant_Garamond, DM_Sans, Great_Vibes } from "next/font/google";
 import "./globals.css";
 import { SITE } from "@/lib/content";
 import { WizardShell } from "@/components/WizardShell";
@@ -25,6 +25,17 @@ const display = Cormorant_Garamond({
 // Body font — clean, neutral, lets the display font + colors carry personality.
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// Script accent — the "are getting married!" flourish on the hero title.
+// TO TRY A DIFFERENT SCRIPT: swap the import + const (same one-line drill
+// as the display font). Candidates: Parisienne (softer), Pinyon_Script
+// (formal calligraphy), Allura (light).
+const script = Great_Vibes({
+  weight: "400",
+  variable: "--font-script",
   subsets: ["latin"],
   display: "swap",
 });
@@ -67,7 +78,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${dmSans.variable} h-full antialiased`}
+      className={`${display.variable} ${dmSans.variable} ${script.variable} h-full antialiased`}
     >
       {/* overflow-x-hidden: clips the horizontal slide-in animation so it
           doesn't briefly create a horizontal scrollbar. Vertical scrolling

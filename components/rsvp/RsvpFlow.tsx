@@ -22,7 +22,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { useRsvpStore, type RsvpStep } from "@/lib/rsvpStore";
-import { EVENT_DETAILS, RSVP_COPY, RSVP_STEPS_COPY, RSVP_CONFIRM } from "@/lib/content";
+import { EVENT_DETAILS, RSVP_STEPS_COPY, RSVP_CONFIRM } from "@/lib/content";
 import { rsvpDeadlinePassed } from "@/lib/rsvpDeadline";
 import { cn } from "@/lib/utils";
 import { EventCountdown } from "@/components/EventCountdown";
@@ -127,9 +127,6 @@ export function RsvpFlow({
           date + countdown hide so the step's actual content (party list,
           menu…) owns the screen. */}
       <header className="text-center space-y-2 sm:space-y-3">
-        <p className="font-sans text-xs uppercase tracking-[0.25em] text-muted-foreground">
-          {RSVP_COPY.eyebrow}
-        </p>
         <h1 className="font-display text-3xl sm:text-4xl leading-tight">
           {greeting
             ? RSVP_STEPS_COPY.introGreeting.replace("{name}", greeting)

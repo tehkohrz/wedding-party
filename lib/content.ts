@@ -40,7 +40,7 @@ export const COUPLE = {
 
 export const EVENT_DETAILS = {
   // [input] Event date as shown on the RSVP pages.
-  date: "Saturday, 31 October 2026",
+  date: "31 October 2026, Saturday",
 
   // [input] Exact event start for the countdown (ISO 8601 with timezone).
   //         +08:00 = Singapore time. Should match the schedule's first entry.
@@ -68,15 +68,14 @@ export const EVENT_DETAILS = {
   // [input] Day-of schedule (PLACEHOLDER — update with the real programme).
   //         Shown in the landing Details section and on the RSVP flow.
   schedule: [
-    { time: "11:30", item: "Tea Ceremony" },
-    { time: "12:00", item: "Solemnization" },
+    { time: "12:00", item: "Guest Arrival" },
+    { time: "12:05", item: "Solemnization" },
     { time: "12:30", item: "Lunch" },
-    { time: "15:00", item: "Send-off" },
     { time: "15:30", item: "Afterparty!" },
   ],
 
   // [input] Attire line in the landing Details section.
-  attire: "The solemnisation is outdoors dress for the weather! Beachwear, underwear or birthday suit - Anything you like!",
+  attire: "Outdoor solemnisation, dress for the sun and breeze. Beachwear, underwear or naked - anything you like!",
 
   // [input] Title of the details section on the landing page.
   detailsHeading: "Details",
@@ -104,8 +103,10 @@ export const EVENT_DETAILS = {
 };
 
 export const RSVP_COPY = {
-  // [input] Small line above the couple names on the RSVP landing.
-  eyebrow: "You're invited to the wedding party of",
+  // [input] The hero title, two lines: the names line (display serif) and
+  //         the flourish line (script font, accent color).
+  heroTitleNames: "Dong Kun & Jermaine",
+  heroTitleFlourish: "are getting married!",
 
   // [input] Shown on the public landing page — guests RSVP only via their
   //         personal link (no public search; protects responses).
@@ -123,9 +124,9 @@ export const RSVP_COPY = {
   slideshowIntervalSeconds: 6,
 
   // [input] Width of the photo panel in landscape/desktop, as a percentage
-  //         of the page (the content side gets the rest). 60–70 recommended;
-  //         has no effect on portrait phones (photo becomes a top banner).
-  photoPanelWidthPercent: 65,
+  //         of the page (the content side gets the rest). Has no effect on
+  //         portrait phones (photo becomes a top banner).
+  photoPanelWidthPercent: 33,
 
   // [input] Height of the photo banner on portrait phones (vh = % of the
   //         screen height).
@@ -145,7 +146,7 @@ export const MENU = {
       course: "Starter",
       name: "Seared Hokkaido Scallop and Tiger Prawn",
       description:
-        "Parsnip Puree | Pickled Shimeji Mushrooms | Allium Crumbs | Truffle Caviar",
+        "Parsnip Puree | Grilled Shimeji Mushrooms | Allium Crumbs | Truffle Caviar",
     },
     {
       course: "Soup",
@@ -165,7 +166,7 @@ export const MENU = {
       id: "A" as const,
       name: "Roasted USDA Prime Ribeye",
       description:
-        "Celeriac Puree | Ratatouille | Broccolini | Pistachio Crumbs | Bordelaise Sauce",
+        "Celeriac Puree | Confit Tomatoes | Broccolini | Pistachio Crumbs | Bordelaise Sauce",
       image: "",
     },
     {
@@ -225,14 +226,14 @@ export const AFTER_PARTY = {
 
   // [input] Details paragraph — when/where/what. Edit freely.
   description:
-    "Once lunch winds down, we're keeping the celebration going — drinks, music and dancing from 7pm at the hotel bar. Casual, come as you are!",
+    "Once lunch winds down, we're keeping the celebration going — sun, sand and sea at the beach club!",
 
   // [input] The question above the per-person toggles.
   question: "Who's coming along?",
 
   // [input] The yes / no choice labels.
   yesLabel: "Count me in",
-  noLabel: "Sitting this one out",
+  noLabel: "I am allergic to fun",
 
   // [input] Continue / back buttons.
   continueLabel: "Continue",
@@ -295,10 +296,14 @@ export const RSVP_STEPS_COPY = {
 
   // ── Step: intro (the personal link's landing view) ──
   // [input] Greeting above the RSVP button. {name} = the invited guest.
-  introGreeting: "Hello, {name}!",
+  introGreeting: "You are invited {name}!",
 
   // [input] The big button that starts the RSVP.
   respondLabel: "RSVP",
+
+  // [input] Deadline note under the RSVP button. {deadline} is replaced
+  //         with EVENT_DETAILS.rsvpDeadline, nicely formatted.
+  rsvpByNote: "Please respond by {deadline}",
 
   // ── Step: attendance ──
   // [input] Heading on the attendance step.
@@ -312,7 +317,7 @@ export const RSVP_STEPS_COPY = {
   attendingLabel: "Joyfully attending!",
 
   // [input] The "no" choice on each member row.
-  decliningLabel: "Regretfully decline :(",
+  decliningLabel: "Regretfully declining :(",
 
   // [input] Continue button (enabled once everyone has an answer).
   continueLabel: "Continue",
