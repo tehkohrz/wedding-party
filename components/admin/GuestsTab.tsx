@@ -21,7 +21,7 @@
  * Also exports the personal-links CSV (name → absolute URL) for WhatsApp.
  */
 import { useCallback, useEffect, useState } from "react";
-import { Download, Plus, RotateCcw, Save, Trash2 } from "lucide-react";
+import { Plus, RotateCcw, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -261,26 +261,6 @@ export function GuestsTab() {
     }
   }
 
-  async function exportLinks() {
-    const res = await fetch("/api/admin/links");
-    if (!res.ok) return alert("Couldn't fetch links.");
-    const { links } = await res.json();
-    const origin = window.location.origin;
-    const csv = [
-      "name,link",
-      ...links.map(
-        (l: { name: string; slug: string }) =>
-          `"${l.name.replace(/"/g, '""')}",${origin}/r/${l.slug}`
-      ),
-    ].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "rsvp-links.csv";
-    a.click();
-    URL.revokeObjectURL(url);
-  }
 
   if (error) {
     return (
@@ -329,9 +309,7 @@ export function GuestsTab() {
           {visible.length} of {guests.length}
         </span>
         <div className="flex-1" />
-        <Button variant="outline" size="sm" onClick={exportLinks}>
-          <Download /> Links CSV
-        </Button>
+
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 pb-3">

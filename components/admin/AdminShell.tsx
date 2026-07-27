@@ -13,13 +13,15 @@ import { ADMIN_COPY } from "@/lib/content";
 import { AdminDashboard } from "@/components/AdminDashboard";
 import { RsvpOverviewTab } from "./RsvpOverviewTab";
 import { GuestsTab } from "./GuestsTab";
+import { LinksTab } from "./LinksTab";
 
-type Tab = "rsvp" | "attendance" | "guests";
+type Tab = "rsvp" | "attendance" | "guests" | "links";
 
 const TABS: Array<{ id: Tab; label: string }> = [
   { id: "rsvp", label: "RSVP" },
   { id: "attendance", label: "Attendance" },
   { id: "guests", label: "Guest list" },
+  { id: "links", label: "Links" },
 ];
 
 export function AdminShell() {
@@ -61,6 +63,7 @@ export function AdminShell() {
         {tab === "rsvp" && <RsvpOverviewTab />}
         {tab === "attendance" && <AdminDashboard />}
         {tab === "guests" && <GuestsTab />}
+        {tab === "links" && <LinksTab />}
       </main>
     </div>
   );

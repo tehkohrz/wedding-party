@@ -503,4 +503,14 @@ export const ADMIN_COPY = {
 
   // [input] Message when a restore file can't be read/validated.
   restoreError: "Couldn't read that file — is it a SitWhereAh backup?",
+
+  // ── Links tab (the send-out list) ──
+  // [input] Hint shown above the grouped link list.
+  linksHint:
+    "Any member's link opens their whole invitation, so you can message one person per household — or send everyone their own. Plus-ones have no link; their host answers for them.",
+
+  // [input] The WhatsApp message copied by the Message button.
+  //         Placeholders: {name} {link} {date} {deadline}.
+  linkMessageTemplate:
+    "Hi {name}! We're getting married on {date} 🎉 Here's your personal invitation — it has all the details and your RSVP: {link}\n\nDo let us know by {deadline}. Can't wait to celebrate with you!",
 };
