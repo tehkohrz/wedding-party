@@ -79,7 +79,7 @@ export function SummaryList({ members }: { members: RsvpMember[] }) {
                 )}
                 {/* After-party: show the answer BOTH ways — a silent "no"
                     looked like a missing answer on the confirm step. */}
-                {a.afterParty !== null && (
+                {m.after_party_invited === true && a.afterParty !== null && (
                   <p
                     className={
                       a.afterParty

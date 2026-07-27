@@ -124,6 +124,13 @@ body {
   --invite-pink: 340 60% 58%; /* script names (e-invite dusty pink) */
   --invite-olive-text: 73 34% 37%; /* small-caps accent lines */
   --invite-blue: 211 42% 52%; /* deeper cousin of the stripe blue (the "&") */
+
+  /* The after-party is a SECOND invitation — an evening counterpart to the
+     cream daytime card: dusk ground, warm gold frame + script. */
+  --invite-night: 224 42% 24%;
+  --invite-night-frame: 41 58% 62%;
+  --invite-night-text: 44 55% 93%;
+  --invite-night-accent: 41 72% 72%;
 }
 
 .invite-stripes {
@@ -143,6 +150,17 @@ body {
 .invite-card-inner {
   border: 1.5px solid hsl(var(--invite-frame-soft));
   border-radius: 36px 50px 40px 54px / 50px 38px 56px 42px;
+}
+
+/* Evening twin of .invite-card — same hand-drawn wobble, dusk palette. */
+.invite-card-night {
+  background: hsl(var(--invite-night));
+  border: 2.5px solid hsl(var(--invite-night-frame));
+  border-radius: 38px 52px 42px 56px / 52px 40px 58px 44px;
+}
+.invite-card-night-inner {
+  border: 1px solid hsl(var(--invite-night-frame) / 0.55);
+  border-radius: 32px 46px 36px 50px / 46px 34px 52px 38px;
 }
 
 /* First-screenful height for the hero fold, inside the framed card.

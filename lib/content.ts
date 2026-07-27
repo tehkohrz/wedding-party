@@ -221,8 +221,20 @@ export const MENU = {
 };
 
 export const AFTER_PARTY = {
-  // [input] Heading on the after-party step.
+  // [input] Heading on the after-party step (screen-reader / fallback only —
+  //         the card below is the visible title).
   heading: "The after-party",
+
+  // ── The after-party card: styled as a SECOND invitation ──
+  // [input] Small-caps line above the script title.
+  eyebrow: "And you're invited to",
+
+  // [input] The script title on the card.
+  scriptTitle: "The After-Party",
+
+  // [input] Time and place lines inside the card (small caps).
+  timeLine: "From 3:30 pm",
+  venueLine: "Beach club, Sentosa",
 
   // [input] Details paragraph — when/where/what. Edit freely.
   description:

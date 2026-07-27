@@ -1,10 +1,16 @@
 "use client";
 
 /**
- * RSVP step 3 of 4 — the after-party.
+ * RSVP step 3 of 4 — the after-party. INVITE-ONLY.
  *
- * Details paragraph, then a yes/no per ATTENDING member (a family can send
- * 2 of 4). Continue enables once every attending member has an answer.
+ * The after-party is a separate celebration for a chosen few, so this step
+ * is dressed as a SECOND invitation: its own dusk-toned card with a gold
+ * wavy frame and script title (the evening twin of the cream daytime
+ * invitation), then a yes/no per invited + attending member.
+ *
+ * Guests reach this step only when someone in their party is flagged
+ * after_party_invited; uninvited members never see the question, and the
+ * API refuses to store an answer for them.
  */
 import { PartyPopper, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,14 +38,52 @@ export function StepAfterParty({ members }: { members: RsvpMember[] }) {
 
   return (
     <div className="space-y-6">
-      <div className="text-center space-y-1">
-        <h2 className="font-display font-bold text-3xl">{AFTER_PARTY.heading}</h2>
-      </div>
+      {/* ── The second invitation ── */}
+      <div className="invite-card-night p-1.5 sm:p-2">
+        <div className="invite-card-night-inner px-5 py-8 sm:px-8 sm:py-10 text-center space-y-4">
+          <p
+            className="font-display font-bold uppercase tracking-[0.28em] text-xs sm:text-sm"
+            style={{ color: "hsl(var(--invite-night-accent))" }}
+          >
+            {AFTER_PARTY.eyebrow}
+          </p>
 
-      <div className="rounded-card border border-border bg-surface px-5 py-4">
-        <p className="font-sans text-sm leading-relaxed">
-          {AFTER_PARTY.description}
-        </p>
+          <p
+            className="text-4xl sm:text-6xl leading-tight"
+            style={{
+              fontFamily: "var(--font-script)",
+              color: "hsl(var(--invite-night-accent))",
+            }}
+          >
+            {AFTER_PARTY.scriptTitle}
+          </p>
+
+          {/* Rule + dot ornament, echoing the paper invite's dividers */}
+          <div
+            className="flex items-center justify-center gap-3"
+            aria-hidden
+            style={{ color: "hsl(var(--invite-night-frame))" }}
+          >
+            <span className="h-px w-10 bg-current opacity-70" />
+            <span className="size-1.5 rounded-full bg-current" />
+            <span className="h-px w-10 bg-current opacity-70" />
+          </div>
+
+          <div
+            className="space-y-1 font-display uppercase tracking-[0.2em] text-sm sm:text-base"
+            style={{ color: "hsl(var(--invite-night-text))" }}
+          >
+            <p>{AFTER_PARTY.timeLine}</p>
+            <p>{AFTER_PARTY.venueLine}</p>
+          </div>
+
+          <p
+            className="font-sans text-sm leading-relaxed max-w-sm mx-auto"
+            style={{ color: "hsl(var(--invite-night-text) / 0.82)" }}
+          >
+            {AFTER_PARTY.description}
+          </p>
+        </div>
       </div>
 
       <p className="font-sans text-sm text-muted-foreground text-center">
