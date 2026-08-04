@@ -23,3 +23,11 @@ export function rsvpDeadlineLabel(): string {
     { day: "numeric", month: "long", year: "numeric" }
   );
 }
+
+/**
+ * Whole days from now until the RSVP deadline (negative once passed).
+ * Drives the chase list's urgency line.
+ */
+export function rsvpDaysRemaining(): number {
+  return Math.ceil((rsvpDeadlineMs() - Date.now()) / 86_400_000);
+}

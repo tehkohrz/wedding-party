@@ -509,6 +509,16 @@ export const ADMIN_COPY = {
   linksHint:
     "Any member's link opens their whole invitation, so you can message one person per household — or send everyone their own. Plus-ones have no link; their host answers for them.",
 
+  // ── Chase tab (following up on non-responders) ──
+  // [input] Hint above the chase list.
+  chaseHint:
+    "Invitations with nobody in the party responded yet. Send the reminder to any one member — their link opens the whole party's RSVP.",
+
+  // [input] The nudge message copied by the Remind button.
+  //         Placeholders: {name} {link} {date} {deadline} {days}.
+  reminderMessageTemplate:
+    "Hi {name}! Just a gentle nudge — we haven't caught your RSVP for {date} yet, and we need to give the venue our numbers by {deadline}. Here's your invitation again: {link}\n\nThank you! 🤍",
+
   // [input] The WhatsApp message copied by the Message button.
   //         Placeholders: {name} {link} {date} {deadline}.
   linkMessageTemplate:

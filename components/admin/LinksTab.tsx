@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { ADMIN_COPY, EVENT_DETAILS } from "@/lib/content";
 import { rsvpDeadlineLabel } from "@/lib/rsvpDeadline";
+import { writeClipboard } from "@/lib/clipboard";
 
 interface LinkRow {
   id: number;
@@ -70,28 +71,6 @@ export function LinksTab() {
     setTimeout(() => setCopied((c) => (c === key ? null : c)), 1500);
   }
 
-  /** Clipboard API where available, with the execCommand fallback that
-      still works on older iOS Safari / non-secure contexts. */
-  async function writeClipboard(text: string): Promise<boolean> {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch {
-      try {
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        ta.style.position = "fixed";
-        ta.style.opacity = "0";
-        document.body.appendChild(ta);
-        ta.select();
-        const done = document.execCommand("copy");
-        document.body.removeChild(ta);
-        return done;
-      } catch {
-        return false;
-      }
-    }
-  }
 
   function exportCsv() {
     const q = (v: string) => `"${v.replace(/"/g, '""')}"`;
