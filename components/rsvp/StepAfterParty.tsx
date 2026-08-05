@@ -13,8 +13,8 @@
  * API refuses to store an answer for them.
  */
 import { PartyPopper, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { ChoiceChip } from "./ChoiceChip";
+import { StepNav } from "./StepNav";
 import { useRsvpStore, EMPTY_ANSWER } from "@/lib/rsvpStore";
 import { AFTER_PARTY, RSVP_STEPS_COPY } from "@/lib/content";
 import { BOUQUET_COLORS } from "@/lib/groups";
@@ -30,59 +30,107 @@ export function StepAfterParty({ members }: { members: RsvpMember[] }) {
   const attending = members.filter(
     (m) =>
       m.after_party_invited === true &&
-      (answers[m.id] ?? EMPTY_ANSWER).attending === true
+      (answers[m.id] ?? EMPTY_ANSWER).attending === true,
   );
   const allAnswered = attending.every(
-    (m) => (answers[m.id] ?? EMPTY_ANSWER).afterParty !== null
+    (m) => (answers[m.id] ?? EMPTY_ANSWER).afterParty !== null,
   );
 
   return (
     <div className="space-y-6">
-      {/* ── The second invitation ── */}
-      <div className="invite-card-night p-1.5 sm:p-2">
-        <div className="invite-card-night-inner px-5 py-8 sm:px-8 sm:py-10 text-center space-y-4">
+      {/* ── The second invitation ──
+          A 3.30pm beach club, so this card is daylight, not dusk: seafoam
+          ground, coral frame and script from the pigeon's party hat, and
+          the bird itself leaning in past the frame (the card clips it, so
+          it reads as gate-crashing rather than as a pasted sticker). */}
+      <div className="invite-card-party p-1.5 sm:p-2">
+        <div className="invite-card-party-inner px-5 py-8 sm:px-8 sm:py-10 text-center space-y-4">
           <p
-            className="font-display font-bold uppercase tracking-[0.28em] text-xs sm:text-sm"
-            style={{ color: "hsl(var(--invite-night-accent))" }}
+            className="font-sans font-medium uppercase tracking-[0.26em] text-xs sm:text-sm"
+            style={{ color: "hsl(var(--afterparty-text))" }}
           >
             {AFTER_PARTY.eyebrow}
           </p>
 
           <p
-            className="text-4xl sm:text-6xl leading-tight"
-            style={{
-              fontFamily: "var(--font-script)",
-              color: "hsl(var(--invite-night-accent))",
-            }}
+            className="font-party italic font-semibold text-3xl sm:text-5xl leading-tight"
+            style={{ color: "hsl(var(--afterparty-accent))" }}
           >
             {AFTER_PARTY.scriptTitle}
           </p>
 
-          {/* Rule + dot ornament, echoing the paper invite's dividers */}
           <div
             className="flex items-center justify-center gap-3"
             aria-hidden
-            style={{ color: "hsl(var(--invite-night-frame))" }}
+            style={{ color: "hsl(var(--afterparty-frame))" }}
           >
             <span className="h-px w-10 bg-current opacity-70" />
             <span className="size-1.5 rounded-full bg-current" />
             <span className="h-px w-10 bg-current opacity-70" />
           </div>
 
+          {/* Details and the sentence below share the title's face (upright,
+              not italic) so the card reads as one piece of stationery
+              rather than a poster headline over app UI. */}
           <div
-            className="space-y-1 font-display uppercase tracking-[0.2em] text-sm sm:text-base"
-            style={{ color: "hsl(var(--invite-night-text))" }}
+            className="space-y-1 font-party font-semibold uppercase tracking-[0.13em] sm:tracking-[0.2em] text-xs sm:text-sm"
+            style={{ color: "hsl(var(--afterparty-text))" }}
           >
             <p>{AFTER_PARTY.timeLine}</p>
             <p>{AFTER_PARTY.venueLine}</p>
           </div>
 
+          {/* Bottom padding keeps the copy clear of the flock below —
+              just enough to clear the tallest hat, so the birds sit close
+              under the text rather than across a gap. */}
           <p
-            className="font-sans text-sm leading-relaxed max-w-sm mx-auto"
-            style={{ color: "hsl(var(--invite-night-text) / 0.82)" }}
+            className="font-party text-[15px] leading-relaxed max-w-sm mx-auto pb-8 sm:pb-10"
+            style={{ color: "hsl(var(--afterparty-text) / 0.85)" }}
           >
             {AFTER_PARTY.description}
           </p>
+        </div>
+
+        {/* A flock peeking over the bottom edge, each in a different hat
+            colour (the same painting, hue-rotated on the hat + streamers
+            only — the eyes and plumage are untouched).
+            The artwork is cropped to the head: the illustration runs off
+            its own frame at the neck, so a full bird ends in a hard
+            vertical line. Cropping above that leaves ONE straight edge —
+            the bottom — and every bird is anchored below the card edge so
+            that edge is clipped away. Widths are percentages (never fixed
+            px) so the row can't overflow and clip a head's right side. */}
+        <div
+          aria-hidden
+          className="pointer-events-none select-none absolute inset-x-0 -bottom-1 flex items-end px-5 sm:px-10"
+        >
+          {/* eslint-disable @next/next/no-img-element */}
+          <img
+            src="/pigeon-head-teal.png"
+            alt=""
+            className="w-[24%] shrink-0 translate-y-1"
+          />
+          <img
+            src="/pigeon-head-yellow.png"
+            alt=""
+            className="w-[20%] shrink-0 -ml-[5.5%] translate-y-2"
+          />
+          <img
+            src="/pigeon-head-violet.png"
+            alt=""
+            className="w-[28%] shrink-0 -ml-[5.5%]"
+          />
+          <img
+            src="/pigeon-head-pink.png"
+            alt=""
+            className="w-[22%] shrink-0 -ml-[5.5%] translate-y-2"
+          />
+          <img
+            src="/pigeon-head.png"
+            alt=""
+            className="w-[28%] shrink-0 -ml-[5.5%]"
+          />
+          {/* eslint-enable @next/next/no-img-element */}
         </div>
       </div>
 
@@ -137,22 +185,13 @@ export function StepAfterParty({ members }: { members: RsvpMember[] }) {
         })}
       </div>
 
-      <div className="space-y-2">
-        <Button
-          onClick={() => goTo("confirm", 1)}
-          disabled={!allAnswered}
-          className="w-full h-13 rounded-pill text-base"
-        >
-          {AFTER_PARTY.continueLabel}
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => goTo("menu", -1)}
-          className="w-full h-11 rounded-pill"
-        >
-          {AFTER_PARTY.backLabel}
-        </Button>
-      </div>
+      <StepNav
+        onBack={() => goTo("menu", -1)}
+        backLabel={AFTER_PARTY.backLabel}
+        onForward={() => goTo("confirm", 1)}
+        forwardDisabled={!allAnswered}
+        forwardLabel={RSVP_STEPS_COPY.stepLabels[3]}
+      />
     </div>
   );
 }

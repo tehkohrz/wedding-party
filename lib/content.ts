@@ -81,7 +81,7 @@ export const EVENT_DETAILS = {
 
   // [input] RSVP deadline (ISO date). After this day, submitted responses
   //         become view-only and the flow shows the deadline notice.
-  rsvpDeadline: "2026-09-30",
+  rsvpDeadline: "2026-09-01",
 
   // ── "Add to Google Calendar" (offered after RSVP confirmation) ──
   // [input] Event title as it appears in the guest's calendar.
@@ -239,12 +239,16 @@ export const AFTER_PARTY = {
   scriptTitle: "The After-Party",
 
   // [input] Time and place lines inside the card (small caps).
+  // The venue depends on the final after-party headcount (Tanjong Beach
+  // Club vs Twelve), so this line stays deliberately unnamed — an invite
+  // that names a club it might not book is worse than one that doesn't.
+  // Once it's booked, swap in the name; nothing else needs touching.
   timeLine: "From 3:30 pm",
-  venueLine: "Beach club, Sentosa",
+  venueLine: "A beach club in Sentosa",
 
   // [input] Details paragraph — when/where/what. Edit freely.
   description:
-    "Once lunch winds down, we're keeping the celebration going — sun, sand and sea at the beach club!",
+    "We're keeping the celebration going — sun, sand and sea. Join us at the club!",
 
   // [input] The question above the per-person toggles.
   question: "Who's coming along?",
@@ -322,9 +326,9 @@ export const RSVP_STEPS_COPY = {
   // [input] The big button that starts the RSVP.
   respondLabel: "RSVP",
 
-  // [input] Deadline note under the RSVP button. {deadline} is replaced
-  //         with EVENT_DETAILS.rsvpDeadline, nicely formatted.
-  rsvpByNote: "Please respond by {deadline}",
+  // [input] Small-caps label above the deadline date, under the RSVP
+  //         button. The date itself comes from EVENT_DETAILS.rsvpDeadline.
+  rsvpByLabel: "RSVP by",
 
   // ── Step: attendance ──
   // [input] Heading on the attendance step.

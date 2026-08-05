@@ -1,8 +1,10 @@
 "use client";
 
 /**
- * Live countdown to the event — three tiles (days / hours / mins).
- * Sits under the date on the RSVP pages.
+ * Live countdown to the event — three tiles (days / hours / mins) under
+ * the date (see components/EventWhen). Ink numerals on a wash of the
+ * stripe blue with blue labels: the tiles still belong to the blue "when"
+ * block, but the date above stays the emphasized line.
  *
  * Hydration note: the server can't know the client's "now", so rendering
  * real numbers during SSR would mismatch the first client render (React
@@ -73,12 +75,16 @@ export function EventCountdown() {
       {tiles.map((t) => (
         <div
           key={t.label}
-          className="flex flex-col items-center rounded-card bg-muted/60 px-3 py-2 min-w-[3.75rem] sm:px-6 sm:py-4 sm:min-w-[6rem]"
+          className="flex flex-col items-center rounded-card px-3 py-2 min-w-[3.75rem] sm:px-6 sm:py-4 sm:min-w-[6rem]"
+          style={{ backgroundColor: "hsl(var(--invite-blue) / 0.10)" }}
         >
-          <span className="font-display text-2xl sm:text-5xl leading-none tabular-nums">
+          <span className="font-display text-2xl sm:text-5xl leading-none tabular-nums text-foreground">
             {t.value}
           </span>
-          <span className="font-sans text-[10px] sm:text-xs uppercase tracking-widest text-muted-foreground mt-1 sm:mt-1.5">
+          <span
+            className="font-sans text-[10px] sm:text-xs uppercase tracking-widest mt-1 sm:mt-1.5"
+            style={{ color: "hsl(var(--invite-blue) / 0.8)" }}
+          >
             {t.label}
           </span>
         </div>

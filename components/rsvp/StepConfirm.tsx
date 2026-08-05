@@ -8,8 +8,8 @@
  * confetti + thanks. On failure: inline error, draft intact, retry.
  */
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { SummaryList } from "./SummaryList";
+import { StepNav } from "./StepNav";
 import { useRsvpStore, EMPTY_ANSWER } from "@/lib/rsvpStore";
 import { RSVP_CONFIRM } from "@/lib/content";
 import { celebrate } from "@/lib/confetti";
@@ -76,7 +76,9 @@ export function StepConfirm({
   return (
     <div className="space-y-6">
       <div className="text-center space-y-1">
-        <h2 className="font-display font-bold text-3xl">{RSVP_CONFIRM.heading}</h2>
+        <h2 className="font-display font-bold text-3xl">
+          {RSVP_CONFIRM.heading}
+        </h2>
         <p className="font-sans text-sm text-muted-foreground">
           {RSVP_CONFIRM.instruction}
         </p>
@@ -90,34 +92,27 @@ export function StepConfirm({
         </p>
       )}
 
-      <div className="space-y-2">
-        <Button
-          onClick={handleSubmit}
-          disabled={submitting}
-          className="w-full h-13 rounded-pill text-base"
-        >
-          {submitting ? "Sending…" : RSVP_CONFIRM.submitLabel}
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() =>
-            goTo(
-              members.some(
-                (m) =>
-                  m.after_party_invited === true &&
-                  answers[m.id]?.attending === true
-              )
-                ? "afterparty"
-                : "menu",
-              -1
+      {/* Terminal step: the forward button submits, so it keeps its own
+          label and drops the "next step" chevron. */}
+      <StepNav
+        onBack={() =>
+          goTo(
+            members.some(
+              (m) =>
+                m.after_party_invited === true &&
+                answers[m.id]?.attending === true,
             )
-          }
-          disabled={submitting}
-          className="w-full h-11 rounded-pill"
-        >
-          {RSVP_CONFIRM.backLabel}
-        </Button>
-      </div>
+              ? "afterparty"
+              : "menu",
+            -1,
+          )
+        }
+        backLabel={RSVP_CONFIRM.backLabel}
+        onForward={handleSubmit}
+        forwardDisabled={submitting}
+        forwardLabel={submitting ? "Sending…" : RSVP_CONFIRM.submitLabel}
+        showForwardChevron={false}
+      />
     </div>
   );
 }

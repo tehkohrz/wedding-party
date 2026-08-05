@@ -108,7 +108,7 @@ export function RsvpFlow({
   // to their summary (or decline note).
   if (step === "intro") {
     const allDeclined = members.every(
-      (m) => answers[m.id]?.attending === false
+      (m) => answers[m.id]?.attending === false,
     );
     return (
       <StepIntro
@@ -127,7 +127,7 @@ export function RsvpFlow({
   // Any invited member in the group → the after-party step + pill exist.
   const hasAfterParty = members.some((m) => m.after_party_invited === true);
   const stepLabels = RSVP_STEPS_COPY.stepLabels.filter(
-    (label) => hasAfterParty || label !== RSVP_STEPS_COPY.afterPartyStepLabel
+    (label) => hasAfterParty || label !== RSVP_STEPS_COPY.afterPartyStepLabel,
   );
   const dotIndex = dotIndexFor(step, hasAfterParty);
   const enterX = reduceMotion ? 0 : direction * 48;
@@ -152,7 +152,7 @@ export function RsvpFlow({
                     ? "bg-primary text-primary-foreground font-semibold"
                     : i < dotIndex
                       ? "bg-muted text-foreground"
-                      : "bg-muted/50 text-muted-foreground"
+                      : "bg-muted/50 text-muted-foreground",
                 )}
               >
                 {label}

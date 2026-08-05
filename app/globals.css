@@ -94,6 +94,9 @@
   /* Typography (wired to next/font variables in app/layout.tsx) */
   --font-display: var(--font-fraunces);
   --font-sans: var(--font-dm-sans);
+  /* The after-party card's face — gives components a `font-party` utility
+     so the second invitation never hard-codes a font-family inline. */
+  --font-party: var(--font-fraunces-party);
 
   /* Shape — our project tokens */
   --radius-card: var(--radius-card);
@@ -123,14 +126,23 @@ body {
   --invite-frame-soft: 69 40% 67%; /* lighter inner frame */
   --invite-pink: 340 60% 58%; /* script names (e-invite dusty pink) */
   --invite-olive-text: 73 34% 37%; /* small-caps accent lines */
-  --invite-blue: 211 42% 52%; /* deeper cousin of the stripe blue (the "&") */
+  /* The stripe blue (211 50% 86%) at a readable depth — same hue and
+     saturation, darker. Used for the hero "&" and the RSVP button so both
+     visibly belong to the striped ground. */
+  --invite-blue: 211 50% 50%;
 
-  /* The after-party is a SECOND invitation — an evening counterpart to the
-     cream daytime card: dusk ground, warm gold frame + script. */
-  --invite-night: 224 42% 24%;
-  --invite-night-frame: 41 58% 62%;
-  --invite-night-text: 44 55% 93%;
-  --invite-night-accent: 41 72% 72%;
+  /* The after-party is a SECOND invitation. It's a 3.30pm beach club, so
+     it borrows the party pigeon's palette rather than an evening one:
+     seafoam ground, coral hat, deep-teal ink. */
+  --afterparty-stripe-a: 0 0% 100%;
+  /* Kept deliberately faint: the card's copy sits straight on the stripes,
+     and Fraunces' thin strokes get chewed up by a hard stripe edge. This
+     is a texture, not a pattern to read against. */
+  --afterparty-stripe-b: 165 38% 95%;
+  --afterparty-frame: 19 76% 57%;
+  --afterparty-accent: 19 76% 52%;
+  --afterparty-text: 174 42% 22%;
+  --afterparty-pink: 345 72% 62%;
 }
 
 .invite-stripes {
@@ -152,14 +164,31 @@ body {
   border-radius: 36px 50px 40px 54px / 50px 38px 56px 42px;
 }
 
-/* Evening twin of .invite-card — same hand-drawn wobble, dusk palette. */
-.invite-card-night {
-  background: hsl(var(--invite-night));
-  border: 2.5px solid hsl(var(--invite-night-frame));
+/* The RSVP call-to-action in the stripe blue (Button's bg-primary would
+   otherwise win — this keeps a proper hover state instead of an inline
+   style). */
+.btn-invite-blue {
+  background-color: hsl(var(--invite-blue));
+}
+.btn-invite-blue:hover {
+  background-color: hsl(var(--invite-blue) / 0.9);
+}
+
+/* Seaside twin of .invite-card — same hand-drawn wobble, beach palette.
+   overflow-hidden lets the party pigeon lean in past the frame edge. */
+.invite-card-party {
+  position: relative;
+  overflow: hidden;
+  background: repeating-linear-gradient(
+    90deg,
+    hsl(var(--afterparty-stripe-a)) 0 16px,
+    hsl(var(--afterparty-stripe-b)) 16px 32px
+  );
+  border: 2.5px solid hsl(var(--afterparty-frame));
   border-radius: 38px 52px 42px 56px / 52px 40px 58px 44px;
 }
-.invite-card-night-inner {
-  border: 1px solid hsl(var(--invite-night-frame) / 0.55);
+.invite-card-party-inner {
+  border: 1px solid hsl(var(--afterparty-frame) / 0.5);
   border-radius: 32px 46px 36px 50px / 46px 34px 52px 38px;
 }
 

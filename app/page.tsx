@@ -9,7 +9,7 @@ import { ChevronDown } from "lucide-react";
 import { EVENT_DETAILS, RSVP_COPY } from "@/lib/content";
 import { HeroTitle } from "@/components/HeroTitle";
 import { PhotoSlideshow } from "@/components/PhotoSlideshow";
-import { EventCountdown } from "@/components/EventCountdown";
+import { EventWhen } from "@/components/EventWhen";
 import { EventDetails } from "@/components/EventDetails";
 
 export default function RsvpLandingPage() {
@@ -30,15 +30,7 @@ export default function RsvpLandingPage() {
           <div className="my-auto text-center space-y-3 sm:space-y-6 max-w-xl w-full">
             <HeroTitle />
 
-            {/* Event date + venue + countdown */}
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <p className="font-display italic text-2xl sm:text-5xl text-balance text-foreground">
-                  {EVENT_DETAILS.date}
-                </p>
-              </div>
-              <EventCountdown />
-            </div>
+            <EventWhen />
 
             {/* No public search — RSVP is via personal links only, so
                 nobody can open (or edit) another party's response. */}

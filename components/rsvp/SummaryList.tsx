@@ -25,18 +25,14 @@ export function SummaryList({ members }: { members: RsvpMember[] }) {
         const displayName = declinedPlusOne
           ? RSVP_CONFIRM.noPlusOneBadge
           : (a.name ?? "").trim() ||
-            (m.is_plus_one
-              ? RSVP_STEPS_COPY.plusOneFallbackName
-              : m.name);
+            (m.is_plus_one ? RSVP_STEPS_COPY.plusOneFallbackName : m.name);
         const main = MENU.mains.find((x) => x.id === a.food);
         const foodLabel =
           a.food === "K"
             ? MENU.kidsMeal.name
             : a.food === "NO_MEAL"
               ? "No meal needed"
-              : main
-                ? `${main.id}. ${main.name}`
-                : null;
+              : (main?.name ?? null);
         return (
           <div
             key={m.id}

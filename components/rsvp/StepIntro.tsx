@@ -16,7 +16,7 @@ import { useRsvpStore, type RsvpStep } from "@/lib/rsvpStore";
 import { rsvpDeadlineLabel } from "@/lib/rsvpDeadline";
 import { EVENT_DETAILS, RSVP_STEPS_COPY } from "@/lib/content";
 import { HeroTitle } from "@/components/HeroTitle";
-import { EventCountdown } from "@/components/EventCountdown";
+import { EventWhen } from "@/components/EventWhen";
 import { EventDetails } from "@/components/EventDetails";
 
 export function StepIntro({
@@ -37,15 +37,7 @@ export function StepIntro({
         <div className="my-auto text-center space-y-3 sm:space-y-6 max-w-xl w-full">
           <HeroTitle />
 
-          {/* Event date + venue + countdown */}
-          <div className="space-y-3">
-            <div className="space-y-1">
-              <p className="font-display italic text-2xl sm:text-5xl text-balance text-foreground">
-                {EVENT_DETAILS.date}
-              </p>
-            </div>
-            <EventCountdown />
-          </div>
+          <EventWhen />
 
           {/* Where the public page explains "personal invite only",
               the personal link greets the guest and offers the button. */}
@@ -70,16 +62,23 @@ export function StepIntro({
             )}
             <Button
               onClick={() => goTo(nextStep, 1)}
-              className="mx-auto inline-flex h-12 sm:h-16 rounded-pill px-10 sm:px-14 font-display font-bold tracking-[0.25em] text-lg sm:text-2xl"
+              className="btn-invite-blue mx-auto inline-flex h-12 sm:h-16 rounded-pill px-10 sm:px-14 font-display font-bold tracking-[0.25em] text-lg sm:text-2xl"
             >
               {RSVP_STEPS_COPY.respondLabel}
               <ChevronRight className="size-5" />
             </Button>
-            <p
-              className="font-display uppercase tracking-[0.2em] text-sm sm:text-base"
-              style={{ color: "hsl(var(--invite-olive-text))" }}
-            >
-              {RSVP_STEPS_COPY.rsvpByNote.replace("{deadline}", rsvpDeadlineLabel())}
+            {/* Deadline on one line: olive small-caps label, then the date
+                in the display serif. */}
+            <p className="flex items-baseline justify-center gap-2 pt-1">
+              <span
+                className="font-display font-bold uppercase tracking-[0.28em] text-xs sm:text-sm"
+                style={{ color: "hsl(var(--invite-olive-text))" }}
+              >
+                {RSVP_STEPS_COPY.rsvpByLabel}
+              </span>
+              <span className="font-display text-lg sm:text-2xl text-foreground">
+                {rsvpDeadlineLabel()}
+              </span>
             </p>
           </div>
         </div>

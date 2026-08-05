@@ -11,8 +11,8 @@
  *
  * Continue enables once every attending member has an answer.
  */
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { StepNav } from "./StepNav";
 import { cn } from "@/lib/utils";
 import { useRsvpStore, EMPTY_ANSWER } from "@/lib/rsvpStore";
 import { MENU, RSVP_STEPS_COPY } from "@/lib/content";
@@ -42,7 +42,7 @@ function FoodOption({
         "focus-visible:ring-2 focus-visible:ring-ring",
         selected
           ? "font-semibold"
-          : "bg-surface border-input text-muted-foreground hover:bg-muted"
+          : "bg-surface border-input text-muted-foreground hover:bg-muted",
       )}
       style={
         selected
@@ -87,9 +87,19 @@ export function StepMenu({ members }: { members: RsvpMember[] }) {
   const goTo = useRsvpStore((s) => s.goTo);
 
   const attending = members.filter(
-    (m) => (answers[m.id] ?? EMPTY_ANSWER).attending === true
+    (m) => (answers[m.id] ?? EMPTY_ANSWER).attending === true,
   );
   // Adults: a main chosen. Kids: kids-meal AND baby-seat answered.
+  // Where Continue leads — the after-party only exists for parties with
+  // an invited, attending member.
+  const nextStep = members.some(
+    (m) =>
+      m.after_party_invited === true &&
+      (answers[m.id] ?? EMPTY_ANSWER).attending === true,
+  )
+    ? ("afterparty" as const)
+    : ("confirm" as const);
+
   const allChosen = attending.every((m) => {
     const a = answers[m.id] ?? EMPTY_ANSWER;
     return a.food !== null && (!m.is_kid || a.babySeat !== null);
@@ -115,59 +125,86 @@ export function StepMenu({ members }: { members: RsvpMember[] }) {
 
         {/* The choice */}
         <div className="space-y-3">
-          <p className="font-sans text-base uppercase tracking-[0.25em] text-primary">
+          <p
+            className="font-display font-bold text-base uppercase tracking-[0.25em]"
+            style={{ color: "hsl(var(--invite-olive-text))" }}
+          >
             {MENU.mainsChoiceLabel}
           </p>
-          {MENU.mains.map((main, i) => (
-            <div key={main.id} className="space-y-3">
-              {i > 0 && (
-                <p className="font-display italic text-base text-muted-foreground">
-                  or
-                </p>
-              )}
-              {/* Each choice sits in its own soft bubble — the one part of
-                  the menu guests act on, gently lifted off the page. */}
-              <div className="rounded-card border border-primary/40 bg-surface/70 px-5 py-4 space-y-1 max-w-md mx-auto">
+          {/* ONE menu panel fenced by olive hairlines, both dishes inside
+              it. A card with a blue border and rounded corners read as two
+              tap targets and competed with the real selectors below; a
+              printed-menu frame lifts the mains without offering to be
+              pressed. */}
+          <div
+            className="max-w-md mx-auto py-4 space-y-1"
+            style={{
+              borderTop: "1px solid hsl(var(--invite-frame))",
+              borderBottom: "1px solid hsl(var(--invite-frame))",
+            }}
+          >
+            {MENU.mains.map((main, i) => (
+              <div key={main.id} className="space-y-1">
+                {i > 0 && (
+                  <p className="font-display italic text-base text-muted-foreground py-2">
+                    or
+                  </p>
+                )}
                 {main.image && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={main.image}
                     alt={main.name}
-                    className="w-full max-w-sm mx-auto h-36 object-cover rounded-card"
+                    className="w-full max-w-sm mx-auto h-36 object-cover rounded-card mb-2"
                   />
                 )}
                 <p className="font-display text-xl leading-tight">
-                  <span className="text-muted-foreground mr-1.5">
-                    {main.id}.
-                  </span>
                   {main.name}
                 </p>
                 <p className="font-sans text-sm text-muted-foreground">
                   {main.description}
                 </p>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {MENU.coursesAfterMains.map((c) => (
           <FixedCourse key={c.course} {...c} />
         ))}
 
-        {/* Kids' meal note */}
-        <div className="space-y-1">
-          <p className="font-sans text-base uppercase tracking-[0.25em] text-muted-foreground">
-            For the kids
-          </p>
-          <p className="font-display text-xl leading-tight">
-            {MENU.kidsMeal.name}
-          </p>
-          {MENU.kidsMeal.courses.map((line) => (
-            <p key={line} className="font-sans text-sm text-muted-foreground">
-              {line}
-            </p>
-          ))}
-        </div>
+        {/* Kids' meal — shown only when a child in this party is actually
+            attending, and separated from the adults' menu by the rule
+            ornament so it reads as its own little menu. */}
+        {attending.some((m) => m.is_kid) && (
+          <>
+            <div
+              className="flex items-center justify-center gap-2.5 pt-2"
+              aria-hidden
+              style={{ color: "hsl(var(--invite-frame))" }}
+            >
+              <span className="h-px w-10 bg-current" />
+              <span className="size-1 rounded-full bg-current" />
+              <span className="h-px w-10 bg-current" />
+            </div>
+            <div className="space-y-1">
+              <p className="font-sans text-base uppercase tracking-[0.25em] text-muted-foreground">
+                For the kids
+              </p>
+              <p className="font-display text-xl leading-tight">
+                {MENU.kidsMeal.name}
+              </p>
+              {MENU.kidsMeal.courses.map((line) => (
+                <p
+                  key={line}
+                  className="font-sans text-sm text-muted-foreground"
+                >
+                  {line}
+                </p>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Per-attending-member selectors */}
@@ -179,9 +216,7 @@ export function StepMenu({ members }: { members: RsvpMember[] }) {
           // placeholder name is never displayed.
           const displayName =
             (answer.name ?? "").trim() ||
-            (m.is_plus_one
-              ? RSVP_STEPS_COPY.plusOneFallbackName
-              : m.name);
+            (m.is_plus_one ? RSVP_STEPS_COPY.plusOneFallbackName : m.name);
           return (
             <div
               key={m.id}
@@ -282,33 +317,19 @@ export function StepMenu({ members }: { members: RsvpMember[] }) {
       </div>
 
       {/* Nav */}
-      <div className="space-y-2">
-        <Button
-          onClick={() =>
-            goTo(
-              members.some(
-                (m) =>
-                  m.after_party_invited === true &&
-                  (answers[m.id] ?? EMPTY_ANSWER).attending === true
-              )
-                ? "afterparty"
-                : "confirm",
-              1
-            )
-          }
-          disabled={!allChosen}
-          className="w-full h-13 rounded-pill text-base"
-        >
-          {MENU.continueLabel}
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => goTo("attendance", -1)}
-          className="w-full h-11 rounded-pill"
-        >
-          {MENU.backLabel}
-        </Button>
-      </div>
+      {/* Forward names the next step: the after-party when someone in the
+          party is invited to it, otherwise straight to the summary. */}
+      <StepNav
+        onBack={() => goTo("attendance", -1)}
+        backLabel={MENU.backLabel}
+        onForward={() => goTo(nextStep, 1)}
+        forwardDisabled={!allChosen}
+        forwardLabel={
+          nextStep === "afterparty"
+            ? RSVP_STEPS_COPY.stepLabels[2]
+            : RSVP_STEPS_COPY.stepLabels[3]
+        }
+      />
     </div>
   );
 }

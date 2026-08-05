@@ -8,7 +8,7 @@
  * food/after-party fields).
  */
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { StepNav } from "./StepNav";
 import { useRsvpStore } from "@/lib/rsvpStore";
 import { RSVP_STEPS_COPY, RSVP_CONFIRM } from "@/lib/content";
 import type { RsvpMember } from "./types";
@@ -69,22 +69,17 @@ export function StepDeclineConfirm({
         </p>
       )}
 
-      <div className="space-y-2 max-w-sm mx-auto">
-        <Button
-          onClick={handleConfirm}
-          disabled={submitting}
-          className="w-full h-13 rounded-pill text-base"
-        >
-          {submitting ? "Sending…" : RSVP_STEPS_COPY.declineConfirmLabel}
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => goTo("attendance", -1)}
-          disabled={submitting}
-          className="w-full h-11 rounded-pill"
-        >
-          {RSVP_STEPS_COPY.declineBackLabel}
-        </Button>
+      <div className="max-w-sm mx-auto">
+        <StepNav
+          onBack={() => goTo("attendance", -1)}
+          backLabel={RSVP_STEPS_COPY.declineBackLabel}
+          onForward={handleConfirm}
+          forwardDisabled={submitting}
+          forwardLabel={
+            submitting ? "Sending…" : RSVP_STEPS_COPY.declineConfirmLabel
+          }
+          showForwardChevron={false}
+        />
       </div>
     </div>
   );

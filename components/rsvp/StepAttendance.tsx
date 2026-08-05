@@ -14,7 +14,7 @@
  */
 import { Check, X } from "lucide-react";
 import { ChoiceChip } from "./ChoiceChip";
-import { Button } from "@/components/ui/button";
+import { StepNav } from "./StepNav";
 import { Input } from "@/components/ui/input";
 import { useRsvpStore, EMPTY_ANSWER } from "@/lib/rsvpStore";
 import { RSVP_STEPS_COPY } from "@/lib/content";
@@ -29,10 +29,10 @@ export function StepAttendance({ members }: { members: RsvpMember[] }) {
   const goTo = useRsvpStore((s) => s.goTo);
 
   const allAnswered = members.every(
-    (m) => (answers[m.id] ?? EMPTY_ANSWER).attending !== null
+    (m) => (answers[m.id] ?? EMPTY_ANSWER).attending !== null,
   );
   const anyAttending = members.some(
-    (m) => (answers[m.id] ?? EMPTY_ANSWER).attending === true
+    (m) => (answers[m.id] ?? EMPTY_ANSWER).attending === true,
   );
 
   function handleContinue() {
@@ -141,24 +141,19 @@ export function StepAttendance({ members }: { members: RsvpMember[] }) {
         })}
       </div>
 
-      {/* Continue */}
-      <Button
-        onClick={handleContinue}
-        disabled={!allAnswered}
-        className="w-full h-13 rounded-pill text-base"
-      >
-        {RSVP_STEPS_COPY.continueLabel}
-      </Button>
-
-      {/* Escape hatch back to the invitation page (intro). */}
-      <Button
-        variant="ghost"
-        onClick={() => goTo("intro", -1)}
-        className="w-full h-11 rounded-pill"
-      >
-        {RSVP_STEPS_COPY.attendanceBackLabel}
-      </Button>
+      {/* Back returns to the invitation; forward names where it leads —
+          the menu, or the decline check when nobody can make it. */}
+      <StepNav
+        onBack={() => goTo("intro", -1)}
+        backLabel={RSVP_STEPS_COPY.attendanceBackLabel}
+        onForward={handleContinue}
+        forwardDisabled={!allAnswered}
+        forwardLabel={
+          anyAttending
+            ? RSVP_STEPS_COPY.stepLabels[1]
+            : RSVP_STEPS_COPY.continueLabel
+        }
+      />
     </div>
   );
 }
-

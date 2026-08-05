@@ -64,7 +64,7 @@ export function StepThanks({
           <p className="font-sans text-xs text-muted-foreground text-center">
             {RSVP_CONFIRM.editUntilNote.replace(
               "{deadline}",
-              rsvpDeadlineLabel()
+              rsvpDeadlineLabel(),
             )}
           </p>
         </div>

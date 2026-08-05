@@ -1,5 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, DM_Sans, Great_Vibes } from "next/font/google";
+import {
+  Cormorant_Garamond,
+  DM_Sans,
+  Fraunces,
+  Great_Vibes,
+} from "next/font/google";
 import "./globals.css";
 import { SITE } from "@/lib/content";
 import { WizardShell } from "@/components/WizardShell";
@@ -26,6 +31,21 @@ const display = Cormorant_Garamond({
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
   subsets: ["latin"],
+  display: "swap",
+});
+
+// The after-party card's title face. Fraunces' soft, deliberately wonky
+// serifs suit the hand-painted party pigeon in a way the formal script
+// doesn't — the wedding card stays Cormorant + Great Vibes, so the two
+// invitations read as the same couple throwing two different parties.
+const partyDisplay = Fraunces({
+  // The raw font handle; app/globals.css's @theme maps it to --font-party
+  // so components can write `font-party` instead of an inline style.
+  variable: "--font-fraunces-party",
+  subsets: ["latin"],
+  // Upright as well as italic — the italic carries the card title, the
+  // upright sets the detail lines and the sentence beneath them.
+  style: ["italic", "normal"],
   display: "swap",
 });
 
@@ -78,7 +98,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${dmSans.variable} ${script.variable} h-full antialiased`}
+      className={`${display.variable} ${dmSans.variable} ${script.variable} ${partyDisplay.variable} h-full antialiased`}
     >
       {/* overflow-x-hidden: clips the horizontal slide-in animation so it
           doesn't briefly create a horizontal scrollbar. Vertical scrolling

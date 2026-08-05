@@ -49,7 +49,7 @@ export function ChoiceChip({
             : accentColor
               ? "font-semibold" // colors come from accentStyle
               : "bg-arrived/15 border-arrived font-semibold"
-          : "bg-surface border-input text-muted-foreground hover:bg-muted"
+          : "bg-surface border-input text-muted-foreground hover:bg-muted",
       )}
     >
       {icon}
