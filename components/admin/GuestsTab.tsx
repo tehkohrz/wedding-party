@@ -38,6 +38,7 @@ import {
   parseInteger,
   parseText,
 } from "@/lib/guestCsv";
+import { mealLabel } from "@/lib/meals";
 
 interface AdminGuest {
   id: number;
@@ -266,7 +267,13 @@ export function GuestsTab() {
     const csv = Papa.unparse({
       fields: [...CSV_COLUMNS],
       data: guests.map((g) =>
-        CSV_COLUMNS.map((c) => csvCell((g as unknown as Record<string, unknown>)[c]))
+        CSV_COLUMNS.map((c) =>
+          // food_label is derived (export-only): the raw code stays in
+          // food_choice, this column spells it out for reading in Sheets.
+          c === "food_label"
+            ? mealLabel(g.food_choice)
+            : csvCell((g as unknown as Record<string, unknown>)[c])
+        )
       ),
     });
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
@@ -571,10 +578,10 @@ export function GuestsTab() {
                       <option value="">—</option>
                       {MENU.mains.map((m) => (
                         <option key={m.id} value={m.id}>
-                          {m.id}. {m.name}
+                          {m.shortName}
                         </option>
                       ))}
-                      <option value="K">{MENU.kidsMeal.name}</option>
+                      <option value="K">{MENU.kidsMeal.shortName}</option>
                     </select>
                   </td>
                   <td className={td}>

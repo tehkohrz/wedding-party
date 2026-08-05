@@ -10,6 +10,7 @@ import { Check, X, RefreshCw, PartyPopper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { MENU } from "@/lib/content";
+import { mealLabel } from "@/lib/meals";
 
 interface Overview {
   guests: {
@@ -85,6 +86,8 @@ export function RsvpOverviewTab() {
   const g = data.guests;
   const mainName = (id: "A" | "B") =>
     MENU.mains.find((m) => m.id === id)?.name ?? id;
+  const shortName = (id: "A" | "B") =>
+    MENU.mains.find((m) => m.id === id)?.shortName ?? id;
 
 
   return (
@@ -142,11 +145,14 @@ export function RsvpOverviewTab() {
             </p>
             {(["A", "B"] as const).map((id) => (
               <p key={id} className="font-sans text-sm">
-                {id}. {mainName(id)}: <strong>{data.food[id]}</strong>
+                {shortName(id)}{" "}
+                <span className="text-muted-foreground">({mainName(id)})</span>
+                : <strong>{data.food[id]}</strong>
               </p>
             ))}
             <p className="font-sans text-sm">
-              Kids&apos; meals: <strong>{data.food.kidsMeals}</strong>
+              {MENU.kidsMeal.shortName} ({MENU.kidsMeal.name}):{" "}
+              <strong>{data.food.kidsMeals}</strong>
               {data.food.kidsNoMeal > 0 && (
                 <span className="text-muted-foreground">
                   {" "}(+{data.food.kidsNoMeal} kids, no meal)
@@ -199,7 +205,7 @@ export function RsvpOverviewTab() {
                     <span className="text-foreground">{m.name}</span>
                     {m.is_kid && <span>(kid)</span>}
                     {m.is_plus_one && <span>(+1)</span>}
-                    {m.food_choice && <span>· {m.food_choice}</span>}
+                    {m.food_choice && <span>· {mealLabel(m.food_choice)}</span>}
                     {m.baby_seat && <span>· baby seat</span>}
                     {m.after_party && <PartyPopper className="size-3" />}
                     {m.dietary_comment && (

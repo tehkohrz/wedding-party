@@ -164,6 +164,8 @@ export const MENU = {
   mains: [
     {
       id: "A" as const,
+      // [input] One-word label used in the admin (stats, table, totals).
+      shortName: "Beef",
       name: "Roasted USDA Prime Ribeye",
       description:
         "Celeriac Puree | Confit Tomatoes | Broccolini | Pistachio Crumbs | Bordelaise Sauce",
@@ -171,6 +173,8 @@ export const MENU = {
     },
     {
       id: "B" as const,
+      // [input] One-word label used in the admin (stats, table, totals).
+      shortName: "Chicken",
       name: "Roasted Chicken Roulade",
       description:
         "Garlic Mashed Potato | Shallot | Haricot Beans | Red Wine Sauce",
@@ -191,6 +195,8 @@ export const MENU = {
   // [input] The kids' meal (children don't pick a main — they toggle this
   //         instead). One line per course.
   kidsMeal: {
+    // [input] One-word label used in the admin (stats, table, totals).
+    shortName: "Kids",
     name: "Kids' Meal",
     courses: [
       "Nuggets | Fries | Mesclun | Tartar Sauce",

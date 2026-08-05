@@ -27,10 +27,13 @@ export const CONFIG_COLUMNS = [
   "seat",
 ] as const;
 
-/** Read-only in a CSV round-trip: exported for reference, never imported. */
+/** Read-only in a CSV round-trip: exported for reference, never imported.
+    `food_label` is derived from food_choice (the raw code stays too, so a
+    re-import is still unambiguous) — it just makes the sheet readable. */
 export const RESPONSE_COLUMNS = [
   "attending",
   "food_choice",
+  "food_label",
   "after_party",
   "baby_seat",
   "dietary_comment",
