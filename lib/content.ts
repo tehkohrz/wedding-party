@@ -239,12 +239,8 @@ export const AFTER_PARTY = {
   scriptTitle: "The After-Party",
 
   // [input] Time and place lines inside the card (small caps).
-  // The venue depends on the final after-party headcount (Tanjong Beach
-  // Club vs Twelve), so this line stays deliberately unnamed — an invite
-  // that names a club it might not book is worse than one that doesn't.
-  // Once it's booked, swap in the name; nothing else needs touching.
   timeLine: "From 3:30 pm",
-  venueLine: "A beach club in Sentosa",
+  venueLine: "Tanjong Beach Club",
 
   // [input] Details paragraph — when/where/what. Edit freely.
   // Deliberately does NOT invite again (the eyebrow above and the question
