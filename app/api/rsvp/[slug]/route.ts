@@ -16,23 +16,11 @@
 import { z } from "zod";
 import { db, type DbGuest, type DbGroup } from "@/lib/db";
 import { rsvpDeadlinePassed } from "@/lib/rsvpDeadline";
+import { createRateLimiter, clientIp } from "@/lib/rateLimit";
 
-// Naive per-instance rate limit — a sanity cap against someone scripting
-// the public submit endpoint, not a security boundary (serverless
-// instances each keep their own window, which is fine at wedding scale).
-const RATE_WINDOW_MS = 60_000;
-const RATE_MAX = 10;
-const hits = new Map<string, { count: number; windowStart: number }>();
-function rateLimited(key: string): boolean {
-  const now = Date.now();
-  const h = hits.get(key);
-  if (!h || now - h.windowStart > RATE_WINDOW_MS) {
-    hits.set(key, { count: 1, windowStart: now });
-    return false;
-  }
-  h.count += 1;
-  return h.count > RATE_MAX;
-}
+// A sanity cap against someone scripting the public submit endpoint, not a
+// security boundary — see lib/rateLimit.ts. Keyed per ip+slug below.
+const submitLimiter = createRateLimiter({ windowMs: 60_000, max: 10 });
 
 const SubmissionSchema = z.object({
   answers: z
@@ -105,8 +93,7 @@ export async function POST(
   }
 
   const { slug } = await params;
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "?";
-  if (rateLimited(`${ip}|${slug.toLowerCase()}`)) {
+  if (submitLimiter(`${clientIp(req)}|${slug.toLowerCase()}`)) {
     return Response.json({ error: "Too many requests" }, { status: 429 });
   }
 
