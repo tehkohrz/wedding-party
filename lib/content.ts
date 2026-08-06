@@ -43,8 +43,9 @@ export const EVENT_DETAILS = {
   date: "31 October 2026, Saturday",
 
   // [input] Exact event start for the countdown (ISO 8601 with timezone).
-  //         +08:00 = Singapore time. Should match the schedule's first entry.
-  eventStartISO: "2026-10-31T10:30:00+08:00",
+  //         +08:00 = Singapore time. Must match the schedule's first entry
+  //         AND calendarStart below — three fields, one moment.
+  eventStartISO: "2026-10-31T12:00:00+08:00",
 
   // [input] Shown in place of the countdown once the moment arrives.
   countdownDoneLabel: "It's wedding day! 🎉",
@@ -65,7 +66,10 @@ export const EVENT_DETAILS = {
   //         "Open in Maps" link on the RSVP attendance step.
   mapsUrl: "https://www.google.com/maps/dir/?api=1&destination=Sol+%26+Ora+The+Outpost+Hotel+Sentosa",
 
-  // [input] Day-of schedule (PLACEHOLDER — update with the real programme).
+  // [input] Day-of schedule — this IS the real programme. The 5 minutes
+  //         between arrival and solemnization is deliberate: the venue has
+  //         nowhere for guests to wait and the booking is short, so the
+  //         ceremony starts promptly at 12:05. Don't "fix" it.
   //         Shown in the landing Details section and on the RSVP flow.
   schedule: [
     { time: "12:00", item: "Guest Arrival" },
@@ -73,7 +77,10 @@ export const EVENT_DETAILS = {
     { time: "12:30", item: "Lunch" },
   ],
 
-  // [input] Attire line in the landing Details section.
+  // [input] Attire line in the landing Details section. The joke is
+  //         intentional — the solemnization is outdoors at midday and it
+  //         will be brutally hot, so the laugh is doing real work: it gets
+  //         people to actually dress for the sun. Leave it.
   attire: "Outdoor solemnisation, dress for the sun and breeze. Beachwear, underwear or naked - anything you like!",
 
   // [input] Title of the details section on the landing page.
@@ -88,7 +95,8 @@ export const EVENT_DETAILS = {
   calendarTitle: "Jermaine & Dong Kun's Wedding 💍",
 
   // [input] Event start/end in the venue's LOCAL time, format YYYYMMDDTHHMMSS.
-  calendarStart: "20261031T113000",
+  //         Start must match eventStartISO / schedule[0] above.
+  calendarStart: "20261031T120000",
   calendarEnd: "20261031T160000",
 
   // [input] IANA timezone the times above are in.
