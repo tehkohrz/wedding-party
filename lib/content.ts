@@ -247,15 +247,21 @@ export const AFTER_PARTY = {
   venueLine: "A beach club in Sentosa",
 
   // [input] Details paragraph — when/where/what. Edit freely.
+  // Deliberately does NOT invite again (the eyebrow above and the question
+  // below both do) and does not name the venue again (the line above does).
+  // "It's our treat" states who's paying as a fact rather than an offer —
+  // an offer invites a polite refusal.
   description:
-    "We're keeping the celebration going — sun, sand and sea. Join us at the club!",
+    "Sun, sand and sea to see out the day. It's our treat — just bring yourselves.",
 
   // [input] The question above the per-person toggles.
   question: "Who's coming along?",
 
-  // [input] The yes / no choice labels.
+  // [input] The yes / no choice labels. The joke lives on the yes button —
+  // guests declining for real reasons (a flight, small kids) shouldn't have
+  // to click something that calls them a spoilsport.
   yesLabel: "Count me in",
-  noLabel: "I am allergic to fun",
+  noLabel: "Can't make this one",
 
   // [input] Continue / back buttons.
   continueLabel: "Continue",
