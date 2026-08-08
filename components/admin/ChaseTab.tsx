@@ -22,7 +22,8 @@ import { Check, Download, Link2, MessageSquare, PartyPopper } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { ADMIN_COPY, EVENT_DETAILS } from "@/lib/content";
+import { fillMessageTemplate } from "@/lib/messageTemplate";
+import { ADMIN_COPY } from "@/lib/content";
 import { rsvpDaysRemaining, rsvpDeadlineLabel } from "@/lib/rsvpDeadline";
 import { writeClipboard } from "@/lib/clipboard";
 
@@ -72,12 +73,10 @@ export function ChaseTab() {
   const urlFor = (slug: string) => `${origin}/r/${slug}`;
 
   const reminderFor = (row: LinkRow) =>
-    ADMIN_COPY.reminderMessageTemplate
-      .replaceAll("{name}", row.name)
-      .replaceAll("{link}", urlFor(row.slug))
-      .replaceAll("{date}", EVENT_DETAILS.date)
-      .replaceAll("{deadline}", rsvpDeadlineLabel())
-      .replaceAll("{days}", String(Math.max(0, rsvpDaysRemaining())));
+    fillMessageTemplate(ADMIN_COPY.reminderMessageTemplate, {
+      name: row.name,
+      link: urlFor(row.slug),
+    });
 
   async function copy(key: string, text: string) {
     const ok = await writeClipboard(text);

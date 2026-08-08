@@ -18,8 +18,8 @@ import { Check, Download, Link2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { ADMIN_COPY, EVENT_DETAILS } from "@/lib/content";
-import { rsvpDeadlineLabel } from "@/lib/rsvpDeadline";
+import { fillMessageTemplate } from "@/lib/messageTemplate";
+import { ADMIN_COPY } from "@/lib/content";
 import { writeClipboard } from "@/lib/clipboard";
 
 interface LinkRow {
@@ -58,11 +58,10 @@ export function LinksTab() {
 
   /** The ready-to-paste message for one guest. */
   const messageFor = (row: LinkRow) =>
-    ADMIN_COPY.linkMessageTemplate
-      .replaceAll("{name}", row.name)
-      .replaceAll("{link}", urlFor(row.slug))
-      .replaceAll("{date}", EVENT_DETAILS.date)
-      .replaceAll("{deadline}", rsvpDeadlineLabel());
+    fillMessageTemplate(ADMIN_COPY.linkMessageTemplate, {
+      name: row.name,
+      link: urlFor(row.slug),
+    });
 
   async function copy(key: string, text: string) {
     const ok = await writeClipboard(text);

@@ -588,8 +588,9 @@ export const ADMIN_COPY = {
   //         Placeholders: {name} {link} {date} {deadline}.
   //         Kept short: WhatsApp collapses long messages behind "Read more",
   //         and the link must stay visible so the preview card renders.
-  //         {date} sits on its own line — EVENT_DETAILS.date is written
-  //         "31 October 2026, Saturday", which reads badly mid-sentence.
+  //         No date line: the invitation and the poster both carry it, so
+  //         repeating it in the message is noise. {deadlineShort} renders
+  //         "1st Sept" — see lib/rsvpDeadline.
   linkMessageTemplate:
-    "Hi {name}! We're getting married, and we'd love you there 🎉\n{date}\n\nHere's your personal invitation — do RSVP with your meal choices by {deadline}:\n{link}",
+    "Hi {name}! We're getting married, and we'd love you there 🎉\n\nHere's your personal invitation — do RSVP with your meal choices by {deadlineShort}:\n{link}",
 };
