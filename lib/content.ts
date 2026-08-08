@@ -92,6 +92,9 @@ export const EVENT_DETAILS = {
   //         reorder freely — the list renders in this order and the section
   //         hides itself entirely when the array is empty.
   faqHeading: "Good to know",
+  // Ordered getting there → timing → weather → your party, so a guest
+  // reading top to bottom answers their questions in the order they'd
+  // actually think of them.
   faq: [
     {
       question: "Is there an entry fee to Sentosa?",
@@ -107,6 +110,25 @@ export const EVENT_DETAILS = {
       answer:
         "No! We have a tight schedule to keep to — the solemnisation will start on time.",
     },
+    {
+      question: "What time will it end?",
+      answer: "The celebration wraps up at 3 pm.",
+    },
+    {
+      question: "What if it rains?",
+      answer:
+        "We move the solemnisation indoors to the dining hall — it goes ahead rain or shine.",
+    },
+    {
+      question: "Can I bring my kids or a plus one?",
+      answer:
+        "We've reserved seats for the names on your RSVP — do let us know if anything changes.",
+    },
+    {
+      question: "What about dietary restrictions?",
+      answer:
+        "You can note any restrictions when you choose your meal in the RSVP. If you need anything else arranged, just tell us.",
+    },
   ] as { question: string; answer: string }[],
 
   // [input] RSVP deadline (ISO date). After this day, submitted responses
@@ -120,7 +142,7 @@ export const EVENT_DETAILS = {
   // [input] Event start/end in the venue's LOCAL time, format YYYYMMDDTHHMMSS.
   //         Start must match eventStartISO / schedule[0] above.
   calendarStart: "20261031T115000",
-  calendarEnd: "20261031T160000",
+  calendarEnd: "20261031T150000",
 
   // [input] IANA timezone the times above are in.
   calendarTimezone: "Asia/Singapore",
