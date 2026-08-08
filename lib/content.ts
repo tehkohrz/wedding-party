@@ -581,8 +581,10 @@ export const ADMIN_COPY = {
 
   // [input] The nudge message copied by the Remind button.
   //         Placeholders: {name} {link} {date} {deadline} {days}.
+  //         Short date form, like the invitation message — these are texts,
+  //         not letters. The website keeps the full "1 September 2026".
   reminderMessageTemplate:
-    "Hi {name}! Just a gentle nudge — we haven't caught your RSVP for {date} yet, and we need to give the venue our numbers by {deadline}. Here's your invitation again: {link}\n\nThank you! 🤍",
+    "Hi {name}! Just a gentle nudge — we haven't caught your RSVP yet, and we need to give the venue our numbers by {deadlineShort}. Here's your invitation again:\n{link}\n\nThank you! 🤍",
 
   // [input] The WhatsApp message copied by the Message button.
   //         Placeholders: {name} {link} {date} {deadline}.
