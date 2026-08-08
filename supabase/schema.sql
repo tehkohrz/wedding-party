@@ -124,3 +124,58 @@ alter table seating_groups enable row level security;
 alter table rsvp_slugs     enable row level security;
 alter table guests         enable row level security;
 alter table attendance     enable row level security;
+
+-- ─── Atomic RSVP submit ──────────────────────────────────────────────────────
+-- The whole group's answers are written in ONE transaction.
+--
+-- Why this exists: the API route used to issue one UPDATE per guest via
+-- Promise.all. Those are independent statements, so a failure partway
+-- through (e.g. a rejected food_choice) left the group half-saved while the
+-- guest saw an error — exactly what happened when the kids meal 'K' hit an
+-- outdated check constraint. A plpgsql function runs inside a single
+-- transaction: any raise rolls back every row it already touched.
+--
+-- Validation and normalization still live in the API route (kid/adult meal
+-- rules, invite-only after-party, decliner clearing). p_rows carries the
+-- FINAL column values; this function only writes them.
+--
+-- Each element of p_rows:
+--   { guest_id, attending, food_choice, dietary_comment,
+--     after_party, baby_seat, responded_at, name? }
+-- `name` is optional and only ever set for plus-one rows; when absent the
+-- existing name is kept.
+create or replace function submit_rsvp(p_group_id text, p_rows jsonb)
+returns void
+language plpgsql as $$
+declare
+  r         jsonb;
+  updated   int;
+  total     int := 0;
+begin
+  for r in select * from jsonb_array_elements(p_rows)
+  loop
+    update guests set
+      attending       = (r->>'attending')::boolean,
+      food_choice     = r->>'food_choice',
+      dietary_comment = r->>'dietary_comment',
+      after_party     = (r->>'after_party')::boolean,
+      baby_seat       = (r->>'baby_seat')::boolean,
+      responded_at    = (r->>'responded_at')::timestamptz,
+      -- Absent key → NULL → keeps the current name.
+      name            = coalesce(r->>'name', name)
+    where id = (r->>'guest_id')::int
+      -- Scoped to the group: a request can never write another group's rows.
+      and rsvp_group_id = p_group_id;
+
+    get diagnostics updated = row_count;
+    total := total + updated;
+  end loop;
+
+  -- Every answer must have matched exactly one row of this group. A
+  -- mismatch means a foreign or stale guest_id — abort so the caller gets
+  -- an error instead of a silent partial write.
+  if total <> jsonb_array_length(p_rows) then
+    raise exception 'submit_rsvp: % answers but % rows updated for group %',
+      jsonb_array_length(p_rows), total, p_group_id;
+  end if;
+end $$;

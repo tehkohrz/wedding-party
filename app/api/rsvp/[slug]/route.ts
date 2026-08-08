@@ -179,30 +179,34 @@ export async function POST(
     }
   }
 
+  // Normalize to the FINAL column values, then hand the whole set to the
+  // submit_rsvp function (supabase/schema.sql), which writes them in one
+  // transaction. Previously this was one UPDATE per guest via Promise.all —
+  // independent statements, so a failure partway through left the group
+  // half-saved while the guest saw an error.
   const now = new Date().toISOString();
-  const updates = answers.map((a) =>
-    client
-      .from("guests")
-      .update({
-        attending: a.attending,
-        food_choice: a.attending ? a.food_choice : null,
-        dietary_comment: a.attending ? a.dietary_comment : null,
-        // Invite-only: uninvited members can never carry an answer.
-        after_party:
-          a.attending && afterPartyIds.has(a.guest_id) ? a.after_party : null,
-        // Baby seat applies to attending kids only.
-        baby_seat:
-          a.attending && kidIds.has(a.guest_id) ? (a.baby_seat ?? null) : null,
-        responded_at: now,
-        // Rename applies to plus-one rows only — a guest can't rename
-        // other real people in their group.
-        ...(plusOneIds.has(a.guest_id) && a.name ? { name: a.name } : {}),
-      })
-      .eq("id", a.guest_id)
-      .eq("rsvp_group_id", groupId) // never write outside this group
-  );
-  const results = await Promise.all(updates);
-  if (results.some((r) => r.error)) {
+  const rows = answers.map((a) => ({
+    guest_id: a.guest_id,
+    attending: a.attending,
+    food_choice: a.attending ? a.food_choice : null,
+    dietary_comment: a.attending ? a.dietary_comment : null,
+    // Invite-only: uninvited members can never carry an answer.
+    after_party:
+      a.attending && afterPartyIds.has(a.guest_id) ? a.after_party : null,
+    // Baby seat applies to attending kids only.
+    baby_seat:
+      a.attending && kidIds.has(a.guest_id) ? (a.baby_seat ?? null) : null,
+    responded_at: now,
+    // Rename applies to plus-one rows only — a guest can't rename other
+    // real people in their group. Omitted key = name left untouched.
+    ...(plusOneIds.has(a.guest_id) && a.name ? { name: a.name } : {}),
+  }));
+
+  const { error: writeError } = await client.rpc("submit_rsvp", {
+    p_group_id: groupId,
+    p_rows: rows,
+  });
+  if (writeError) {
     return Response.json({ error: "Database error" }, { status: 500 });
   }
 
