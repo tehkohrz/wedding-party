@@ -25,7 +25,17 @@
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import Papa from "papaparse";
-import { Download, Plus, RotateCcw, Save, Trash2, Upload } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronsUpDown,
+  Download,
+  Plus,
+  RotateCcw,
+  Save,
+  Trash2,
+  Upload,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -95,6 +105,19 @@ const CELL =
 const TH =
   "px-2 py-2 text-left font-sans text-[10px] uppercase tracking-wider text-muted-foreground whitespace-nowrap";
 
+/** Columns the table can be sorted by — the two grouping ids. */
+type SortKey = "rsvp_group_id" | "seating_group_id";
+type Sort = { key: SortKey; dir: "asc" | "desc" };
+
+/* Group ids are numeric STRINGS ("2", "10", "30"). A plain string compare
+   orders them 1, 10, 11, 2 — useless for eyeballing groups — so sort with a
+   numeric-aware collator, which also handles prefixed ids like "g2" < "g10"
+   if the scheme ever changes. */
+const groupCollator = new Intl.Collator(undefined, {
+  numeric: true,
+  sensitivity: "base",
+});
+
 export function GuestsTab() {
   const [guests, setGuests] = useState<AdminGuest[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -104,6 +127,8 @@ export function GuestsTab() {
   const [savingId, setSavingId] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [draft, setDraft] = useState<GuestDraft | null>(null);
+  /** null = the table's natural order (guest id, as loaded). */
+  const [sort, setSort] = useState<Sort | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(() => {
@@ -361,7 +386,7 @@ export function GuestsTab() {
   }
 
   const q = filter.trim().toLowerCase();
-  const visible = q
+  const filtered = q
     ? guests.filter(
         (g) =>
           g.name.toLowerCase().includes(q) ||
@@ -369,7 +394,35 @@ export function GuestsTab() {
           (g.seating_group_id ?? "").toLowerCase() === q
       )
     : guests;
+
+  /* Sorting is for VERIFYING groups, so members of a group must land
+     together AND in a readable order — hence the id tiebreak. Ungrouped
+     rows always sink to the bottom in both directions: they're the ones
+     you're hunting for, and flipping them to the top on "desc" would bury
+     the groups you're actually reading. */
+  const visible = sort
+    ? [...filtered].sort((a, b) => {
+        const av = a[sort.key];
+        const bv = b[sort.key];
+        if (!av && !bv) return a.id - b.id;
+        if (!av) return 1;
+        if (!bv) return -1;
+        const c = groupCollator.compare(av, bv);
+        return c !== 0 ? (sort.dir === "asc" ? c : -c) : a.id - b.id;
+      })
+    : filtered;
   const dirtyCount = Object.keys(edits).length;
+
+  /** Click cycles asc → desc → off (back to guest-id order). */
+  function toggleSort(key: SortKey) {
+    setSort((s) =>
+      s?.key !== key
+        ? { key, dir: "asc" }
+        : s.dir === "asc"
+          ? { key, dir: "desc" }
+          : null
+    );
+  }
 
   return (
     <div className="h-full min-h-0 flex flex-col">
@@ -427,8 +480,18 @@ export function GuestsTab() {
                 Name
               </th>
               <th className={TH}>Side</th>
-              <th className={TH}>RSVP grp</th>
-              <th className={TH}>Seat grp</th>
+              <SortableTh
+                label="RSVP grp"
+                sortKey="rsvp_group_id"
+                sort={sort}
+                onToggle={toggleSort}
+              />
+              <SortableTh
+                label="Seat grp"
+                sortKey="seating_group_id"
+                sort={sort}
+                onToggle={toggleSort}
+              />
               <th className={TH}>Kid</th>
               <th className={TH}>+1</th>
               <th className={TH}>AP inv</th>
@@ -868,5 +931,46 @@ export function GuestsTab() {
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * A column header that sorts the table. Click cycles asc → desc → off; the
+ * icon shows which state you're in, so the header doubles as the indicator
+ * (no separate legend needed).
+ */
+function SortableTh({
+  label,
+  sortKey,
+  sort,
+  onToggle,
+}: {
+  label: string;
+  sortKey: SortKey;
+  sort: Sort | null;
+  onToggle: (key: SortKey) => void;
+}) {
+  const active = sort?.key === sortKey;
+  const Icon = !active ? ChevronsUpDown : sort.dir === "asc" ? ArrowUp : ArrowDown;
+  return (
+    <th
+      className={cn(TH, "p-0")}
+      aria-sort={
+        !active ? "none" : sort.dir === "asc" ? "ascending" : "descending"
+      }
+    >
+      <button
+        type="button"
+        onClick={() => onToggle(sortKey)}
+        title={`Sort by ${label}`}
+        className={cn(
+          "flex w-full items-center gap-1 px-2 py-2 uppercase tracking-wider hover:text-foreground",
+          active && "text-foreground font-semibold"
+        )}
+      >
+        {label}
+        <Icon className={cn("size-3", !active && "opacity-40")} />
+      </button>
+    </th>
   );
 }
