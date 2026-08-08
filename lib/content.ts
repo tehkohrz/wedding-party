@@ -44,8 +44,10 @@ export const EVENT_DETAILS = {
 
   // [input] Exact event start for the countdown (ISO 8601 with timezone).
   //         +08:00 = Singapore time. Must match the schedule's first entry
-  //         AND calendarStart below — three fields, one moment.
-  eventStartISO: "2026-10-31T12:00:00+08:00",
+  //         AND calendarStart below — three fields, one moment. That moment
+  //         is GUEST ARRIVAL, not the ceremony: the calendar block is what
+  //         gets people there in time, and the solemnization starts sharp.
+  eventStartISO: "2026-10-31T11:50:00+08:00",
 
   // [input] Shown in place of the countdown once the moment arrives.
   countdownDoneLabel: "It's wedding day! 🎉",
@@ -72,8 +74,8 @@ export const EVENT_DETAILS = {
   //         ceremony starts promptly at 12:05. Don't "fix" it.
   //         Shown in the landing Details section and on the RSVP flow.
   schedule: [
-    { time: "12:00", item: "Guest Arrival" },
-    { time: "12:05", item: "Solemnization" },
+    { time: "11:50", item: "Guest Arrival" },
+    { time: "12:00", item: "Solemnization" },
     { time: "12:30", item: "Lunch" },
   ],
 
@@ -86,6 +88,27 @@ export const EVENT_DETAILS = {
   // [input] Title of the details section on the landing page.
   detailsHeading: "Details",
 
+  // [input] FAQ shown at the BOTTOM of the details section. Add, remove or
+  //         reorder freely — the list renders in this order and the section
+  //         hides itself entirely when the array is empty.
+  faqHeading: "Good to know",
+  faq: [
+    {
+      question: "Is there an entry fee to Sentosa?",
+      answer:
+        "Yes, but there are complimentary entry QR codes which we'll send out closer to the date.",
+    },
+    {
+      question: "Where should I park?",
+      answer: "You can park right below the venue at the Outpost Hotel.",
+    },
+    {
+      question: "Can I arrive late?",
+      answer:
+        "No! We have a tight schedule to keep to — the solemnisation will start on time.",
+    },
+  ] as { question: string; answer: string }[],
+
   // [input] RSVP deadline (ISO date). After this day, submitted responses
   //         become view-only and the flow shows the deadline notice.
   rsvpDeadline: "2026-09-01",
@@ -96,7 +119,7 @@ export const EVENT_DETAILS = {
 
   // [input] Event start/end in the venue's LOCAL time, format YYYYMMDDTHHMMSS.
   //         Start must match eventStartISO / schedule[0] above.
-  calendarStart: "20261031T120000",
+  calendarStart: "20261031T115000",
   calendarEnd: "20261031T160000",
 
   // [input] IANA timezone the times above are in.

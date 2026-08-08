@@ -14,7 +14,7 @@
  *
  * Server component — no hooks, renders to static HTML.
  */
-import { Shirt, MapPin, ExternalLink } from "lucide-react";
+import { Shirt, MapPin, ExternalLink, HelpCircle } from "lucide-react";
 import { EVENT_DETAILS } from "@/lib/content";
 import { ScheduleBlock } from "@/components/ScheduleBlock";
 import { PigeonSignoff } from "@/components/PigeonSignoff";
@@ -65,6 +65,32 @@ export function EventDetails() {
       >
         <ExternalLink className="size-3.5" /> Get directions
       </a>
+
+      {/* FAQ — last section before the sign-off. Hidden entirely when the
+          list is empty, so emptying EVENT_DETAILS.faq removes it cleanly.
+          <dl> rather than divs: it IS a description list, which gives
+          screen readers the question/answer pairing for free. */}
+      {EVENT_DETAILS.faq.length > 0 && (
+        <>
+          <DotDivider />
+          <SectionLabel
+            icon={<HelpCircle className="size-5" />}
+            label={EVENT_DETAILS.faqHeading}
+          />
+          <dl className="mt-4 space-y-6">
+            {EVENT_DETAILS.faq.map((item) => (
+              <div key={item.question} className="space-y-1">
+                <dt className="font-display text-2xl sm:text-3xl">
+                  {item.question}
+                </dt>
+                <dd className="font-sans text-base text-muted-foreground max-w-md mx-auto">
+                  {item.answer}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </>
+      )}
 
       {/* The pigeon pair signs off the invitation content. */}
       <PigeonSignoff />
