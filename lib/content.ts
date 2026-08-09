@@ -88,49 +88,6 @@ export const EVENT_DETAILS = {
   // [input] Title of the details section on the landing page.
   detailsHeading: "Details",
 
-  // [input] FAQ shown at the BOTTOM of the details section. Add, remove or
-  //         reorder freely — the list renders in this order and the section
-  //         hides itself entirely when the array is empty.
-  faqHeading: "Good to know",
-  // Ordered getting there → timing → weather → your party, so a guest
-  // reading top to bottom answers their questions in the order they'd
-  // actually think of them.
-  faq: [
-    {
-      question: "Is there an entry fee to Sentosa?",
-      answer:
-        "Yes, but there are complimentary entry QR codes which we'll send out closer to the date.",
-    },
-    {
-      question: "Where should I park?",
-      answer: "You can park right below the venue at the Outpost Hotel.",
-    },
-    {
-      question: "Can I arrive late?",
-      answer:
-        "No! We have a tight schedule to keep to — the solemnisation will start on time.",
-    },
-    {
-      question: "What time will it end?",
-      answer: "The celebration wraps up at 3 pm.",
-    },
-    {
-      question: "What if it rains?",
-      answer:
-        "We move the solemnisation indoors to the dining hall — it goes ahead rain or shine.",
-    },
-    {
-      question: "Can I bring my kids or a plus one?",
-      answer:
-        "We've reserved seats for the names on your RSVP — do let us know if anything changes.",
-    },
-    {
-      question: "What about dietary restrictions?",
-      answer:
-        "You can note any restrictions when you choose your meal in the RSVP. If you need anything else arranged, just tell us.",
-    },
-  ] as { question: string; answer: string }[],
-
   // [input] RSVP deadline (ISO date). After this day, submitted responses
   //         become view-only and the flow shows the deadline notice.
   rsvpDeadline: "2026-09-01",
