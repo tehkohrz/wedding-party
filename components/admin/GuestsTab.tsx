@@ -49,6 +49,7 @@ import {
   parseText,
 } from "@/lib/guestCsv";
 import { mealLabel } from "@/lib/meals";
+import { compareGroupIds } from "@/lib/groupOrder";
 
 interface AdminGuest {
   id: number;
@@ -109,14 +110,6 @@ const TH =
 type SortKey = "rsvp_group_id" | "seating_group_id";
 type Sort = { key: SortKey; dir: "asc" | "desc" };
 
-/* Group ids are numeric STRINGS ("2", "10", "30"). A plain string compare
-   orders them 1, 10, 11, 2 — useless for eyeballing groups — so sort with a
-   numeric-aware collator, which also handles prefixed ids like "g2" < "g10"
-   if the scheme ever changes. */
-const groupCollator = new Intl.Collator(undefined, {
-  numeric: true,
-  sensitivity: "base",
-});
 
 export function GuestsTab() {
   const [guests, setGuests] = useState<AdminGuest[]>([]);
@@ -407,7 +400,7 @@ export function GuestsTab() {
         if (!av && !bv) return a.id - b.id;
         if (!av) return 1;
         if (!bv) return -1;
-        const c = groupCollator.compare(av, bv);
+        const c = compareGroupIds(av, bv);
         return c !== 0 ? (sort.dir === "asc" ? c : -c) : a.id - b.id;
       })
     : filtered;

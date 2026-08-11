@@ -5,6 +5,7 @@
  */
 import { db, type DbGuest } from "@/lib/db";
 import { isAuthed, unauthorized } from "@/lib/adminAuth";
+import { compareGroupIds } from "@/lib/groupOrder";
 
 export async function GET(req: Request) {
   if (!isAuthed(req)) return unauthorized();
@@ -12,7 +13,9 @@ export async function GET(req: Request) {
   const client = db();
   const [guestsRes, groupsRes] = await Promise.all([
     client.from("guests").select("*").order("id"),
-    client.from("rsvp_groups").select("id, label").order("id"),
+    // NOTE: no .order("id") — id is TEXT, so Postgres would sort it
+    // 1, 10, 11, 2. Sorted numerically below instead.
+    client.from("rsvp_groups").select("id, label"),
   ]);
   if (guestsRes.error || groupsRes.error) {
     return Response.json({ error: "Database error" }, { status: 500 });
@@ -61,7 +64,7 @@ export async function GET(req: Request) {
       babySeats: attending.filter((g) => g.baby_seat === true).length,
     },
     afterParty: attending.filter((g) => g.after_party === true).length,
-    groups: groups.map((grp) => {
+    groups: [...groups].sort((a, b) => compareGroupIds(a.id, b.id)).map((grp) => {
       const members = guestsByGroup.get(grp.id) ?? [];
       return {
         id: grp.id,
