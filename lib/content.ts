@@ -126,6 +126,15 @@ export const RSVP_COPY = {
   linkOnlyNote:
     "Please use the personal RSVP link we sent you — it opens your party's invitation directly. Can't find it? Just message us!",
 
+  // [input] Shown when the invitation can't be loaded because the DATABASE
+  //         is unreachable — NOT when a link is wrong. Keeping these apart
+  //         matters: during a Supabase outage every guest was being shown
+  //         Next's "404 — page could not be found", which reads as "your
+  //         invitation doesn't exist".
+  linkUnavailableHeading: "We can't load your invitation right now",
+  linkUnavailableBody:
+    "Something's temporarily wrong on our end — your invitation is safe. Please try again in a few minutes, and message us if it keeps happening.",
+
   // [input] Photo slideshow images, in order. Drop files into public/photos/
   //         and list them here. Empty list = soft gradient placeholder.
   photos: ["/photos/one.jpg", "/photos/two.jpg", "/photos/three.jpg", "/photos/four.jpg", "/photos/five.jpg"] as string[],

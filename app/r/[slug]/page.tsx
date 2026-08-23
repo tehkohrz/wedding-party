@@ -3,7 +3,10 @@
 // Server component: resolves the slug to its group + members directly via
 // lib/db (no client fetch for the initial load), then mounts the client
 // RSVP stepper (components/rsvp/RsvpFlow) with the data as props.
-// Unknown slugs render Next's not-found page.
+// Unknown slugs render Next's not-found page. A DATABASE failure is a
+// different thing and renders the "temporarily unavailable" view instead —
+// telling a guest their invitation "could not be found" during an outage
+// is both wrong and alarming.
 //
 // The page itself is just the photo/content split — the stepper renders
 // the whole content side, opening on an intro view that mirrors the public
@@ -15,6 +18,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { PhotoSlideshow } from "@/components/PhotoSlideshow";
 import { RsvpFlow } from "@/components/rsvp/RsvpFlow";
+import { RSVP_COPY } from "@/lib/content";
 import type { RsvpGroup, RsvpMember } from "@/components/rsvp/types";
 
 export default async function PersonalRsvpPage({
@@ -31,7 +35,9 @@ export default async function PersonalRsvpPage({
     .eq("slug", slug.toLowerCase())
     .maybeSingle();
 
-  if (slugRow.error || !slugRow.data) notFound();
+  // Database unreachable vs. link genuinely unknown — NOT the same thing.
+  if (slugRow.error) return <InvitationUnavailable />;
+  if (!slugRow.data) notFound();
 
   const groupId = slugRow.data.group_id as string;
   const linkGuestId = slugRow.data.guest_id as number | null;
@@ -47,7 +53,7 @@ export default async function PersonalRsvpPage({
       .order("id"),
   ]);
 
-  if (groupRes.error || membersRes.error) notFound();
+  if (groupRes.error || membersRes.error) return <InvitationUnavailable />;
 
   const group = groupRes.data as RsvpGroup;
   const members = (membersRes.data ?? []) as RsvpMember[];
@@ -70,6 +76,35 @@ export default async function PersonalRsvpPage({
                 members={members}
                 greeting={linkGuest?.name}
               />
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/**
+ * Shown when the database can't be reached. Deliberately reassuring and
+ * deliberately NOT a 404: the guest's invitation exists, we just can't
+ * read it this second.
+ */
+function InvitationUnavailable() {
+  return (
+    <div className="h-dvh w-screen overflow-hidden flex flex-col landscape:flex-row">
+      <PhotoSlideshow />
+      <section className="relative flex-1 overflow-y-auto invite-stripes">
+        <div className="p-3 sm:p-6 min-h-full flex flex-col">
+          <div className="invite-card p-1.5 sm:p-2 flex-1 flex flex-col">
+            <div className="invite-card-inner flex-1 grid place-items-center px-6 py-16">
+              <div className="text-center space-y-3 max-w-sm">
+                <h1 className="font-display text-3xl sm:text-4xl">
+                  {RSVP_COPY.linkUnavailableHeading}
+                </h1>
+                <p className="font-sans text-sm text-muted-foreground">
+                  {RSVP_COPY.linkUnavailableBody}
+                </p>
+              </div>
             </div>
           </div>
         </div>

@@ -38,8 +38,12 @@ function notify(): void {
 // ─── Reads ───────────────────────────────────────────────────────────────────
 
 /** Every arrival — stats, map overlay, admin dashboard. */
-export async function getAllArrived(): Promise<AttendanceRecord[]> {
-  const res = await fetch("/api/attendance");
+export async function getAllArrived(
+  // Optional so callers that don't care keep working; the polling hook
+  // passes one so a hung request can be aborted instead of stacking up.
+  signal?: AbortSignal,
+): Promise<AttendanceRecord[]> {
+  const res = await fetch("/api/attendance", { signal });
   if (!res.ok) throw new Error("attendance fetch failed");
   const json = (await res.json()) as { attendance: AttendanceRecord[] };
   return json.attendance;

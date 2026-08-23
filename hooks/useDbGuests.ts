@@ -13,8 +13,9 @@
  * Returns undefined until loaded. Rows are mapped to the v1 `Guest` shape
  * (lib/schema) so every existing helper keeps working.
  */
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import type { Guest } from "@/lib/schema";
+import { useBackoffPoll } from "./useBackoffPoll";
 
 interface ApiGuestRow {
   id: number;
@@ -55,30 +56,18 @@ function toGuest(r: ApiGuestRow): Guest {
 export function useDbGuests(): readonly Guest[] | undefined {
   const [guests, setGuests] = useState<Guest[] | undefined>();
 
-  useEffect(() => {
-    let alive = true;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const load = () => {
-      fetch("/api/guests")
-        .then((res) => (res.ok ? res.json() : Promise.reject()))
-        .then((json: { guests: ApiGuestRow[] }) => {
-          if (!alive) return;
-          setGuests(
-            json.guests.filter((g) => g.attending !== false).map(toGuest)
-          );
-        })
-        .catch(() => {
-          // WiFi blip on the kiosk: keep retrying until the list loads —
-          // a check-in iPad with no guest list is useless.
-          if (alive) timer = setTimeout(load, 5000);
-        });
-    };
-    load();
-    return () => {
-      alive = false;
-      if (timer) clearTimeout(timer);
-    };
+  const load = useCallback(async (signal: AbortSignal) => {
+    const res = await fetch("/api/guests", { signal });
+    if (!res.ok) throw new Error("guest list fetch failed");
+    const json = (await res.json()) as { guests: ApiGuestRow[] };
+    setGuests(json.guests.filter((g) => g.attending !== false).map(toGuest));
   }, []);
+
+  // No intervalMs: load once, then stop. On failure the scheduler retries
+  // with exponential backoff instead of the old flat 5s forever — a
+  // check-in iPad with no guest list is useless, but hammering a dead API
+  // every 5 seconds for hours is what got the database flagged.
+  useBackoffPoll(load, {});
 
   return guests;
 }

@@ -10,38 +10,36 @@
  *   - the lib/attendance change bus — writes from THIS device refresh
  *     instantly instead of waiting out the poll interval.
  *
+ * Scheduling is delegated to useBackoffPoll: no overlapping requests, a
+ * hard timeout per attempt, exponential backoff while the API is failing,
+ * and nothing at all while the tab is hidden. It previously used a raw
+ * setInterval, which piled up in-flight requests during an outage.
+ *
  * Returns undefined until the first fetch lands (same contract as
  * useLiveQuery), then the full record list. Failed polls keep the last
  * good data — a WiFi blip shouldn't blank the dashboard.
  */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   getAllArrived,
   subscribeAttendance,
   type AttendanceRecord,
 } from "@/lib/attendance";
+import { useBackoffPoll } from "./useBackoffPoll";
 
 export function useAttendance(pollMs = 4000): AttendanceRecord[] | undefined {
   const [records, setRecords] = useState<AttendanceRecord[] | undefined>();
 
-  useEffect(() => {
-    let alive = true;
-    const load = () => {
-      getAllArrived()
-        .then((r) => {
-          if (alive) setRecords(r);
-        })
-        .catch(() => {}); // keep last good data on failure
-    };
-    load();
-    const id = setInterval(load, pollMs);
-    const unsubscribe = subscribeAttendance(load);
-    return () => {
-      alive = false;
-      clearInterval(id);
-      unsubscribe();
-    };
-  }, [pollMs]);
+  const load = useCallback(async (signal: AbortSignal) => {
+    // Throwing is how the scheduler learns to back off, so no catch here.
+    setRecords(await getAllArrived(signal));
+  }, []);
+
+  const { refresh } = useBackoffPoll(load, { intervalMs: pollMs });
+
+  // A write on THIS device should show immediately rather than waiting
+  // out the interval (or an accumulated backoff).
+  useEffect(() => subscribeAttendance(refresh), [refresh]);
 
   return records;
 }
