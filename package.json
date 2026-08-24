@@ -12,7 +12,8 @@
     "icons": "node scripts/generate-icons.mjs",
     "start": "next start",
     "lint": "eslint",
-    "photos": "node scripts/optimize-photos.mjs"
+    "photos": "node scripts/optimize-photos.mjs",
+    "snapshot": "tsx scripts/snapshot-db.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.5",
