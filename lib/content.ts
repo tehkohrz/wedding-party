@@ -90,7 +90,7 @@ export const EVENT_DETAILS = {
 
   // [input] RSVP deadline (ISO date). After this day, submitted responses
   //         become view-only and the flow shows the deadline notice.
-  rsvpDeadline: "2026-09-01",
+  rsvpDeadline: "2026-09-14",
 
   // ── "Add to Google Calendar" (offered after RSVP confirmation) ──
   // [input] Event title as it appears in the guest's calendar.
@@ -548,7 +548,7 @@ export const ADMIN_COPY = {
   // [input] The nudge message copied by the Remind button.
   //         Placeholders: {name} {link} {date} {deadline} {days}.
   //         Short date form, like the invitation message — these are texts,
-  //         not letters. The website keeps the full "1 September 2026".
+  //         not letters. The website keeps the full long-form date.
   reminderMessageTemplate:
     "Hi {name}! Just a gentle nudge — we haven't caught your RSVP yet, and we need to give the venue our numbers by {deadlineShort}. Here's your invitation again:\n{link}\n\nThank you! 🤍",
 
@@ -558,7 +558,7 @@ export const ADMIN_COPY = {
   //         and the link must stay visible so the preview card renders.
   //         No date line: the invitation and the poster both carry it, so
   //         repeating it in the message is noise. {deadlineShort} renders
-  //         "1st Sept" — see lib/rsvpDeadline.
+  //         the short "14th Sept" form — see lib/rsvpDeadline.
   linkMessageTemplate:
     "Hi {name}! We're getting married, and we'd love you there 🎉\n\nHere's your personal invitation — do RSVP with your meal choices by {deadlineShort}:\n{link}",
 };
