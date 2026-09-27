@@ -562,3 +562,40 @@ export const ADMIN_COPY = {
   linkMessageTemplate:
     "Hi {name}! We're getting married, and we'd love you there 🎉\n\nHere's your personal invitation — do RSVP with your meal choices by {deadlineShort}:\n{link}",
 };
+
+// ─── Seating overview (/seating, shown on the projector) ─────────────────────
+
+export const SEATING_OVERVIEW = {
+  // [input] Small caps line above the title.
+  eyebrow: "Lunch seating",
+
+  // [input] Page title.
+  title: "Find Your Seat",
+
+  // [input] One line under the title.
+  note: "Your name card is waiting on your seat",
+
+  // [input] Group names on the floor plan.
+  groups: {
+    A: "Yeo Family",
+    B: "DK's Family",
+    C: "Floorball Friends",
+    D: "KC Girlz",
+    E: "NAS",
+    F: "DK's Friends",
+    G: "Wong Family",
+  },
+
+  // [input] Printed before each table number, so "T" shows T1, T2, T3.
+  tablePrefix: "T",
+
+  // [input] Name cards beside the parents' seats.
+  tags: {
+    brideParents: "Tommy & Nancy",
+    groomParents: "Serene & Koh",
+  },
+
+  // [input] Orientation labels at either end of the room.
+  poolLabel: "Pool",
+  screenLabel: "Screen",
+};

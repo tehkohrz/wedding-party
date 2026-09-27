@@ -97,6 +97,9 @@
   /* The after-party card's face — gives components a `font-party` utility
      so the second invitation never hard-codes a font-family inline. */
   --font-party: var(--font-fraunces-party);
+  /* Labels on the /seating projector. That page loads the face itself,
+     so no other route downloads it. */
+  --font-signage: var(--font-fredoka);
 
   /* Shape — our project tokens */
   --radius-card: var(--radius-card);
@@ -130,6 +133,21 @@ body {
      saturation, darker. Used for the hero "&" and the RSVP button so both
      visibly belong to the striped ground. */
   --invite-blue: 211 50% 50%;
+
+  /* Seating overview (/seating). One colour per group, dark enough for
+     white label text and distinct on a washed-out projector. */
+  --seat-a: 22 62% 48%; /* terracotta */
+  --seat-b: 38 82% 44%; /* mustard */
+  --seat-c: 356 62% 46%; /* red */
+  --seat-d: 268 30% 50%; /* plum */
+  --seat-e: 211 50% 46%; /* invite blue */
+  --seat-f: 96 36% 38%; /* olive green */
+  --seat-g: 302 50% 36%; /* berry */
+  --seat-couple: var(--invite-pink);
+  --seat-table: 40 35% 88%; /* table top */
+  --seat-pool: 190 55% 82%;
+  --seat-pool-wave: 190 50% 62%;
+  --seat-screen: 215 22% 26%;
 
   /* The after-party is a SECOND invitation. It's a 3.30pm beach club, so
      it borrows the party pigeon's palette rather than an evening one:
