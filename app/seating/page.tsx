@@ -2,17 +2,8 @@
 // solemnization. It makes no database calls, so it still loads if Supabase
 // is down on the day.
 
-import { Fredoka } from "next/font/google";
 import { SeatingOverview } from "@/components/SeatingOverview";
 import { SEATING_OVERVIEW } from "@/lib/content";
-
-// Rounded, friendly face for the floor plan labels. It loads here rather
-// than in the root layout, so only this page downloads it.
-const signage = Fredoka({
-  variable: "--font-fredoka",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 // Party pigeons flank the title and lean outward. Each head is cut flat at
 // the neck, so its bottom fades out instead of ending in a hard edge.
@@ -24,7 +15,7 @@ const NECK_FADE = "linear-gradient(to bottom, black 60%, transparent 95%)";
 
 export default function SeatingOverviewPage() {
   return (
-    <main className={`${signage.variable} invite-stripes h-dvh w-screen overflow-hidden p-5`}>
+    <main className="invite-stripes h-dvh w-screen overflow-hidden p-5">
       <div className="invite-card flex h-full flex-col p-2">
         <div className="invite-card-inner flex min-h-0 flex-1 flex-col items-center px-10 pb-6 pt-8">
           {/* Type matches the invitation hero, with a pink script title

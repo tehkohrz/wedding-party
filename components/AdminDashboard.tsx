@@ -17,6 +17,7 @@ import { useDbGuests } from "@/hooks/useDbGuests";
 import { useAttendance } from "@/hooks/useAttendance";
 import { markArrived, unmark } from "@/lib/attendance";
 import { ADMIN_COPY } from "@/lib/content";
+import { seatOf, tableName } from "@/lib/floorPlan";
 import { AdminDataControls } from "@/components/AdminDataControls";
 
 type Filter = "all" | "arrived" | "pending";
@@ -146,6 +147,7 @@ export function AdminDashboard() {
           {visible.map((g) => {
             const arrivedAt = arrivedMap.get(g.id);
             const isArrived = arrivedAt !== undefined;
+            const seat = seatOf(g);
             return (
               <div
                 key={g.id}
@@ -162,8 +164,8 @@ export function AdminDashboard() {
                     {g.name}
                   </span>
                   <span className="font-sans text-xs text-muted-foreground shrink-0">
-                    {g.side} · R{g.row}
-                    {g.section ?? ""} S{g.seat}
+                    {g.side}
+                    {seat && ` · ${tableName(seat.table)}`}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">

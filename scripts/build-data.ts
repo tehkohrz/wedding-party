@@ -4,18 +4,14 @@
  * Run via: pnpm build:data
  * Auto-run: predev / prebuild hooks in package.json.
  *
- * Fails loudly on any CSV/Zod/cross-reference error so you find data
+ * Fails loudly on any CSV or Zod error so you find data
  * problems at build time, not on the iPad at the reception desk.
  */
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 import Papa from "papaparse";
 import { z } from "zod";
-import {
-  GuestSchema,
-  LayoutSectionSchema,
-  type LayoutSection,
-} from "../lib/schema";
+import { GuestSchema } from "../lib/schema";
 import { deriveSeatingGroups } from "./derive-groups";
 
 const ROOT = process.cwd();
@@ -55,7 +51,6 @@ function parseCsv<T>(filename: string, schema: z.ZodType<T>): T[] {
 console.log("Building data...");
 
 const guests = parseCsv("guests.csv", GuestSchema);
-const layout = parseCsv("layout.csv", LayoutSectionSchema);
 
 // The check-in app cares about SEATING groups (who sits/arrives together) —
 // derived from the guest list's seating_group_id column. Labels are
@@ -63,50 +58,14 @@ const layout = parseCsv("layout.csv", LayoutSectionSchema);
 const groups = deriveSeatingGroups(guests);
 
 // ---------------------------------------------------------------------------
-// 2) Cross-reference validation — catches data integrity issues that no
-//    single-row schema can catch.
-// ---------------------------------------------------------------------------
-
-// Every guest's seat must fall within a layout section's range.
-function findSection(
-  row: number,
-  section: string | null,
-  seat: number
-): LayoutSection | undefined {
-  return layout.find(
-    (l) =>
-      l.row === row &&
-      l.section === section &&
-      seat >= l.start_seat &&
-      seat <= l.end_seat
-  );
-}
-
-for (const g of guests) {
-  // Seats are nullable during RSVP season (assigned after the deadline) —
-  // only validate guests who actually have a seat assigned.
-  if (g.row === null || g.seat === null) continue;
-  if (!findSection(g.row, g.section, g.seat)) {
-    fail(
-      `Guest ${g.id} (${g.name}): seat row=${g.row} section=${g.section ?? "(none)"} seat=${g.seat} doesn't fall within any layout section`
-    );
-  }
-}
-
-function fail(msg: string): never {
-  console.error(`✗ ${msg}`);
-  process.exit(1);
-}
-
-// ---------------------------------------------------------------------------
-// 3) Write the typed JSON artifact.
+// 2) Write the typed JSON artifact.
 // ---------------------------------------------------------------------------
 mkdirSync(LIB_DIR, { recursive: true });
 writeFileSync(
   resolve(LIB_DIR, "data.json"),
-  JSON.stringify({ guests, groups, layout }, null, 2) + "\n"
+  JSON.stringify({ guests, groups }, null, 2) + "\n"
 );
 
 console.log(
-  `✓ Wrote lib/data.json — ${guests.length} guests, ${groups.length} groups, ${layout.length} layout sections.`
+  `✓ Wrote lib/data.json — ${guests.length} guests, ${groups.length} groups.`
 );

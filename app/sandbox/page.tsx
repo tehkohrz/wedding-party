@@ -14,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { guests, groups, layout } from "@/lib/data";
+import { guests, groups } from "@/lib/data";
 import { AttendanceDemo } from "./attendance-demo";
 
 export default function SandboxPage() {
@@ -221,21 +221,6 @@ export default function SandboxPage() {
                 {groups.map((g) => (
                   <div key={g.id}>{g.label}</div>
                 ))}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="font-display text-2xl">
-                  {layout.length} sections
-                </CardTitle>
-                <CardDescription>lunch seating sections</CardDescription>
-              </CardHeader>
-              <CardContent className="font-sans text-sm space-y-1">
-                {layout.slice(0, 3).map((l) => (
-                  <div key={`${l.row}-${l.section}`}>{l.label}</div>
-                ))}
-                <div className="text-muted-foreground">…</div>
               </CardContent>
             </Card>
           </div>

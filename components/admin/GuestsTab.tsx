@@ -494,8 +494,10 @@ export function GuestsTab() {
               <th className={TH}>Baby</th>
               <th className={TH}>Dietary</th>
               <th className={TH}>Aliases</th>
-              <th className={TH}>Row</th>
-              <th className={TH}>Sec</th>
+              {/* Stored as row_num / section / seat. The lunch plan reads them
+                  as table, side (top or bottom) and position from the pool. */}
+              <th className={TH}>Table</th>
+              <th className={TH}>Side</th>
               <th className={TH}>Seat</th>
               <th className={TH}>Responded</th>
               <th className={cn(TH, "sticky right-0 z-40 bg-background")} />

@@ -443,7 +443,7 @@ export const LUNCH_COPY = {
 
   // [input] Friendly note under the name boxes, shown for grouped guests.
   //         Hint that any group member can take any of their party's seats.
-  groupSeatingNote: "Feel free to sit how you like among your group.",
+  groupSeatingNote: "Your name cards are waiting on your seats.",
 
   // [input] Label on the final button that returns to the welcome screen.
   doneLabel: "Done",
@@ -586,16 +586,27 @@ export const SEATING_OVERVIEW = {
     G: "Wong Family",
   },
 
-  // [input] Printed before each table number, so "T" shows T1, T2, T3.
-  tablePrefix: "T",
-
   // [input] Name cards beside the parents' seats.
   tags: {
     brideParents: "Tommy & Nancy",
     groomParents: "Serene & Koh",
   },
 
-  // [input] Orientation labels at either end of the room.
+};
+
+// ─── Floor plan (shared by /seating, /checkin/lunch and /find) ──────────────
+
+export const FLOOR_PLAN_COPY = {
+  // [input] Printed before each table number, so "T" shows T1, T2, T3.
+  tablePrefix: "T",
+
+  // [input] Labels on the bars at either end of the room.
   poolLabel: "Pool",
   screenLabel: "Screen",
+
+  // [input] Seat popover on the check-in map, for a seat nobody holds.
+  freeSeat: "Free seat",
+
+  // [input] Seat popover line for a guest who has checked in.
+  arrived: "Arrived",
 };

@@ -1408,42 +1408,5 @@
       "id": "26",
       "label": "Wani & Greg"
     }
-  ],
-  "layout": [
-    {
-      "row": 1,
-      "section": "A",
-      "start_seat": 1,
-      "end_seat": 4,
-      "label": "Row 1 — Bride's Family"
-    },
-    {
-      "row": 1,
-      "section": "B",
-      "start_seat": 5,
-      "end_seat": 8,
-      "label": "Row 1 — Friends"
-    },
-    {
-      "row": 2,
-      "section": null,
-      "start_seat": 1,
-      "end_seat": 10,
-      "label": "Row 2"
-    },
-    {
-      "row": 3,
-      "section": "A",
-      "start_seat": 1,
-      "end_seat": 5,
-      "label": "Row 3 — Section A"
-    },
-    {
-      "row": 3,
-      "section": "B",
-      "start_seat": 6,
-      "end_seat": 12,
-      "label": "Row 3 — Section B"
-    }
   ]
 }

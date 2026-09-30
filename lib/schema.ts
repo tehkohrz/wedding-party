@@ -74,9 +74,9 @@ export const GuestSchema = z.object({
     .optional()
     .transform((s) => (s ?? "").trim().toLowerCase() === "true"),
   /**
-   * Seat address — one seating (the lunch). NULLABLE since v2: seats are
-   * assigned only after the RSVP deadline, so during RSVP season these
-   * cells are empty in the CSV / null in the database.
+   * Lunch seat. row is the table number, section the side ("top" or
+   * "bottom"), and seat the position from the pool end; lib/floorPlan.ts
+   * reads them with seatOf(). Null until seats are assigned.
    */
   row: z
     .string()
@@ -94,18 +94,9 @@ export const GroupSchema = z.object({
   label: z.string().min(1),
 });
 
-export const LayoutSectionSchema = z.object({
-  row: z.coerce.number().int().positive(),
-  section: nullableString,
-  start_seat: z.coerce.number().int().positive(),
-  end_seat: z.coerce.number().int().positive(),
-  label: z.string().min(1),
-});
-
 export type Side = z.infer<typeof SideSchema>;
 export type Guest = z.infer<typeof GuestSchema>;
 export type Group = z.infer<typeof GroupSchema>;
-export type LayoutSection = z.infer<typeof LayoutSectionSchema>;
 
 // ─── Attendance export / restore ─────────────────────────────────────────────
 // A backup file read from disk is untrusted input, so we validate it with

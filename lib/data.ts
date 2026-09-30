@@ -10,8 +10,7 @@
  * to get the proper types.
  */
 import raw from "./data.json";
-import type { Guest, Group, LayoutSection } from "./schema";
+import type { Guest, Group } from "./schema";
 
 export const guests: readonly Guest[] = raw.guests as Guest[];
 export const groups: readonly Group[] = raw.groups as Group[];
-export const layout: readonly LayoutSection[] = raw.layout as LayoutSection[];

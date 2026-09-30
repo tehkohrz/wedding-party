@@ -18,11 +18,8 @@
 import { useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ForwardLink } from "@/components/WizardShell";
-import {
-  SeatingMap,
-  type SeatHighlight,
-  type SeatRef,
-} from "@/components/SeatingMap";
+import { SeatingMap, type SeatHighlight } from "@/components/SeatingMap";
+import { seatOf, tableName, type SeatRef } from "@/lib/floorPlan";
 import { useRequireGuest } from "@/hooks/useRequireGuest";
 import { useDbGuests } from "@/hooks/useDbGuests";
 import { useWizardStore } from "@/lib/store";
@@ -70,32 +67,23 @@ export default function LunchPage() {
   //     "in your party" but distinct from unrelated seats AND from the
   //     people actively checking in.
   //
-  // Seats are nullable since v2 (assigned only after the RSVP deadline) —
-  // members without a seat simply can't be shown on the map. By event day
-  // every attending guest has one, so this filter is a no-op on the day.
-  const seated = assignments.filter(
-    (
-      a
-    ): a is typeof a & { guest: { row: number; seat: number } } =>
-      a.guest.row !== null && a.guest.seat !== null
-  );
+  // Members without a seat on the plan can't be shown on the map. Every
+  // attending guest has one, so this filter is a no-op on the day.
+  const seated = assignments.flatMap(({ guest: m, color }) => {
+    const seat = seatOf(m);
+    return seat ? [{ m, color, seat }] : [];
+  });
 
-  const highlights: SeatHighlight[] = seated.map(({ guest: m, color }) => ({
-    row: m.row,
-    section: m.section,
-    seat: m.seat,
+  const highlights: SeatHighlight[] = seated.map(({ m, color, seat }) => ({
+    seat,
     color,
     state: thisRound.has(m.id) ? ("arrived" as const) : ("pending" as const),
   }));
 
   // Only this-round members pulse.
   const pulseAt: SeatRef[] = seated
-    .filter(({ guest: m }) => thisRound.has(m.id))
-    .map(({ guest: m }) => ({
-      row: m.row,
-      section: m.section,
-      seat: m.seat,
-    }));
+    .filter(({ m }) => thisRound.has(m.id))
+    .map(({ seat }) => seat);
 
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col">
@@ -111,6 +99,7 @@ export default function LunchPage() {
         <div className="max-w-3xl mx-auto flex flex-wrap justify-center gap-2">
           {sortedAssignments.map(({ guest: m, color }, i) => {
             const isInRound = thisRound.has(m.id);
+            const seat = seatOf(m);
             return (
               <motion.div
                 key={m.id}
@@ -162,10 +151,11 @@ export default function LunchPage() {
                 >
                   {m.name}
                 </span>
-                <span className="font-sans text-xs text-muted-foreground leading-none">
-                  R{m.row}
-                  {m.section ? m.section : ""} · Seat {m.seat}
-                </span>
+                {seat && (
+                  <span className="font-sans text-xs text-muted-foreground leading-none">
+                    {tableName(seat.table)}
+                  </span>
+                )}
               </motion.div>
             );
           })}
@@ -180,11 +170,14 @@ export default function LunchPage() {
       </section>
 
       {/* The map — only this-round members' seats are highlighted and pulse */}
-      {/* overflow-auto (not hidden): on phones the map is wider than the
-          screen — guests pan to their section. On tablets it still fits
-          and centers. */}
-      <main className="flex-1 overflow-auto grid place-items-center px-6 py-2">
-        <SeatingMap highlights={highlights} pulseAt={pulseAt} />
+      {/* The plan keeps a minimum width, so on phones it scrolls sideways
+          instead of shrinking past legibility. On tablets it fits. */}
+      <main className="flex-1 min-h-0 overflow-auto px-6 py-2">
+        <SeatingMap
+          highlights={highlights}
+          pulseAt={pulseAt}
+          className="h-full w-full min-w-[720px]"
+        />
       </main>
 
       {/* Footer — done */}

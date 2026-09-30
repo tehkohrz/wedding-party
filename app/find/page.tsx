@@ -20,6 +20,7 @@ import { useGuestSearch } from "@/hooks/useGuestSearch";
 import { useDbGuests } from "@/hooks/useDbGuests";
 import { useAttendance } from "@/hooks/useAttendance";
 import { getMemberColorAssignments } from "@/lib/groups";
+import { seatOf, tableName } from "@/lib/floorPlan";
 import { LOOKUP_COPY } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import type { Guest } from "@/lib/schema";
@@ -47,21 +48,17 @@ export default function FindPage() {
 
   // Color assignments for the viewed guest's group (current viewer first,
   // companions after). Same logic as the lunch screen — one color per
-  // person, stable across screens. Members without an assigned seat (nullable
-  // since v2 — seats are assigned after the RSVP deadline) can't be shown on
-  // the map, so they're filtered from the highlights.
+  // person, stable across screens. Members without a seat on the plan
+  // can't be shown on the map, so they're left out of the highlights.
   const assignments = viewing
     ? getMemberColorAssignments(viewing, allGuests ?? [viewing])
     : [];
-  const highlights: SeatHighlight[] = assignments
-    .filter(({ guest: m }) => m.row !== null && m.seat !== null)
-    .map(({ guest: m, color }) => ({
-      row: m.row as number,
-      section: m.section,
-      seat: m.seat as number,
-      color,
-      state: arrivedIds.has(m.id) ? ("arrived" as const) : ("pending" as const),
-    }));
+  const highlights: SeatHighlight[] = assignments.flatMap(({ guest: m, color }) => {
+    const seat = seatOf(m);
+    return seat
+      ? [{ seat, color, state: arrivedIds.has(m.id) ? ("arrived" as const) : ("pending" as const) }]
+      : [];
+  });
 
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col">
@@ -124,6 +121,7 @@ export default function FindPage() {
           <div className="max-w-3xl mx-auto flex flex-wrap justify-center gap-2">
             {assignments.map(({ guest: m, color }) => {
               const isArrived = arrivedIds.has(m.id);
+              const seat = seatOf(m);
               return (
                 <div
                   key={m.id}
@@ -160,10 +158,11 @@ export default function FindPage() {
                   >
                     {m.name}
                   </span>
-                  <span className="font-sans text-xs text-muted-foreground leading-none">
-                    R{m.row}
-                    {m.section ? m.section : ""} · Seat {m.seat}
-                  </span>
+                  {seat && (
+                    <span className="font-sans text-xs text-muted-foreground leading-none">
+                      {tableName(seat.table)}
+                    </span>
+                  )}
                 </div>
               );
             })}
@@ -171,11 +170,10 @@ export default function FindPage() {
         </section>
       )}
 
-      {/* overflow-auto (not hidden): on phones the map is wider than the
-          screen — guests pan to their section. On tablets it still fits
-          and centers. */}
-      <main className="flex-1 overflow-auto grid place-items-center px-6 py-2">
-        <SeatingMap highlights={highlights} />
+      {/* The plan keeps a minimum width, so on phones it scrolls sideways
+          instead of shrinking past legibility. On tablets it fits. */}
+      <main className="flex-1 min-h-0 overflow-auto px-6 py-2">
+        <SeatingMap highlights={highlights} className="h-full w-full min-w-[720px]" />
       </main>
     </div>
   );

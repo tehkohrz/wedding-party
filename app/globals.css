@@ -97,8 +97,8 @@
   /* The after-party card's face — gives components a `font-party` utility
      so the second invitation never hard-codes a font-family inline. */
   --font-party: var(--font-fraunces-party);
-  /* Labels on the /seating projector. That page loads the face itself,
-     so no other route downloads it. */
+  /* Labels on the lunch floor plan. components/FloorPlan.tsx loads the
+     face, so pages without a plan never download it. */
   --font-signage: var(--font-fredoka);
 
   /* Shape — our project tokens */
