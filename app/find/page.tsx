@@ -56,7 +56,7 @@ export default function FindPage() {
   const highlights: SeatHighlight[] = assignments.flatMap(({ guest: m, color }) => {
     const seat = seatOf(m);
     return seat
-      ? [{ seat, color, state: arrivedIds.has(m.id) ? ("arrived" as const) : ("pending" as const) }]
+      ? [{ seat, name: m.name, color, state: arrivedIds.has(m.id) ? ("arrived" as const) : ("pending" as const) }]
       : [];
   });
 

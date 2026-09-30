@@ -5,15 +5,13 @@
 // "use client" + useRequireGuest: needs a selected guest. Reached either
 // from /group (grouped guests) or straight from / (solo guests).
 //
-// Display rules (round-scoped):
+// Display rules:
+//   - Colour means "has arrived", whether this round or an earlier one.
+//     Arrived members get a coloured name box and a solid coloured seat.
 //   - "This round" = the guests just checked in via this wizard flow
-//     (tracked in lib/store as `checkedInThisRound`).
-//   - Members in this round: fully-colored name box + solid colored seat
-//     on the map + brief pulse animation.
-//   - Members in the same group but NOT in this round (toggled off, or
-//     checked in during a previous round): greyed name box and NO map
-//     highlight — their seat blends with all the other unrelated seats.
-//   - Solo guests see one colored box and one pulsing highlight.
+//     (tracked in lib/store as `checkedInThisRound`). Only their seats pulse.
+//   - Members not here yet (toggled off) get the standby taupe box and seat.
+//   - Every member's name sits beside their seat on the map.
 
 import { useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
@@ -22,6 +20,7 @@ import { SeatingMap, type SeatHighlight } from "@/components/SeatingMap";
 import { seatOf, tableName, type SeatRef } from "@/lib/floorPlan";
 import { useRequireGuest } from "@/hooks/useRequireGuest";
 import { useDbGuests } from "@/hooks/useDbGuests";
+import { useAttendance } from "@/hooks/useAttendance";
 import { useWizardStore } from "@/lib/store";
 import { getMemberColorAssignments } from "@/lib/groups";
 import { celebrate } from "@/lib/confetti";
@@ -32,6 +31,7 @@ export default function LunchPage() {
   const guest = useRequireGuest();
   const allGuests = useDbGuests();
   const checkedInThisRound = useWizardStore((s) => s.checkedInThisRound);
+  const arrived = useAttendance();
   const reduceMotion = useReducedMotion();
 
   // Confetti fires once on arrival, and ONLY when someone actually checked
@@ -46,6 +46,9 @@ export default function LunchPage() {
   if (!guest) return null;
 
   const thisRound = new Set(checkedInThisRound);
+  const arrivedIds = new Set((arrived ?? []).map((r) => r.guest_id));
+  // This round counts before the attendance poll catches up with it.
+  const hasArrived = (id: number) => thisRound.has(id) || arrivedIds.has(id);
 
   // Stable color per member (current guest first, companions in CSV order).
   const assignments = getMemberColorAssignments(guest, allGuests ?? [guest]);
@@ -59,14 +62,6 @@ export default function LunchPage() {
     return aIn - bIn;
   });
 
-  // EVERY group member's seat is highlighted on the map, but with two
-  // different visual treatments:
-  //   - This round → "arrived" state → solid bouquet color + pulse
-  //   - Not this round (toggled off / previous round) → "pending" state →
-  //     neutral grey treatment with a visible border, so the seat reads as
-  //     "in your party" but distinct from unrelated seats AND from the
-  //     people actively checking in.
-  //
   // Members without a seat on the plan can't be shown on the map. Every
   // attending guest has one, so this filter is a no-op on the day.
   const seated = assignments.flatMap(({ guest: m, color }) => {
@@ -76,8 +71,9 @@ export default function LunchPage() {
 
   const highlights: SeatHighlight[] = seated.map(({ m, color, seat }) => ({
     seat,
+    name: m.name,
     color,
-    state: thisRound.has(m.id) ? ("arrived" as const) : ("pending" as const),
+    state: hasArrived(m.id) ? ("arrived" as const) : ("pending" as const),
   }));
 
   // Only this-round members pulse.
@@ -94,11 +90,11 @@ export default function LunchPage() {
         </h1>
       </header>
 
-      {/* Name boxes — this-round first; in-round colored, others greyed */}
+      {/* Name boxes — this round first; arrived colored, others on standby */}
       <section className="shrink-0 px-6 pb-3">
         <div className="max-w-3xl mx-auto flex flex-wrap justify-center gap-2">
           {sortedAssignments.map(({ guest: m, color }, i) => {
-            const isInRound = thisRound.has(m.id);
+            const isHere = hasArrived(m.id);
             const seat = seatOf(m);
             return (
               <motion.div
@@ -117,13 +113,13 @@ export default function LunchPage() {
                 }
                 className={cn(
                   "rounded-card border px-4 py-2 flex items-center gap-3 transition-colors",
-                  // Not in this round: standby (taupe) treatment — matches
-                  // the seat's pending-state color so the name box and the
-                  // map seat read as the same "in-group, on standby" pair.
-                  !isInRound && "bg-standby/25 border-standby"
+                  // Not here yet: standby (taupe) treatment — matches the
+                  // seat's pending-state color so the name box and the map
+                  // seat read as the same "in-group, on standby" pair.
+                  !isHere && "bg-standby/25 border-standby"
                 )}
                 style={
-                  isInRound
+                  isHere
                     ? {
                         backgroundColor: `hsl(var(--${color}) / 0.12)`,
                         borderColor: `hsl(var(--${color}))`,
@@ -135,10 +131,10 @@ export default function LunchPage() {
                   aria-hidden
                   className={cn(
                     "size-3 rounded-full shrink-0",
-                    !isInRound && "bg-standby"
+                    !isHere && "bg-standby"
                   )}
                   style={
-                    isInRound
+                    isHere
                       ? { backgroundColor: `hsl(var(--${color}))` }
                       : undefined
                   }
@@ -146,7 +142,7 @@ export default function LunchPage() {
                 <span
                   className={cn(
                     "font-display text-base leading-none",
-                    !isInRound && "text-foreground/70"
+                    !isHere && "text-foreground/70"
                   )}
                 >
                   {m.name}

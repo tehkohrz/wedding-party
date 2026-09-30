@@ -3,8 +3,8 @@
 /**
  * SeatingMap — the lunch floor plan for check-in (/checkin/lunch) and the
  * lookup page (/find). The viewer's party lights up in each member's
- * colour, and every other seat stays plain. Tap a seat to see whose it is
- * and whether they've arrived.
+ * colour with their name beside the seat, and every other seat stays
+ * plain. Tap a seat to see whose it is and whether they've arrived.
  */
 import { useMemo, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { FloorPlan, SEAT_R, seatCentre } from "@/components/FloorPlan";
+import { FloorPlan, SEAT_R, padToFit, seatCentre } from "@/components/FloorPlan";
 import { useDbGuests } from "@/hooks/useDbGuests";
 import { useAttendance } from "@/hooks/useAttendance";
 import { FLOOR_PLAN_COPY } from "@/lib/content";
@@ -29,14 +29,70 @@ import type { Guest } from "@/lib/schema";
 
 export interface SeatHighlight {
   seat: SeatRef;
+  /** Printed beside the seat. */
+  name: string;
   /** Bouquet colour token, such as "rose". */
   color: string;
-  /** arrived = solid colour; pending = in the party but not checked in. */
+  /** arrived = solid colour; pending = in the party but not arrived yet. */
   state: "arrived" | "pending";
 }
 
 const PULSE_R = SEAT_R * 1.18;
 const PULSE = [SEAT_R, ...Array.from({ length: 5 }, () => [PULSE_R, SEAT_R]).flat()];
+
+// Names use the display serif, like the name boxes above the map.
+const NAME_SIZE = 28;
+const LANE_H = 32; // one line of names
+const NAME_GAP = 8; // seat edge to the first lane
+const CHAR_W = 0.5; // glyph width as a share of NAME_SIZE (measured 0.45 average, 0.54 widest)
+
+interface NameLabel {
+  key: string;
+  name: string;
+  /** Lead line colour, matching the seat's look. */
+  tone: string;
+  x: number;
+  y: number;
+  /** Where a lead line back to the seat starts. */
+  seatEdge: number;
+  lane: number;
+}
+
+/**
+ * Places each name on the aisle side of its row. A name that would overlap
+ * its neighbour moves out to the next free lane.
+ */
+function layoutNames(highlights: SeatHighlight[]): NameLabel[] {
+  const rows = new Map<string, SeatHighlight[]>();
+  for (const h of highlights) {
+    const key = `${h.seat.table}|${h.seat.side}`;
+    rows.set(key, [...(rows.get(key) ?? []), h]);
+  }
+
+  return [...rows.values()].flatMap((row) => {
+    const laneEnds: number[] = []; // right edge of the last name in each lane
+    return row
+      .map((h) => ({ h, ...seatCentre(h.seat) }))
+      .sort((a, b) => a.x - b.x)
+      .map(({ h, x, y }) => {
+        const half = (h.name.length * NAME_SIZE * CHAR_W) / 2 + 6;
+        const free = laneEnds.findIndex((end) => end <= x - half);
+        const lane = free === -1 ? laneEnds.length : free;
+        laneEnds[lane] = x + half;
+        const out = h.seat.side === "top" ? -1 : 1;
+        const seatEdge = y + out * SEAT_R;
+        return {
+          key: seatKey(h.seat),
+          name: h.name,
+          tone: h.state === "arrived" ? `hsl(var(--${h.color}))` : "hsl(var(--standby))",
+          x,
+          y: seatEdge + out * (NAME_GAP + LANE_H / 2 + lane * LANE_H),
+          seatEdge,
+          lane,
+        };
+      });
+  });
+}
 
 export function SeatingMap({
   highlights = [],
@@ -65,8 +121,16 @@ export function SeatingMap({
   const arrived = useAttendance();
   const arrivedIds = new Set((arrived ?? []).map((r) => r.guest_id));
 
+  // The plan grows only as far as the names need, so it stays as large as
+  // possible on screen.
+  const names = layoutNames(highlights);
+  const pad = padToFit(
+    Math.min(...names.map((n) => n.y - LANE_H / 2)),
+    Math.max(...names.map((n) => n.y + LANE_H / 2)),
+  );
+
   return (
-    <FloorPlan pad={{ top: 16, bottom: 16 }} role="group" label="Lunch seating plan" className={className}>
+    <FloorPlan pad={pad} role="group" label="Lunch seating plan" className={className}>
       {PLAN_SEATS.map((seat) => {
         const key = seatKey(seat);
         const guest = guestBySeat.get(key);
@@ -81,6 +145,42 @@ export function SeatingMap({
           />
         );
       })}
+      {/* Lines first, so each name's halo sits over any line crossing it. */}
+      {names
+        .filter((n) => n.lane > 0)
+        .map((n) => (
+          <line
+            key={`${n.key}-line`}
+            x1={n.x}
+            y1={n.seatEdge}
+            x2={n.x}
+            y2={n.y + (n.y < n.seatEdge ? 1 : -1) * (LANE_H / 2 - 6)}
+            style={{ stroke: n.tone, strokeWidth: 2.5 }}
+            pointerEvents="none"
+          />
+        ))}
+      {names.map((n) => (
+        <text
+          key={n.key}
+          x={n.x}
+          y={n.y}
+          textAnchor="middle"
+          dominantBaseline="central"
+          className="font-display"
+          style={{
+            fontSize: NAME_SIZE,
+            fontWeight: 600,
+            fill: "hsl(var(--foreground))",
+            stroke: "hsl(var(--background))",
+            strokeWidth: 6,
+            strokeLinejoin: "round",
+            paintOrder: "stroke",
+          }}
+          pointerEvents="none"
+        >
+          {n.name}
+        </text>
+      ))}
     </FloorPlan>
   );
 }

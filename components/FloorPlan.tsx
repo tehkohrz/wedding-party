@@ -44,6 +44,14 @@ const TABLE_BY_NUMBER = new Map(FLOOR_TABLES.map((t) => [t.number, t]));
 const colX = (col: number) => GRID_LEFT + (col - 13) * PITCH + PITCH / 2;
 const colour = (token: string) => `hsl(var(--seat-${token}))`;
 
+/** Space around the room that keeps content spanning minY..maxY in view. */
+export function padToFit(minY: number, maxY: number, min = 16) {
+  return {
+    top: Math.max(min, ROOM_TOP - minY),
+    bottom: Math.max(min, maxY - (ROOM_TOP + ROOM_H)),
+  };
+}
+
 /** Centre of a seat in viewBox units. */
 export function seatCentre({ table, side, position }: SeatRef) {
   const t = TABLE_BY_NUMBER.get(table)!;
