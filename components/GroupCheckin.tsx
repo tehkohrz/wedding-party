@@ -12,7 +12,7 @@
  * Layout: fixed header + footer, scrollable member list in between — so a
  * large group never breaks the locked viewport.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, useReducedMotion } from "motion/react";
 import { Check } from "lucide-react";
@@ -68,18 +68,16 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
   const arrived = useAttendance();
   const arrivedIds = new Set((arrived ?? []).map((r) => r.guest_id));
 
-  // Which companions are toggled on. Default: all of them. The list
-  // arrives async from the DB, so re-default when it lands (fires before
-  // any realistic user interaction; useDbGuests fetches once per mount).
-  const [selected, setSelected] = useState<Set<number>>(
-    () => new Set(others.map((m) => m.id))
+  // Everyone starts toggled on, so only the companions switched OFF are
+  // stored. The default then holds even when the list lands after mount.
+  const [deselected, setDeselected] = useState<Set<number>>(() => new Set());
+  const selected = useMemo(
+    () => new Set(others.filter((m) => !deselected.has(m.id)).map((m) => m.id)),
+    [others, deselected]
   );
-  const othersKey = others.map((m) => m.id).join(",");
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => setSelected(new Set(others.map((m) => m.id))), [othersKey]);
 
   function toggle(id: number) {
-    setSelected((prev) => {
+    setDeselected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);

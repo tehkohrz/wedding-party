@@ -436,10 +436,10 @@ export const WELCOME_COPY = {
 
 export const LUNCH_COPY = {
   // [input] Heading on the lunch screen when only the guest is checking in.
-  headingSolo: "Your lunch seat",
+  headingSolo: "Here is your seat!",
 
   // [input] Heading on the lunch screen when checking in with companions.
-  headingGroup: "Your lunch seats",
+  headingGroup: "Here are your seats!",
 
   // [input] Friendly note under the name boxes, shown for grouped guests.
   //         Hint that any group member can take any of their party's seats.

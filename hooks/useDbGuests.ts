@@ -10,12 +10,15 @@
  * day-of app never needs them. Not-yet-responded guests stay in — someone
  * who never RSVP'd but shows up anyway can still check in.
  *
+ * One list is shared by every screen (see useLiveResource), so moving
+ * through the wizard never waits on a refetch. It refreshes in the
+ * background every minute, which is how admin edits reach the kiosks.
+ *
  * Returns undefined until loaded. Rows are mapped to the v1 `Guest` shape
  * (lib/schema) so every existing helper keeps working.
  */
-import { useCallback, useState } from "react";
 import type { Guest } from "@/lib/schema";
-import { useBackoffPoll } from "./useBackoffPoll";
+import { liveResource, useLiveResource } from "./useLiveResource";
 
 interface ApiGuestRow {
   id: number;
@@ -53,21 +56,16 @@ function toGuest(r: ApiGuestRow): Guest {
   };
 }
 
-export function useDbGuests(): readonly Guest[] | undefined {
-  const [guests, setGuests] = useState<Guest[] | undefined>();
-
-  const load = useCallback(async (signal: AbortSignal) => {
+const guests = liveResource(
+  async (signal) => {
     const res = await fetch("/api/guests", { signal });
     if (!res.ok) throw new Error("guest list fetch failed");
     const json = (await res.json()) as { guests: ApiGuestRow[] };
-    setGuests(json.guests.filter((g) => g.attending !== false).map(toGuest));
-  }, []);
+    return json.guests.filter((g) => g.attending !== false).map(toGuest);
+  },
+  { intervalMs: 60_000 },
+);
 
-  // No intervalMs: load once, then stop. On failure the scheduler retries
-  // with exponential backoff instead of the old flat 5s forever — a
-  // check-in iPad with no guest list is useless, but hammering a dead API
-  // every 5 seconds for hours is what got the database flagged.
-  useBackoffPoll(load, {});
-
-  return guests;
+export function useDbGuests(): readonly Guest[] | undefined {
+  return useLiveResource(guests);
 }
