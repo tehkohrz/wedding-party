@@ -137,7 +137,7 @@ export const RSVP_COPY = {
 
   // [input] Photo slideshow images, in order. Drop files into public/photos/
   //         and list them here. Empty list = soft gradient placeholder.
-  photos: ["/photos/one.jpg", "/photos/two.jpg", "/photos/three.jpg", "/photos/four.jpg", "/photos/five.jpg"] as string[],
+  photos: ["/photos/six.jpg", "/photos/one.jpg", "/photos/two.jpg", "/photos/three.jpg", "/photos/four.jpg", "/photos/five.jpg"] as string[],
 
   // [input] Seconds each slideshow photo is shown before crossfading.
   slideshowIntervalSeconds: 6,
@@ -600,8 +600,9 @@ export const FLOOR_PLAN_COPY = {
   // [input] Printed before each table number, so "T" shows T1, T2, T3.
   tablePrefix: "T",
 
-  // [input] Labels on the bars at either end of the room.
+  // [input] Labels on the pool, stage and screen.
   poolLabel: "Pool",
+  stageLabel: "Stage",
   screenLabel: "Screen",
 
   // [input] Seat popover on the check-in map, for a seat nobody holds.

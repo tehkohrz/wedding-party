@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { FloorPlan, SEAT_R, padToFit, seatCentre } from "@/components/FloorPlan";
+import { FLOOR_X, FloorPlan, SEAT_R, padToFit, seatCentre } from "@/components/FloorPlan";
 import { useDbGuests } from "@/hooks/useDbGuests";
 import { useAttendance } from "@/hooks/useAttendance";
 import { FLOOR_PLAN_COPY } from "@/lib/content";
@@ -53,6 +53,10 @@ interface NameLabel {
   tone: string;
   x: number;
   y: number;
+  /** Half the name's estimated width, padding included. */
+  half: number;
+  /** The seat's x, where its lead line runs. */
+  lineX: number;
   /** Where a lead line back to the seat starts. */
   seatEdge: number;
   lane: number;
@@ -74,8 +78,11 @@ function layoutNames(highlights: SeatHighlight[]): NameLabel[] {
     return row
       .map((h) => ({ h, ...seatCentre(h.seat) }))
       .sort((a, b) => a.x - b.x)
-      .map(({ h, x, y }) => {
+      .map(({ h, x: seatX, y }) => {
         const half = (h.name.length * NAME_SIZE * CHAR_W) / 2 + 6;
+        // A name by a seat at either end shifts inward, clear of the stage
+        // and the screen.
+        const x = Math.min(Math.max(seatX, FLOOR_X.left + half), FLOOR_X.right - half);
         const free = laneEnds.findIndex((end) => end <= x - half);
         const lane = free === -1 ? laneEnds.length : free;
         laneEnds[lane] = x + half;
@@ -87,6 +94,8 @@ function layoutNames(highlights: SeatHighlight[]): NameLabel[] {
           tone: h.state === "arrived" ? `hsl(var(--${h.color}))` : "hsl(var(--standby))",
           x,
           y: seatEdge + out * (NAME_GAP + LANE_H / 2 + lane * LANE_H),
+          half,
+          lineX: seatX,
           seatEdge,
           lane,
         };
@@ -145,41 +154,41 @@ export function SeatingMap({
           />
         );
       })}
-      {/* Lines first, so each name's halo sits over any line crossing it. */}
+      {/* Lines first, so each name's backing hides any line that crosses it. */}
       {names
         .filter((n) => n.lane > 0)
         .map((n) => (
           <line
             key={`${n.key}-line`}
-            x1={n.x}
+            x1={n.lineX}
             y1={n.seatEdge}
-            x2={n.x}
+            x2={n.lineX}
             y2={n.y + (n.y < n.seatEdge ? 1 : -1) * (LANE_H / 2 - 6)}
             style={{ stroke: n.tone, strokeWidth: 2.5 }}
             pointerEvents="none"
           />
         ))}
       {names.map((n) => (
-        <text
-          key={n.key}
-          x={n.x}
-          y={n.y}
-          textAnchor="middle"
-          dominantBaseline="central"
-          className="font-display"
-          style={{
-            fontSize: NAME_SIZE,
-            fontWeight: 600,
-            fill: "hsl(var(--foreground))",
-            stroke: "hsl(var(--background))",
-            strokeWidth: 6,
-            strokeLinejoin: "round",
-            paintOrder: "stroke",
-          }}
-          pointerEvents="none"
-        >
-          {n.name}
-        </text>
+        <g key={n.key} pointerEvents="none">
+          <rect
+            x={n.x - n.half}
+            y={n.y - LANE_H / 2 + 3}
+            width={2 * n.half}
+            height={LANE_H - 6}
+            rx={6}
+            style={{ fill: "hsl(var(--background))" }}
+          />
+          <text
+            x={n.x}
+            y={n.y}
+            textAnchor="middle"
+            dominantBaseline="central"
+            className="font-display"
+            style={{ fontSize: NAME_SIZE, fontWeight: 600, fill: "hsl(var(--foreground))" }}
+          >
+            {n.name}
+          </text>
+        </g>
       ))}
     </FloorPlan>
   );

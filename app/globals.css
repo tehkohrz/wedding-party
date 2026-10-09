@@ -148,6 +148,7 @@ body {
   --seat-pool: 190 55% 82%;
   --seat-pool-wave: 190 50% 62%;
   --seat-screen: 215 22% 26%;
+  --seat-stage: var(--invite-olive-text);
 
   /* The after-party is a SECOND invitation. It's a 3.30pm beach club, so
      it borrows the party pigeon's palette rather than an evening one:

@@ -26,23 +26,30 @@ const signage = Fredoka({
 
 const VIEW_W = 1600;
 const PITCH = 54; // width of one seat
-const GRID_LEFT = 152; // x of workbook column N (13), centring columns 13–36
 export const SEAT_R = 19;
 const SEAT_GAP = 47; // table centre line to each seat row
 const TABLE_H = 44;
 // Centre line of each row of tables. The aisle between them is wide enough
 // for T1's lower labels to read as T1's.
 const BAND_Y = [250, 512];
-// The pool and screen are thin bars at either edge, spanning the tables.
+// The pool and stage run side by side down the left edge and the screen
+// down the right, each a thin bar spanning the tables.
 const SIDE_W = 72;
-const SIDE_INSET = 32; // viewBox edge to each bar
+const SIDE_INSET = 20; // viewBox edge to the pool, and to the screen
+const STAGE_GAP = 6; // pool to stage
+const STAGE_X = SIDE_INSET + SIDE_W + STAGE_GAP;
+const SCREEN_X = VIEW_W - SIDE_INSET - SIDE_W;
 const ROOM_TOP = 172;
 const ROOM_H = 418;
+const GRID_LEFT = STAGE_X + SIDE_W + 12; // x of workbook column N (13); its seats clear the stage by 20
 const WAVE_OFFSETS = [-150, -90, 90, 150]; // from the pool's centre, clear of its label
 
 const TABLE_BY_NUMBER = new Map(FLOOR_TABLES.map((t) => [t.number, t]));
 const colX = (col: number) => GRID_LEFT + (col - 13) * PITCH + PITCH / 2;
 const colour = (token: string) => `hsl(var(--seat-${token}))`;
+
+/** Edges of the floor between the stage and the screen. */
+export const FLOOR_X = { left: STAGE_X + SIDE_W, right: SCREEN_X };
 
 /** Space around the room that keeps content spanning minY..maxY in view. */
 export function padToFit(minY: number, maxY: number, min = 16) {
@@ -84,7 +91,7 @@ export function FloorPlan({
       aria-label={label}
       className={`${signage.variable} ${className ?? ""}`}
     >
-      <SideBar
+      <LabelledBar
         x={SIDE_INSET}
         rx={24}
         fill={colour("pool")}
@@ -92,9 +99,16 @@ export function FloorPlan({
         labelFill="hsl(var(--foreground))"
       >
         <PoolWaves x={SIDE_INSET} />
-      </SideBar>
-      <SideBar
-        x={VIEW_W - SIDE_INSET - SIDE_W}
+      </LabelledBar>
+      <LabelledBar
+        x={STAGE_X}
+        rx={14}
+        fill={colour("stage")}
+        label={FLOOR_PLAN_COPY.stageLabel}
+        labelFill="white"
+      />
+      <LabelledBar
+        x={SCREEN_X}
         rx={14}
         fill={colour("screen")}
         label={FLOOR_PLAN_COPY.screenLabel}
@@ -147,8 +161,8 @@ function Table({ table }: { table: FloorTable }) {
   );
 }
 
-/** A thin bar at one edge of the room, labelled along its length. */
-function SideBar({
+/** A thin bar labelled along its length, for the pool, stage and screen. */
+function LabelledBar({
   x,
   rx,
   fill,

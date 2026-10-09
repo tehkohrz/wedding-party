@@ -28,7 +28,7 @@ export function SeatingOverview({ className }: { className?: string }) {
   return (
     <FloorPlan
       pad={{ top: 80, bottom: 86 }}
-      label="Seating plan. The pool is on the left and the screen is on the right."
+      label="Seating plan. The pool and the stage are on the left, and the screen is on the right."
       className={className}
     >
       {PLAN_SEATS.map((seat) => {

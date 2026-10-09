@@ -12,7 +12,7 @@
  * source-of-truth photos live in your photo library; these are web copies.
  */
 import sharp from "sharp";
-import { readdirSync, statSync, renameSync } from "node:fs";
+import { readdirSync, statSync, renameSync, unlinkSync } from "node:fs";
 import { resolve, extname } from "node:path";
 
 const DIR = resolve(process.cwd(), "public/photos");
@@ -43,9 +43,17 @@ for (const file of files) {
     .resize(LONG_EDGE, LONG_EDGE, { fit: "inside", withoutEnlargement: true })
     .jpeg({ quality: 80, progressive: true, mozjpeg: true })
     .toFile(tmp);
-  renameSync(tmp, path);
 
-  const after = statSync(path).size;
+  // Re-encoding a photo this script already optimised barely shrinks it and
+  // costs a little quality each time, so keep the original unless the saving
+  // is real. That makes re-running the script safe.
+  const after = statSync(tmp).size;
+  if (after > before * 0.9) {
+    unlinkSync(tmp);
+    console.log(`· ${file} — ${kb(before)}, already optimised, kept`);
+    continue;
+  }
+  renameSync(tmp, path);
   console.log(`✓ ${file} — ${kb(before)} → ${kb(after)}`);
 }
 

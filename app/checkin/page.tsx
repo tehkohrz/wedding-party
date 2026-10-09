@@ -3,13 +3,15 @@
 //
 // Layout strategy:
 //   - h-dvh + overflow-hidden = locked to viewport, no scrolling
-//   - landscape: split (photo left, form right)
+//   - landscape: split (photo left, form right). The photo side is the
+//     RSVP pages' slideshow, so both share one photo list.
 //   - portrait: stacked (photo top, form bottom)
 //   - One component, Tailwind `landscape:` modifier handles the swap
 
 import Link from "next/link";
 import { COUPLE, WELCOME_COPY, LOOKUP_COPY, ADMIN_COPY } from "@/lib/content";
 import { NameSearch } from "@/components/NameSearch";
+import { PhotoSlideshow } from "@/components/PhotoSlideshow";
 import { WelcomeEquation } from "@/components/WelcomeEquation";
 import { ForwardLink } from "@/components/WizardShell";
 import { Flower2 } from "lucide-react";
@@ -17,7 +19,7 @@ import { Flower2 } from "lucide-react";
 export default function WelcomePage() {
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col landscape:flex-row">
-      <PhotoSide />
+      <PhotoSlideshow />
       <FormSide />
 
       {/* Admin entry — bottom-right, bold primary. PIN-gated (/admin), so a
@@ -29,47 +31,6 @@ export default function WelcomePage() {
       >
         {ADMIN_COPY.entryLabel}
       </Link>
-    </div>
-  );
-}
-
-// ─── Photo side ──────────────────────────────────────────────────────────────
-// Placeholder shown until you drop a real photo into `public/`.
-// JPEG, PNG, or WebP all work. To swap in your photo:
-//   1. Drop the file at e.g. `public/couple.jpg`.
-//   2. Replace the inner content of <PhotoSide /> below with:
-//      <Image
-//        src="/couple.jpg"
-//        alt="The couple"
-//        fill
-//        priority
-//        className="object-cover"
-//      />
-//   3. Add `import Image from "next/image"` at the top of this file.
-
-function PhotoSide() {
-  return (
-    <div
-      className="
-        relative
-        h-[40%] landscape:h-full
-        landscape:w-[45%]
-        bg-gradient-to-br from-rose/30 via-peach/20 to-marigold/20
-        flex items-center justify-center
-        overflow-hidden
-      "
-    >
-      <div className="text-center p-8 space-y-2">
-        <p className="font-sans text-xs uppercase tracking-widest text-foreground/40">
-          photo placeholder
-        </p>
-        <p className="font-display text-2xl text-foreground/60">
-          {COUPLE.brideName} & {COUPLE.groomName}
-        </p>
-        <p className="font-sans text-xs text-foreground/40">
-          drop your photo at public/couple.webp
-        </p>
-      </div>
     </div>
   );
 }
