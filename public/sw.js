@@ -1,11 +1,10 @@
 /**
  * SitWhereAh service worker — makes the app work fully offline.
  *
- * Strategy: runtime caching. On first visit (online), every same-origin
- * file the app fetches is copied into a cache. On later visits — even with
- * no network — those cached copies are served. Because all guest data is
- * baked into the JS bundle and attendance lives in IndexedDB, caching the
- * app shell is enough to run the whole app offline.
+ * Strategy: runtime caching. Static files (JS, CSS, fonts, images) are
+ * cached as the app fetches them and served from the cache after that.
+ * Pages are network-first, with the cache as an offline fallback. Live
+ * data (/api) and Next.js screen-to-screen data always go to the network.
  *
  * DEV SAFETY: localhost is exempt from the HTTPS requirement, so this worker
  * can install during `pnpm dev`. Cache-first would then serve stale JS and
@@ -20,7 +19,7 @@
  * Bump CACHE_VERSION to force clients to re-fetch after a production deploy;
  * old caches are deleted on activate.
  */
-const CACHE_VERSION = "sitwhereah-v3";
+const CACHE_VERSION = "sitwhereah-v4";
 
 const DEV_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
 const IS_DEV = DEV_HOSTS.has(self.location.hostname);
@@ -78,6 +77,14 @@ self.addEventListener("fetch", (event) => {
   // them would freeze multi-device check-in. Straight to the network,
   // always.
   if (url.pathname.startsWith("/api/")) {
+    return;
+  }
+
+  // Next.js screen-to-screen data (React Server Component payloads) is tied
+  // to the build that served it. A cached copy from an older deploy makes
+  // Next reload the whole page, which wipes the check-in wizard's in-memory
+  // state and sends the guest back to the start. Always fetch it fresh.
+  if (req.headers.get("RSC") === "1" || url.searchParams.has("_rsc")) {
     return;
   }
 

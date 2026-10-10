@@ -10,16 +10,15 @@
  *      which would be wasteful to redo on every keystroke).
  *   2. Debounce — 150ms wait after typing stops before searching. Stops us
  *      from running Fuse on every single character.
- *   3. Multi-field search — Fuse looks at both `name` and `search_aliases`,
- *      ranking results by combined relevance.
+ *   3. Word-start matching — a search matches from the start of any word
+ *      in the name or an alias, never from the middle of one. "che" finds
+ *      Cheryl, not Michelle; "cy" finds CY, not Nancy.
  *
  * Returns:
  *   - matches: top 5 Guest objects, best first. Empty array if query is empty.
  *
- * Fuzziness knob: `threshold` below.
- *   0   = exact match only
- *   0.4 = our sweet spot for names — "Jhon" finds "John"
- *   1   = matches anything
+ * Fuzziness: `threshold` 0.2 allows one typo from five letters up
+ * ("gladis" finds Gladys) and none in shorter searches.
  */
 import Fuse from "fuse.js";
 import { useMemo } from "react";
@@ -29,6 +28,23 @@ import type { Guest } from "@/lib/schema";
 
 const MAX_RESULTS = 5;
 const DEBOUNCE_MS = 150;
+
+/**
+ * Every point a search can start from: the name and each alias from each
+ * word onwards, with and without spaces. "kian teck", "teck" and "kianteck"
+ * all reach Koh Kian Teck.
+ */
+function searchTerms(guest: Guest): string[] {
+  const terms = new Set<string>();
+  for (const name of [guest.name, ...guest.search_aliases]) {
+    const words = name.toLowerCase().split(/\s+/).filter(Boolean);
+    words.forEach((_, i) => {
+      terms.add(words.slice(i).join(" "));
+      terms.add(words.slice(i).join(""));
+    });
+  }
+  return [...terms];
+}
 
 export function useGuestSearch(
   query: string,
@@ -47,12 +63,18 @@ export function useGuestSearch(
           SEARCH_CONFIG.hiddenSeatingGroupIds.includes(g.seating_group_id)
         )
     );
-    return new Fuse(searchable, {
-      keys: ["name", "search_aliases"],
-      threshold: 0.3, // tightened: fewer loose matches
-      minMatchCharLength: 2,
-      ignoreLocation: true, // don't penalize matches near end of string
-    });
+    return new Fuse(
+      searchable.map((guest) => ({ guest, terms: searchTerms(guest) })),
+      {
+        keys: ["terms"],
+        threshold: 0.2,
+        // A match must begin at the start of a term. With distance 2, a
+        // match even one letter in scores past the threshold.
+        location: 0,
+        distance: 2,
+        minMatchCharLength: 2,
+      },
+    );
   }, [guests]);
 
   // Debounce the query so Fuse runs after the user pauses.
@@ -66,7 +88,7 @@ export function useGuestSearch(
     if (debouncedQuery.length < SEARCH_CONFIG.minQueryLength) return [];
     return fuse
       .search(debouncedQuery, { limit: MAX_RESULTS })
-      .map((r) => r.item);
+      .map((r) => r.item.guest);
   }, [debouncedQuery, fuse]);
 
   return matches;

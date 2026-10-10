@@ -252,22 +252,22 @@ export const AFTER_PARTY = {
 
   // ── The after-party card: styled as a SECOND invitation ──
   // [input] Small-caps line above the script title.
-  eyebrow: "And you're invited to",
+  eyebrow: "You're invited to",
 
   // [input] The script title on the card.
   scriptTitle: "The After-Party",
 
   // [input] Time and place lines inside the card (small caps).
   timeLine: "From 3:30 pm",
-  venueLine: "Tanjong Beach Club",
+  venueLine: "FOC by the Beach",
 
   // [input] Details paragraph — when/where/what. Edit freely.
   // Deliberately does NOT invite again (the eyebrow above and the question
   // below both do) and does not name the venue again (the line above does).
-  // "It's our treat" states who's paying as a fact rather than an offer —
-  // an offer invites a polite refusal.
+  // "Provided" states it as a fact rather than an offer, since an offer
+  // invites a polite refusal. public/afterparty-invite.html repeats this.
   description:
-    "Sun, sand and sea to see out the day. It's our treat — just bring yourselves.",
+    "Sun, sand and sea to see out the day. Food and drinks are provided, so just bring yourselves.",
 
   // [input] The question above the per-person toggles.
   question: "Who's coming along?",

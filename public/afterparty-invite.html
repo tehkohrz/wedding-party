@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>The After-Party — Invite</title>
+<!--
+  The sendable after-party invitation (WhatsApp). Rendered to
+  public/afterparty-invite.png:
+
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+      --headless --disable-gpu --hide-scrollbars --force-device-scale-factor=2 \
+      --window-size=560,600 --screenshot=public/afterparty-invite.png \
+      file://$PWD/public/afterparty-invite.html
+
+  then trim the blank space under the card. It copies the after-party card
+  in components/rsvp/StepAfterParty.tsx, so keep its copy in step with
+  AFTER_PARTY in lib/content.ts.
+-->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@500&family=Fraunces:ital,wght@0,400;0,600;1,600&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 560px; background: #ffffff; }
+  .poster { padding: 24px; }
+  /* The card's hand-drawn frame and faint seafoam stripes (.invite-card-party). */
+  .card {
+    position: relative;
+    overflow: hidden;
+    padding: 8px;
+    background: repeating-linear-gradient(90deg, hsl(0 0% 100%) 0 16px, hsl(165 38% 95%) 16px 32px);
+    border: 2.5px solid hsl(19 76% 57%);
+    border-radius: 38px 52px 42px 56px / 52px 40px 58px 44px;
+  }
+  .inner {
+    border: 1px solid hsl(19 76% 57% / 0.5);
+    border-radius: 32px 46px 36px 50px / 46px 34px 52px 38px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .inner > * + * { margin-top: 16px; }
+  .eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: hsl(174 42% 22%);
+  }
+  .title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 48px;
+    line-height: 1.25;
+    color: hsl(19 76% 52%);
+  }
+  .rule { display: flex; align-items: center; justify-content: center; gap: 12px; color: hsl(19 76% 57%); }
+  .rule .line { height: 1px; width: 40px; background: currentColor; opacity: 0.7; }
+  .rule .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .details {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: hsl(174 42% 22%);
+  }
+  .details p + p { margin-top: 4px; }
+  /* One sentence per line. */
+  .description span { display: block; white-space: nowrap; }
+  .description {
+    padding-bottom: 40px; /* clears the tallest hat in the flock */
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    line-height: 1.625;
+    color: hsl(174 42% 22% / 0.85);
+  }
+  /* The flock peeks over the bottom edge; the card clips the cut necks. */
+  .flock { position: absolute; left: 0; right: 0; bottom: -4px; display: flex; align-items: flex-end; padding: 0 40px; }
+  .flock img { display: block; flex-shrink: 0; }
+</style>
+</head>
+<body>
+  <div class="poster">
+    <div class="card">
+      <div class="inner">
+        <p class="eyebrow">You're invited to</p>
+        <p class="title">The After-Party</p>
+        <div class="rule"><span class="line"></span><span class="dot"></span><span class="line"></span></div>
+        <div class="details">
+          <p>From 3:30 pm</p>
+          <p>FOC by the Beach</p>
+        </div>
+        <p class="description">
+          <span>Sun, sand and sea to see out the day.</span>
+          <span>Food and drinks are provided, so just bring yourselves.</span>
+        </p>
+      </div>
+      <div class="flock">
+        <img src="pigeon-head-teal.png" alt="" style="width: 24%; transform: translateY(4px)" />
+        <img src="pigeon-head-yellow.png" alt="" style="width: 20%; margin-left: -5.5%; transform: translateY(8px)" />
+        <img src="pigeon-head-violet.png" alt="" style="width: 28%; margin-left: -5.5%" />
+        <img src="pigeon-head-pink.png" alt="" style="width: 22%; margin-left: -5.5%; transform: translateY(8px)" />
+        <img src="pigeon-head.png" alt="" style="width: 28%; margin-left: -5.5%" />
+      </div>
+    </div>
+  </div>
+</body>
+</html>
