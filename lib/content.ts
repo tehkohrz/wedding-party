@@ -24,12 +24,6 @@ export const COUPLE = {
   // [input] Groom's full display name on the welcome screen.
   groomName: "Koh Dong Kun",
 
-  // [input] Wedding date, free-form text. e.g. "31 Oct 2026" or "Saturday, 31st October 2026".
-  weddingDate: "31 Oct 2026",
-
-  // [input] Optional venue line, shown under the date. Set to "" to hide.
-  venue: "",
-
   // [input] The result of "Bride + Groom = ?" on the welcome screen.
   //         Try: "Happiness", "Forever", "Us", "Family", "Always", "Bliss",
   //         "One", "Home", "Adventure", "Love", "❤".
@@ -39,7 +33,8 @@ export const COUPLE = {
 // ─── RSVP (v2) ────────────────────────────────────────────────────────────────
 
 export const EVENT_DETAILS = {
-  // [input] Event date as shown on the RSVP pages.
+  // [input] Event date as shown on the RSVP pages and the check-in
+  //         welcome screen.
   date: "31 October 2026, Saturday",
 
   // [input] Exact event start for the countdown (ISO 8601 with timezone).
@@ -428,10 +423,13 @@ export const WELCOME_COPY = {
   greeting: "Welcome!",
 
   // [input] Short instruction line under the greeting.
-  instruction: "Please enter your name to check-in and find your seat.",
+  instruction: "Please enter your name to check in and find your seat.",
 
   // [input] Placeholder text inside the input box.
   inputPlaceholder: "Your name...",
+
+  // [input] Shown under the input when the typed name matches no guest.
+  noMatches: "No matches yet — try a different spelling or a nickname.",
 };
 
 export const LUNCH_COPY = {

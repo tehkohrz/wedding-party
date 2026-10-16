@@ -15,6 +15,8 @@
  *
  * To tweak:
  *   - Name size:      text-7xl on the name spans
+ *   - Name weight:    font-semibold on the h1 (Cormorant's thin strokes
+ *                     need the extra weight to read from a distance)
  *   - Operator size:  text-5xl on the + and = spans
  *   - Operator color: text-marigold
  *   - Result style:   italic + text-lavender
@@ -49,7 +51,7 @@ export function WelcomeEquation() {
   const lineVariants = reduceMotion ? undefined : line;
 
   return (
-    <motion.h1 className="font-display leading-tight" {...motionProps}>
+    <motion.h1 className="font-display font-semibold leading-tight" {...motionProps}>
       <motion.span variants={lineVariants} className="block text-4xl sm:text-7xl">
         {COUPLE.brideName}
       </motion.span>

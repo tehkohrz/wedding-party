@@ -13,8 +13,7 @@
  * Back/Home buttons + the WizardShell idle timer apply (it's in WIZARD_PATHS).
  */
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { GuestSearchBox } from "@/components/GuestSearchBox";
 import { SeatingMap, type SeatHighlight } from "@/components/SeatingMap";
 import { useGuestSearch } from "@/hooks/useGuestSearch";
 import { useDbGuests } from "@/hooks/useDbGuests";
@@ -72,45 +71,14 @@ export default function FindPage() {
 
       {/* Search + results */}
       <section className="shrink-0 px-6 pb-3">
-        <div className="max-w-md mx-auto space-y-3">
-          <Input
-            type="search"
-            inputMode="text"
-            autoComplete="off"
-            autoFocus
-            placeholder={LOOKUP_COPY.searchPlaceholder}
-            className="text-lg h-14 rounded-pill text-center placeholder:transition-opacity placeholder:duration-150 focus:placeholder:opacity-0"
-            value={query}
-            onChange={(e) => handleQueryChange(e.target.value)}
-          />
-          {query.trim().length > 0 && (
-            <div className="space-y-2" role="listbox">
-              {matches.length > 0 ? (
-                matches.map((g) => (
-                  <Card
-                    key={g.id}
-                    role="option"
-                    tabIndex={0}
-                    onClick={() => handleSelectGuest(g)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        handleSelectGuest(g);
-                      }
-                    }}
-                    className="cursor-pointer px-5 py-3 hover:bg-muted active:bg-muted/70 focus-visible:ring-2 focus-visible:ring-ring transition"
-                  >
-                    <span className="font-display text-xl">{g.name}</span>
-                  </Card>
-                ))
-              ) : (
-                <p className="font-sans text-sm text-muted-foreground text-center">
-                  {LOOKUP_COPY.noMatches}
-                </p>
-              )}
-            </div>
-          )}
-        </div>
+        <GuestSearchBox
+          query={query}
+          onQueryChange={handleQueryChange}
+          matches={matches}
+          onSelect={handleSelectGuest}
+          placeholder={LOOKUP_COPY.searchPlaceholder}
+          emptyText={LOOKUP_COPY.noMatches}
+        />
       </section>
 
       {/* Name boxes only appear once a guest is selected. The map below

@@ -9,7 +9,8 @@
 //   - One component, Tailwind `landscape:` modifier handles the swap
 
 import Link from "next/link";
-import { COUPLE, WELCOME_COPY, LOOKUP_COPY, ADMIN_COPY } from "@/lib/content";
+import { WELCOME_COPY, LOOKUP_COPY, ADMIN_COPY } from "@/lib/content";
+import { EventDate } from "@/components/EventWhen";
 import { NameSearch } from "@/components/NameSearch";
 import { PhotoSlideshow } from "@/components/PhotoSlideshow";
 import { WelcomeEquation } from "@/components/WelcomeEquation";
@@ -44,7 +45,7 @@ function FormSide() {
   return (
     <section
       className="
-        relative flex-1
+        group relative flex-1
         bg-background
         flex flex-col items-center justify-center
         px-6 py-8
@@ -69,19 +70,22 @@ function FormSide() {
 
       <div className="text-center space-y-6 max-w-xl">
         {/* Names equation (bride + groom = unionWord), staggered entrance.
-            Sizes/colors/stagger are tweakable in components/WelcomeEquation.tsx. */}
-        <header className="space-y-4">
+            Sizes/colors/stagger are tweakable in components/WelcomeEquation.tsx.
+            It hides while search results are open, so five results fit on
+            the iPad without pushing the page off screen. */}
+        <header className="space-y-6 group-has-[[data-searching]]:hidden">
           <WelcomeEquation />
-          <p className="font-sans text-base text-muted-foreground pt-2">
-            {COUPLE.weddingDate}
-            {COUPLE.venue && ` · ${COUPLE.venue}`}
-          </p>
+          {/* The RSVP pages' date block: olive rule, blue italic date. */}
+          <EventDate className="text-2xl sm:text-3xl" />
         </header>
 
-        {/* Greeting + instruction */}
-        <div className="space-y-1 pt-2">
-          <h2 className="font-display text-2xl">{WELCOME_COPY.greeting}</h2>
-          <p className="font-sans text-sm text-muted-foreground">
+        {/* Greeting + instruction. The instruction is the line guests act
+            on, so it uses the main text colour rather than muted grey. */}
+        <div className="space-y-2 pt-2">
+          <h2 className="font-display text-4xl sm:text-5xl font-semibold">
+            {WELCOME_COPY.greeting}
+          </h2>
+          <p className="font-sans text-lg sm:text-xl font-medium text-foreground text-balance">
             {WELCOME_COPY.instruction}
           </p>
         </div>

@@ -9,11 +9,25 @@
  * The rule fences the date structurally so the date doesn't have to shout
  * to feel important; the blue ties it to the countdown below and the
  * ampersand above.
+ *
+ * EventDate is the rule and date alone, for the check-in welcome screen,
+ * where a countdown has nothing left to count.
  */
 import { EVENT_DETAILS } from "@/lib/content";
 import { EventCountdown } from "@/components/EventCountdown";
+import { cn } from "@/lib/utils";
 
 export function EventWhen() {
+  return (
+    <div className="space-y-3">
+      <EventDate className="text-3xl sm:text-5xl" />
+      <EventCountdown />
+    </div>
+  );
+}
+
+/** className sets the date's size, which differs per page. */
+export function EventDate({ className }: { className?: string }) {
   return (
     <div className="space-y-3">
       <div
@@ -27,13 +41,11 @@ export function EventWhen() {
       </div>
 
       <p
-        className="font-display font-semibold italic text-3xl sm:text-5xl text-balance"
+        className={cn("font-display font-semibold italic text-balance", className)}
         style={{ color: "hsl(var(--invite-blue))" }}
       >
         {EVENT_DETAILS.date}
       </p>
-
-      <EventCountdown />
     </div>
   );
 }
