@@ -1,0 +1,196 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>The After-Party — Getting There</title>
+<!--
+  How to get from The Outpost Hotel to FOC by the Beach, sent with
+  public/afterparty-invite.png. The map is illustrated and not to scale.
+  The walk follows Google's walking directions (about 1.1 km, 15 min).
+  Rendered to public/afterparty-map.png:
+
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+      --headless --disable-gpu --hide-scrollbars --force-device-scale-factor=2 \
+      --window-size=560,1100 --screenshot=public/afterparty-map.png \
+      file://$PWD/public/afterparty-map.html
+
+  then trim the blank space under the card.
+-->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700&family=Fraunces:ital,wght@0,400;0,600;1,600&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 560px; background: #ffffff; font-variant-numeric: lining-nums; }
+  .poster { padding: 24px; }
+  /* The after-party card's hand-drawn frame and faint seafoam stripes. */
+  .card {
+    position: relative;
+    overflow: hidden;
+    padding: 8px;
+    background: repeating-linear-gradient(90deg, hsl(0 0% 100%) 0 16px, hsl(165 38% 95%) 16px 32px);
+    border: 2.5px solid hsl(19 76% 57%);
+    border-radius: 38px 52px 42px 56px / 52px 40px 58px 44px;
+  }
+  .inner {
+    border: 1px solid hsl(19 76% 57% / 0.5);
+    border-radius: 32px 46px 36px 50px / 46px 34px 52px 38px;
+    padding: 36px 20px 96px;
+    text-align: center;
+  }
+  .eyebrow { font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px; letter-spacing: 0.26em; text-transform: uppercase; color: hsl(174 42% 22%); }
+  .title { margin-top: 12px; font-family: 'Fraunces', serif; font-style: italic; font-weight: 600; font-size: 44px; line-height: 1.2; color: hsl(19 76% 52%); }
+  .details { margin-top: 10px; font-family: 'Fraunces', serif; font-weight: 600; font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; color: hsl(174 42% 22%); }
+  .map { margin: 22px auto 26px; width: 432px; border: 1.5px solid hsl(19 76% 57% / 0.5); border-radius: 22px; overflow: hidden; }
+  .map svg { display: block; }
+  .options { list-style: none; width: 400px; margin: 0 auto; text-align: left; }
+  .options li { display: flex; gap: 14px; align-items: flex-start; }
+  .options li + li { margin-top: 16px; }
+  .options .badge { flex: 0 0 36px; height: 36px; border-radius: 11px; background: hsl(174 42% 22%); display: grid; place-items: center; }
+  .options .badge svg { width: 20px; height: 20px; }
+  .options h3 { font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: hsl(19 76% 50%); }
+  .options p { margin-top: 3px; font-family: 'Fraunces', serif; font-size: 15px; line-height: 1.45; color: hsl(174 42% 22% / 0.9); }
+  /* The flock peeks over the bottom edge; the card clips the cut necks. */
+  .flock { position: absolute; left: 0; right: 0; bottom: -4px; display: flex; align-items: flex-end; padding: 0 40px; }
+  .flock img { display: block; flex-shrink: 0; }
+
+  /* Icons are Lucide line icons, drawn white on teal. */
+  .icon { fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Map */
+  .land { fill: #fbf8f0; }
+  .green { fill: hsl(95 35% 88%); }
+  .sand { fill: hsl(40 70% 87%); }
+  .sea { fill: hsl(185 45% 84%); }
+  .wave { fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; opacity: 0.8; }
+  .hotel { fill: hsl(174 30% 87%); }
+  .palm-trunk { fill: none; stroke: hsl(30 35% 52%); stroke-width: 2.5; stroke-linecap: round; }
+  .palm-leaf { fill: none; stroke: hsl(150 35% 42%); stroke-width: 2.5; stroke-linecap: round; }
+  .stairs { fill: none; stroke: hsl(174 42% 22% / 0.55); stroke-width: 2; stroke-linejoin: round; }
+  .route-halo, .route { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .route-halo { stroke: #fff; stroke-width: 12; }
+  .route { stroke: hsl(19 76% 54%); stroke-width: 6.5; stroke-dasharray: 0 11; }
+  .pin-start { fill: hsl(174 42% 22%); stroke: #fff; stroke-width: 3.5; }
+  .pin-end { fill: hsl(19 76% 54%); stroke: #fff; stroke-width: 3.5; }
+  .pin-letter { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 13px; fill: #fff; text-anchor: middle; dominant-baseline: central; }
+  .tile { fill: hsl(174 42% 22%); stroke: #fff; stroke-width: 2; }
+  .label { paint-order: stroke; stroke: #fbf8f0; stroke-width: 5px; stroke-linejoin: round; font-family: 'DM Sans', sans-serif; font-weight: 700; text-transform: uppercase; fill: hsl(174 42% 22%); }
+  .label.big { font-size: 13px; letter-spacing: 0.12em; }
+  .label.small { font-size: 10px; letter-spacing: 0.14em; fill: hsl(174 42% 22% / 0.8); }
+  .place { font-family: 'Fraunces', serif; font-style: italic; font-weight: 600; font-size: 17px; fill: hsl(35 50% 42%); text-anchor: middle; }
+  .walk-badge { fill: #fff; stroke: hsl(19 76% 54%); stroke-width: 1.5; }
+  .walk-text { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.14em; fill: hsl(19 76% 50%); text-anchor: middle; dominant-baseline: central; }
+  .compass { fill: hsl(174 42% 22%); }
+  .compass text { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+  .note { font-family: 'DM Sans', sans-serif; font-size: 9px; letter-spacing: 0.08em; fill: hsl(174 42% 22% / 0.6); }
+</style>
+</head>
+<body>
+  <!-- Shared icons for the map tiles and the travel options. -->
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="i-car" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></symbol>
+    <symbol id="i-walk" viewBox="0 0 24 24"><path d="M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z"/><path d="M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z"/><path d="M16 17h4"/><path d="M4 13h4"/></symbol>
+    <symbol id="i-bus" viewBox="0 0 24 24"><path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></symbol>
+    <symbol id="palm" viewBox="-16 -34 32 36" overflow="visible">
+      <path class="palm-trunk" d="M0 0 Q4 -14 1 -26"/>
+      <path class="palm-leaf" d="M1 -26 Q-8 -32 -15 -24 M1 -26 Q-6 -24 -10 -16 M1 -26 Q10 -32 16 -23 M1 -26 Q8 -22 11 -15 M1 -26 Q1 -33 -3 -34"/>
+    </symbol>
+  </svg>
+
+  <div class="poster">
+    <div class="card">
+      <div class="inner">
+        <p class="eyebrow">Getting to the</p>
+        <p class="title">The After-Party</p>
+        <p class="details">From 3:30 pm · FOC by the Beach</p>
+        <div class="map">
+          <svg viewBox="0 0 432 392" width="432" height="392" aria-hidden="true">
+            <rect width="432" height="392" class="land"/>
+
+            <!-- Gardens around the hotels, then the beach and the sea. -->
+            <path class="green" d="M0 0 H222 C214 44 186 102 128 122 C82 138 40 134 0 150 Z"/>
+            <path class="green" d="M318 0 H432 V182 C396 170 370 132 356 96 C344 62 326 34 318 0 Z"/>
+            <path class="sand" d="M0 208 C96 208 176 238 246 290 C286 320 318 356 336 392 L0 392 Z"/>
+            <path class="sea" d="M0 256 C84 256 150 284 210 326 C238 346 258 370 268 392 L0 392 Z"/>
+            <path class="wave" d="M28 300 q7 -6 14 0 t14 0"/>
+            <path class="wave" d="M104 334 q7 -6 14 0 t14 0"/>
+            <path class="wave" d="M40 352 q7 -6 14 0 t14 0"/>
+            <use href="#palm" x="22" y="208" width="32" height="36" transform="translate(-16 -34)"/>
+            <use href="#palm" x="212" y="292" width="32" height="36" transform="translate(-16 -34)"/>
+
+            <!-- The Outpost Hotel -->
+            <rect class="hotel" x="80" y="36" width="92" height="56" rx="12"/>
+
+            <!-- Stairs down to Beach View -->
+            <path class="stairs" d="M24 98 h7 v7 h7 v7 h7 v7"/>
+
+            <!-- The walk: out of the car park, down the stairs, past Beach
+                 Station, then along Palawan Beach Walk to FOC. -->
+            <path class="route-halo" d="M118 64 H64 Q50 64 50 78 V170 Q50 198 80 198 C120 198 182 230 246 280 C274 302 286 316 290 324"/>
+            <path class="route" d="M118 64 H64 Q50 64 50 78 V170 Q50 198 80 198 C120 198 182 230 246 280 C274 302 286 316 290 324"/>
+
+            <!-- Bus stops and the car park -->
+            <g transform="translate(140 118)">
+              <rect class="tile" x="-13" y="-13" width="26" height="26" rx="7"/>
+              <use href="#i-bus" class="icon" x="-8" y="-8" width="16" height="16"/>
+            </g>
+            <g transform="translate(336 282)">
+              <rect class="tile" x="-13" y="-13" width="26" height="26" rx="7"/>
+              <use href="#i-bus" class="icon" x="-8" y="-8" width="16" height="16"/>
+            </g>
+            <g transform="translate(336 330)">
+              <rect class="tile" x="-13" y="-13" width="26" height="26" rx="7"/>
+              <use href="#i-car" class="icon" x="-8" y="-8" width="16" height="16"/>
+            </g>
+
+            <!-- Start and finish -->
+            <circle class="pin-start" cx="118" cy="64" r="13"/>
+            <text class="pin-letter" x="118" y="64">A</text>
+            <circle class="pin-end" cx="290" cy="330" r="14"/>
+            <text class="pin-letter" x="290" y="330">B</text>
+
+            <text class="label big" x="182" y="69">The Outpost Hotel</text>
+            <text class="label small" x="160" y="122">Bus stop</text>
+            <text class="label small" x="62" y="114">Stairs</text>
+            <text class="label small" x="80" y="186">Beach Station</text>
+            <text class="label small" x="356" y="286">Bus stop</text>
+            <text class="label small" x="356" y="334">Car park</text>
+            <text class="label big" x="290" y="366" text-anchor="middle">FOC by the Beach</text>
+            <text class="place" x="122" y="256">Palawan Beach</text>
+
+            <g transform="translate(286 196)">
+              <rect class="walk-badge" x="-50" y="-14" width="100" height="28" rx="14"/>
+              <text class="walk-text" x="1">15 MIN WALK</text>
+            </g>
+
+            <g class="compass" transform="translate(404 30)">
+              <path d="M0 -14 L6 5 L0 1 L-6 5 Z"/>
+              <text y="17">N</text>
+            </g>
+            <text class="note" x="12" y="382">Not to scale</text>
+          </svg>
+        </div>
+        <ul class="options">
+          <li>
+            <span class="badge"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-car" class="icon"/></svg></span>
+            <div><h3>Drive</h3><p>Palawan Beach car park is right beside FOC.</p></div>
+          </li>
+          <li>
+            <span class="badge"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-walk" class="icon"/></svg></span>
+            <div><h3>Walk · 15 min</h3><p>Take the stairs down to Beach View, then follow Palawan Beach Walk along the sand.</p></div>
+          </li>
+          <li>
+            <span class="badge"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bus" class="icon"/></svg></span>
+            <div><h3>Sentosa bus · every 10 min</h3><p>Board at the stop below the hotel and get off at Palawan Beach.</p></div>
+          </li>
+        </ul>
+      </div>
+      <div class="flock">
+        <img src="pigeon-head-teal.png" alt="" style="width: 24%; transform: translateY(4px)" />
+        <img src="pigeon-head-yellow.png" alt="" style="width: 20%; margin-left: -5.5%; transform: translateY(8px)" />
+        <img src="pigeon-head-violet.png" alt="" style="width: 28%; margin-left: -5.5%" />
+        <img src="pigeon-head-pink.png" alt="" style="width: 22%; margin-left: -5.5%; transform: translateY(8px)" />
+        <img src="pigeon-head.png" alt="" style="width: 28%; margin-left: -5.5%" />
+      </div>
+    </div>
+  </div>
+</body>
+</html>
