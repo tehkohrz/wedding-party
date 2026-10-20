@@ -80,7 +80,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   // theme_color equivalent — tints the iOS status bar / task switcher.
-  themeColor: "#1FA6EB",
+  themeColor: "#FDFBF5",
   // Kiosk-style: fill the screen edge-to-edge and stop guests accidentally
   // pinch-zooming the whole page (the map has its own zoom when enabled).
   width: "device-width",

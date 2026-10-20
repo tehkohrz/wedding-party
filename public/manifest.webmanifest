@@ -2,11 +2,11 @@
   "name": "SitWhereAh",
   "short_name": "SitWhereAh",
   "description": "Wedding seating & attendance",
-  "start_url": "/",
+  "start_url": "/checkin",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#FDFBF5",
-  "theme_color": "#1FA6EB",
+  "theme_color": "#FDFBF5",
   "icons": [
     {
       "src": "/icons/icon-192.png",

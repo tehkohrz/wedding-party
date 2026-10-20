@@ -48,7 +48,7 @@ Useful scripts:
 | `pnpm start` | Serve the production build locally |
 | `pnpm build:data` | Regenerate `lib/data.json` from `data/*.csv` |
 | `pnpm seed:db` | Seed/refresh Supabase from `data/guests.csv` (groups auto-derived) |
-| `pnpm icons` | Regenerate PWA icons from `assets/icon-source.svg` |
+| `pnpm icons` | Regenerate the PWA icons from the pigeon artwork in `public/pigeons.png` |
 | `pnpm lint` | ESLint |
 
 ## Editing the data

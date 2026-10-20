@@ -84,25 +84,25 @@ single atomic submit with sessionStorage draft.
 
 - [x] Stage 18 — Tea ceremony and after-party send-outs *(2026-10 — static posters in public/, each HTML file carrying its own headless-Chrome render command (2× scale, white space under the card trimmed). TEA CEREMONY: tea-invite.html → tea-invite.png in the e-invite's stationery (stripes, olive frame, pink script, pigeon pair) with a teapot and 囍 in place of the sun: Oasia Resort Sentosa, Sat 31 Oct, 11:00–11:30 am, park at The Outpost. tea-map.html → tea-map.png is drawn from OpenStreetMap data (credited on the map) with the route from Google's walking directions: out of the Outpost car park, up the service road to Artillery Avenue, left along Beach View, then down Oasia's north driveway, about 5 minutes. AFTER-PARTY: afterparty-map.html → afterparty-map.png in the after-party card's style, with three ways to FOC (drive to the Palawan Beach car park beside it, a 15-minute walk, the Sentosa bus every 10 minutes). The map is illustrated and marked not to scale: the walk is about 1 km and the card about 430 px wide, so a true-scale map couldn't bring the two ends closer, and even rotating it gained only about 20%. UNVERIFIED ON THE GROUND: Oasia's entrance, the bus stop below the hotel, and the stop name to get off at.)*
 
+- [x] Stage 19 — Kiosk install readiness *(2026-10 — the iPads run the website added to the home screen (Safari → Share → Add to Home Screen), locked with Guided Access. The manifest's start_url was "/", so the home-screen app opened the RSVP page; it now opens /checkin. Any iPad that added the app before this deploy must delete and re-add it, because iOS keeps the old icon and start page. ICON: the couple's pigeon pair on cream, built by `pnpm icons` straight from public/pigeons.png with the artwork's flat bottom cut on the icon's edge (the maskable version shrinks the pair so both heads sit in Android's safe zone). The placeholder SVG and the default Next.js favicon are gone, so the tab uses the same pigeon icon, and the brand colour is the cream #FDFBF5 in the generator, the manifest and layout.tsx. THEME: bride-2 locked. DATA: the 4 test arrivals from 10 Oct were deleted after a snapshot, so the live attendance table is empty.)*
+
 ---
 
 ## Art & asset tasks (before the app is "done")
 
 Everything visual currently uses a placeholder. Swap these before the event:
 
-- [ ] **App icon** — replace `assets/icon-source.svg` (keep 512×512 square) with
-      real artwork, then run `pnpm icons` to regenerate all PNG sizes in
-      `public/icons/`. Also update the two brand colors if the art changes:
-      `background_color`/`theme_color` in `public/manifest.webmanifest`, the
-      `themeColor` in `app/layout.tsx`, and the `#1FA6EB` background in
-      `scripts/generate-icons.mjs` (maskable padding).
+- [x] **App icon** — the couple's pigeon pair on cream (2026-10-20). `pnpm icons`
+      builds every size in `public/icons/` from `public/pigeons.png`. The cream
+      (`#FDFBF5`) is set in three places that must agree: `scripts/generate-icons.mjs`,
+      `public/manifest.webmanifest` and `themeColor` in `app/layout.tsx`.
 - [ ] **Couple photo** — drop a real photo into `public/` (e.g. `couple.jpg`)
       and wire it into `<PhotoSide>` in `app/page.tsx` (instructions are in the
       comment there). Currently a gradient placeholder.
 - [ ] **Welcome flourish** — the top-left corner uses a Lucide `Flower2` icon
       as a placeholder (`app/page.tsx`). Swap for a custom floral SVG if wanted.
-- [ ] **Final theme/palette** — bride still deciding between bride-1 / bride-2 /
-      garden-electric (see `app/globals.css` @import line). Lock before the day.
+- [x] **Final theme/palette** — locked to bride-2 on 2026-10-20 (navy, magenta,
+      marigold; the `app/globals.css` @import line).
 - [ ] **(Optional) Figma venue SVG** — Path B in Milestone 4: a drawn venue
       background behind the schematic seat map. Only if the schematic isn't
       enough. See the "Deferred — Path B" note in Milestone 4.
@@ -110,8 +110,8 @@ Everything visual currently uses a placeholder. Swap these before the event:
       descender that looked odd at hero size; parked. Swap the display font in
       `app/layout.tsx` if it bothers you (Playfair Display / Cormorant / DM Serif
       Display are drop-in candidates).
-- [ ] **Favicon** — currently the default Next.js favicon (`app/favicon.ico`).
-      Replace with something on-brand.
+- [x] **Favicon** — the default `app/favicon.ico` is removed, so the tab uses the
+      pigeon icon from the metadata in `app/layout.tsx` (2026-10-20).
 
 ## Future considerations (not yet scheduled)
 

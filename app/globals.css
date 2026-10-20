@@ -1,8 +1,9 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-/* === Active theme — change this one line to swap the look ===
-   Options:
+/* === Active theme: bride-2, locked for the wedding (Oct 2026) ===
+   Swapping is still one line, but the check-in screens were last checked
+   against bride-2. Options:
      ../themes/bride-1.css         (Pantone — sophisticated jewel-tone wedding)
      ../themes/bride-2.css         (Bold poster — saturated Pop Art palette)
      ../themes/garden-electric.css (Electric — magenta primary, sapphire / emerald / airy peach)
