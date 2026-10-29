@@ -1,7 +1,7 @@
 /**
  * The lunch floor plan: which seats exist, and which group sits in each.
- * The projector overview (/seating) and the check-in seat map
- * (/checkin/lunch, /find) both draw from it.
+ * The seating overview (/seating, /find) and the check-in seat map
+ * (/checkin/lunch) both draw from it.
  *
  * Mirrors the Seating Plan tab of the venue workbook. Each table side is a
  * list of runs, pool end first, as [owner, seatCount]. A null owner is an

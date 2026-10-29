@@ -2,8 +2,7 @@
 
 /**
  * The kiosk name search box: a large pill input and the matching guests
- * below it. Shared by the welcome screen (check-in) and /find (lookup),
- * which differ only in what picking a guest does.
+ * below it. NameSearch decides what picking a guest does.
  *
  * Matching lives in useGuestSearch; this component only displays it.
  */

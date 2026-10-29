@@ -9,7 +9,7 @@
 //   - One component, Tailwind `landscape:` modifier handles the swap
 
 import Link from "next/link";
-import { WELCOME_COPY, LOOKUP_COPY, ADMIN_COPY } from "@/lib/content";
+import { WELCOME_COPY, ADMIN_COPY } from "@/lib/content";
 import { EventDate } from "@/components/EventWhen";
 import { NameSearch } from "@/components/NameSearch";
 import { PhotoSlideshow } from "@/components/PhotoSlideshow";
@@ -58,14 +58,15 @@ function FormSide() {
         aria-hidden
       />
 
-      {/* Seating plan lookup — bottom-left of the form area (beside the
-          photo side in landscape). Browse-only, no check-in writes.
-          ForwardLink because /find is a wizard route (slide transition). */}
+      {/* Seating plan — bottom-left of the form area (beside the photo
+          side in landscape). Opens the seating overview, with no check-in
+          writes. ForwardLink because /find is a wizard route (slide
+          transition). */}
       <ForwardLink
         href="/find"
         className="absolute bottom-4 left-4 z-40 font-sans text-base font-bold text-primary hover:underline transition px-3 py-2"
       >
-        {LOOKUP_COPY.welcomeLinkLabel}
+        {WELCOME_COPY.seatingPlanLink}
       </ForwardLink>
 
       <div className="text-center space-y-6 max-w-xl">

@@ -35,9 +35,8 @@ export default function LunchPage() {
   const reduceMotion = useReducedMotion();
 
   // Confetti fires once on arrival, and ONLY when someone actually checked
-  // in this round. Browsing the map via /find never celebrates, and neither
-  // does landing here with an empty round. celebrate() self-guards against
-  // reduced-motion too.
+  // in this round. Landing here with an empty round never celebrates.
+  // celebrate() self-guards against reduced-motion too.
   const didCheckIn = checkedInThisRound.length > 0;
   useEffect(() => {
     if (didCheckIn) celebrate();

@@ -405,9 +405,9 @@ export const RSVP_STEPS_COPY = {
 };
 
 export const SEARCH_CONFIG = {
-  // [input] Minimum letters typed before the day-of searches (check-in,
-  //         seating lookup) show results. 2 keeps two-letter guests (DK,
-  //         QY, CY) findable while stopping single-letter noise.
+  // [input] Minimum letters typed before the check-in search shows
+  //         results. 2 keeps two-letter guests (DK, QY, CY) findable while
+  //         stopping single-letter noise.
   minQueryLength: 2,
 
   // [input] Guest ids hidden from the day-of searches (e.g. the couple —
@@ -430,6 +430,9 @@ export const WELCOME_COPY = {
 
   // [input] Shown under the input when the typed name matches no guest.
   noMatches: "No matches yet — try a different spelling or a nickname.",
+
+  // [input] Link in the bottom-left corner that opens the seating overview.
+  seatingPlanLink: "Seating plan →",
 };
 
 export const LUNCH_COPY = {
@@ -445,26 +448,6 @@ export const LUNCH_COPY = {
 
   // [input] Label on the final button that returns to the welcome screen.
   doneLabel: "Done",
-};
-
-export const LOOKUP_COPY = {
-  // [input] Heading on the seating-plan lookup page.
-  heading: "Seating plan",
-
-  // [input] Sub-instruction under the heading.
-  subheading: "Search a name to see where they're seated. No check-in.",
-
-  // [input] Placeholder text inside the lookup search input.
-  searchPlaceholder: "Search by name...",
-
-  // [input] Shown when no guests match the typed query.
-  noMatches: "No matches found.",
-
-  // [input] Hint shown before anything is searched.
-  initialHint: "Type a name above to find their seat.",
-
-  // [input] Subtle "Seating plan" link in the bottom-right of the welcome screen.
-  welcomeLinkLabel: "Seating plan →",
 };
 
 export const GROUP_COPY = {
@@ -592,7 +575,7 @@ export const SEATING_OVERVIEW = {
 
 };
 
-// ─── Floor plan (shared by /seating, /checkin/lunch and /find) ──────────────
+// ─── Floor plan (shared by /seating, /find and /checkin/lunch) ──────────────
 
 export const FLOOR_PLAN_COPY = {
   // [input] Printed before each table number, so "T" shows T1, T2, T3.

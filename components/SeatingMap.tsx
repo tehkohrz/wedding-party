@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * SeatingMap — the lunch floor plan for check-in (/checkin/lunch) and the
- * lookup page (/find). The viewer's party lights up in each member's
- * colour with their name beside the seat, and every other seat stays
- * plain. Tap a seat to see whose it is and whether they've arrived.
+ * SeatingMap — the lunch floor plan for check-in (/checkin/lunch). The
+ * viewer's party lights up in each member's colour with their name beside
+ * the seat, and every other seat stays plain. Tap a seat to see whose it
+ * is and whether they've arrived.
  */
 import { useMemo, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
