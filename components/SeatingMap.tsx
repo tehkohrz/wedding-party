@@ -280,19 +280,24 @@ function SeatInfoCard({
 }) {
   if (!guest) {
     return (
-      <div className="font-sans text-sm text-muted-foreground">
+      <div className="font-display text-base italic font-semibold lining-nums text-muted-foreground">
         {FLOOR_PLAN_COPY.freeSeat} · {tableName(table)}
       </div>
     );
   }
+
+  // lining-nums keeps Cormorant's 3 off the subscript line.
   return (
     <div className="space-y-1 min-w-[8rem]">
-      <div className="font-display text-base leading-none">{guest.name}</div>
-      <div className="font-sans text-xs text-muted-foreground leading-none">
+      <div className="font-display text-lg font-semibold leading-none">{guest.name}</div>
+      <div
+        className="font-display text-base font-semibold uppercase tracking-[0.2em] lining-nums leading-none"
+        style={{ color: "hsl(var(--invite-olive-text))" }}
+      >
         {tableName(table)}
       </div>
       {isArrived && (
-        <div className="flex items-center gap-1 font-sans text-xs text-arrived leading-none pt-1">
+        <div className="flex items-center gap-1 font-display text-base italic font-semibold text-arrived leading-none pt-1">
           <Check className="size-3" /> {FLOOR_PLAN_COPY.arrived}
         </div>
       )}

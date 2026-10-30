@@ -84,7 +84,7 @@ export default function LunchPage() {
     <div className="h-dvh w-screen overflow-hidden flex flex-col">
       {/* Header — pt-20 clears the WizardShell Back/Home buttons */}
       <header className="shrink-0 px-6 pt-20 pb-3 text-center">
-        <h1 className="font-display text-3xl">
+        <h1 className="font-display text-3xl sm:text-4xl font-semibold">
           {isGroup ? LUNCH_COPY.headingGroup : LUNCH_COPY.headingSolo}
         </h1>
       </header>
@@ -140,14 +140,19 @@ export default function LunchPage() {
                 />
                 <span
                   className={cn(
-                    "font-display text-base leading-none",
+                    "font-display text-lg font-semibold leading-none",
                     !isHere && "text-foreground/70"
                   )}
                 >
                   {m.name}
                 </span>
+                {/* Table in the invitation's olive small caps. lining-nums
+                    keeps Cormorant's 3 off the subscript line. */}
                 {seat && (
-                  <span className="font-sans text-xs text-muted-foreground leading-none">
+                  <span
+                    className="font-display text-base font-semibold uppercase tracking-[0.2em] lining-nums leading-none"
+                    style={{ color: "hsl(var(--invite-olive-text))" }}
+                  >
                     {tableName(seat.table)}
                   </span>
                 )}
@@ -158,7 +163,7 @@ export default function LunchPage() {
 
         {/* Friendly seating note — only for groups */}
         {isGroup && (
-          <p className="font-sans text-xs text-muted-foreground text-center mt-3 italic">
+          <p className="font-display text-lg italic font-semibold text-muted-foreground text-center mt-3">
             {LUNCH_COPY.groupSeatingNote}
           </p>
         )}
@@ -175,12 +180,12 @@ export default function LunchPage() {
         />
       </main>
 
-      {/* Footer — done */}
+      {/* Footer — done, styled like the group screen's Check-in button */}
       <footer className="shrink-0 px-6 py-5">
         <div className="max-w-md mx-auto">
           <ForwardLink
             href="/checkin"
-            className="flex items-center justify-center bg-primary text-primary-foreground rounded-pill h-14 font-sans font-medium text-lg hover:opacity-90 transition"
+            className="btn-invite-blue flex items-center justify-center text-primary-foreground rounded-pill h-14 font-display text-xl font-bold uppercase tracking-[0.2em] transition"
           >
             {LUNCH_COPY.doneLabel}
           </ForwardLink>

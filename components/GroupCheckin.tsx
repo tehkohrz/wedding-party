@@ -96,10 +96,13 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
 
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col">
-      {/* Header — pt-20 clears the WizardShell Back/Home buttons */}
-      <header className="shrink-0 px-6 pt-20 pb-4 text-center">
-        <h1 className="font-display text-3xl">{GROUP_COPY.heading}</h1>
-        <p className="font-sans text-sm text-muted-foreground mt-1">
+      {/* Header — pt-20 clears the WizardShell Back/Home buttons. The
+          instruction matches the welcome screen's. */}
+      <header className="shrink-0 px-6 pt-20 pb-4 text-center space-y-2">
+        <h1 className="font-display text-3xl sm:text-4xl font-semibold">
+          {GROUP_COPY.heading}
+        </h1>
+        <p className="font-display text-xl sm:text-2xl font-semibold text-foreground text-balance">
           {GROUP_COPY.subheading}
         </p>
       </header>
@@ -115,9 +118,13 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
               borderColor: `hsl(var(--${colorByGuestId.get(guest.id)}))`,
             }}
           >
-            <span className="font-display text-xl">{guest.name}</span>
+            <span className="font-display text-2xl font-semibold">{guest.name}</span>
             <div className="flex items-center gap-3">
-              <span className="font-sans text-xs uppercase tracking-wider text-muted-foreground">
+              {/* The invitation's olive small caps */}
+              <span
+                className="font-display text-lg font-semibold uppercase tracking-[0.2em]"
+                style={{ color: "hsl(var(--invite-olive-text))" }}
+              >
                 {GROUP_COPY.youLabel}
               </span>
               <ColorCircle color={colorByGuestId.get(guest.id)!} filled />
@@ -168,7 +175,7 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
                     : undefined
                 }
               >
-                <span className="font-display text-xl">{m.name}</span>
+                <span className="font-display text-2xl font-semibold">{m.name}</span>
                 <ColorCircle color={color} filled={isOn} />
               </motion.div>
             );
@@ -180,11 +187,11 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
               key={m.id}
               className="flex items-center justify-between rounded-card bg-muted/50 px-5 py-4"
             >
-              <span className="font-display text-xl text-muted-foreground">
+              <span className="font-display text-2xl font-semibold text-muted-foreground">
                 {m.name}
               </span>
-              <span className="flex items-center gap-1 font-sans text-xs text-arrived">
-                <Check className="size-4" /> checked in
+              <span className="flex items-center gap-1 font-display text-lg italic font-semibold text-arrived">
+                <Check className="size-4" /> {GROUP_COPY.arrivedLabel}
               </span>
             </div>
           ))}
@@ -195,14 +202,15 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
       <footer className="shrink-0 px-6 py-5">
         <div className="max-w-md mx-auto space-y-3">
           {status === "failed" && (
-            <p role="alert" className="font-sans text-base text-destructive text-center">
+            <p role="alert" className="font-display text-xl italic font-semibold text-destructive text-center">
               {CHECKIN_COPY.saveFailed}
             </p>
           )}
+          {/* The RSVP pages' forward button: small caps on the date's blue */}
           <Button
             onClick={handleConfirm}
             disabled={status === "saving"}
-            className="w-full h-14 rounded-pill text-lg"
+            className="btn-invite-blue w-full h-14 rounded-pill font-display text-xl font-bold uppercase tracking-[0.2em]"
           >
             {status === "saving" ? CHECKIN_COPY.saving : GROUP_COPY.confirmLabel}
           </Button>

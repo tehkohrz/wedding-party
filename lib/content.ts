@@ -460,6 +460,9 @@ export const GROUP_COPY = {
   // [input] Label on the row for the guest who is checking in.
   youLabel: "You",
 
+  // [input] Shown on the row of a companion who checked in earlier.
+  arrivedLabel: "checked in",
+
   // [input] Confirm button label on the group screen.
   confirmLabel: "Check-in",
 };
