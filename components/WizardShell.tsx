@@ -100,10 +100,12 @@ export function ForwardLink({
   href,
   children,
   className,
+  style,
 }: {
   href: string;
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }) {
   const setDirection = useWizardStore((s) => s.setDirection);
   return (
@@ -111,6 +113,7 @@ export function ForwardLink({
       href={href}
       onClick={() => setDirection("forward")}
       className={className}
+      style={style}
     >
       {children}
     </Link>

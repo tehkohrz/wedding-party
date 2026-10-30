@@ -464,6 +464,16 @@ export const GROUP_COPY = {
   confirmLabel: "Check-in",
 };
 
+export const CHECKIN_COPY = {
+  // [input] Shown while an arrival saves: under the welcome search for a
+  //         solo guest, and on the group screen's Check-in button.
+  saving: "Checking in…",
+
+  // [input] Shown on the welcome and group screens when an arrival can't
+  //         be saved, usually because the WiFi dropped. Tapping again retries.
+  saveFailed: "We couldn't check you in. Please try again.",
+};
+
 export const ADMIN_COPY = {
   // [input] Heading on the PIN gate.
   pinHeading: "Admin access",

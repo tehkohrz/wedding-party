@@ -17,18 +17,25 @@ import { WelcomeEquation } from "@/components/WelcomeEquation";
 import { ForwardLink } from "@/components/WizardShell";
 import { Flower2 } from "lucide-react";
 
+// The two corner links use the invitation's small caps in the date's blue.
+// The bright primary blue is too faint on cream at this size.
+const CORNER_LINK =
+  "z-40 px-3 py-2 font-display text-xl font-semibold uppercase tracking-[0.2em] underline-offset-4 hover:underline transition";
+const CORNER_LINK_STYLE = { color: "hsl(var(--invite-blue))" };
+
 export default function WelcomePage() {
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col landscape:flex-row">
       <PhotoSlideshow />
       <FormSide />
 
-      {/* Admin entry — bottom-right, bold primary. PIN-gated (/admin), so a
-          visible prominent link is fine; the PIN stops guests. Plain Link
-          (not a wizard route, so no slide direction to set). */}
+      {/* Admin entry — bottom-right. PIN-gated (/admin), so a visible link
+          is fine; the PIN stops guests. Plain Link (not a wizard route, so
+          no slide direction to set). */}
       <Link
         href="/admin"
-        className="fixed bottom-4 right-4 z-40 font-sans text-base font-bold text-primary hover:underline transition px-3 py-2"
+        className={`fixed bottom-4 right-4 ${CORNER_LINK}`}
+        style={CORNER_LINK_STYLE}
       >
         {ADMIN_COPY.entryLabel}
       </Link>
@@ -64,7 +71,8 @@ function FormSide() {
           transition). */}
       <ForwardLink
         href="/find"
-        className="absolute bottom-4 left-4 z-40 font-sans text-base font-bold text-primary hover:underline transition px-3 py-2"
+        className={`absolute bottom-4 left-4 ${CORNER_LINK}`}
+        style={CORNER_LINK_STYLE}
       >
         {WELCOME_COPY.seatingPlanLink}
       </ForwardLink>
@@ -80,13 +88,15 @@ function FormSide() {
           <EventDate className="text-2xl sm:text-3xl" />
         </header>
 
-        {/* Greeting + instruction. The instruction is the line guests act
-            on, so it uses the main text colour rather than muted grey. */}
+        {/* Greeting + instruction, both in the display serif. The
+            instruction is the line guests act on, so it keeps the main text
+            colour and semibold weight (Cormorant's thin strokes fade
+            otherwise). */}
         <div className="space-y-2 pt-2">
           <h2 className="font-display text-4xl sm:text-5xl font-semibold">
             {WELCOME_COPY.greeting}
           </h2>
-          <p className="font-sans text-lg sm:text-xl font-medium text-foreground text-balance">
+          <p className="font-display text-xl sm:text-2xl font-semibold text-foreground text-balance">
             {WELCOME_COPY.instruction}
           </p>
         </div>

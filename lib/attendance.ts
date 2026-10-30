@@ -8,9 +8,9 @@
  * the local `subscribeAttendance` bus below, which fires immediately after
  * any write from THIS device so the UI never waits a poll interval).
  *
- * Writes THROW on failure (network down / server error) — callers run
- * inside user-action handlers and simply won't advance the flow, which is
- * the right day-of behavior for an online-only kiosk.
+ * Writes THROW on failure (network down, server error or timeout). The
+ * check-in screens catch it through hooks/useCheckIn, which keeps the guest
+ * on the screen with a message to try again.
  */
 
 export interface AttendanceRecord {
@@ -51,9 +51,14 @@ export async function getAllArrived(
 
 // ─── Writes (check-in devices) ───────────────────────────────────────────────
 
+// A check-in that hasn't answered by now has hit dead WiFi. Giving up lets
+// the screen say so instead of leaving the guest at a frozen button.
+const WRITE_TIMEOUT_MS = 8_000;
+
 /**
  * Mark several guests as arrived in one request (group check-in).
- * Idempotent — re-marking refreshes the timestamp.
+ * Idempotent — re-marking refreshes the timestamp, so a retry after a
+ * timeout that did reach the server is harmless.
  */
 export async function markArrivedMany(guestIds: number[]): Promise<void> {
   if (guestIds.length === 0) return;
@@ -61,6 +66,7 @@ export async function markArrivedMany(guestIds: number[]): Promise<void> {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ guest_ids: guestIds }),
+    signal: AbortSignal.timeout(WRITE_TIMEOUT_MS),
   });
   if (!res.ok) throw new Error("mark arrived failed");
   notify();

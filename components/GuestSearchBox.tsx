@@ -40,11 +40,13 @@ export function GuestSearchBox({
         autoComplete="off"
         autoFocus
         placeholder={placeholder}
+        // Typed names use the result cards' serif, so a name looks the same
+        // in the box and in the list; the placeholder is its italic.
         // The base Input shrinks to md:text-sm on wider screens, so the
         // size is set for md as well or the iPad gets 14px text.
         // focus:placeholder:opacity-0 hides the placeholder as soon as
         // the input is focused, not only once text is typed.
-        className="h-16 rounded-pill text-center text-xl md:text-xl placeholder:transition-opacity placeholder:duration-150 focus:placeholder:opacity-0"
+        className="h-16 rounded-pill text-center font-display text-2xl md:text-2xl font-semibold placeholder:italic placeholder:transition-opacity placeholder:duration-150 focus:placeholder:opacity-0"
         value={query}
         onChange={(e) => onQueryChange(e.target.value)}
       />
@@ -89,7 +91,7 @@ export function GuestSearchBox({
           ))}
 
           {matches.length === 0 && (
-            <p className="font-sans text-base text-muted-foreground text-center pt-2">
+            <p className="font-display text-xl italic font-semibold text-muted-foreground text-center pt-2">
               {emptyText}
             </p>
           )}

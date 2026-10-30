@@ -13,30 +13,24 @@
  * large group never breaks the locked viewport.
  */
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion, useReducedMotion } from "motion/react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { markArrivedMany } from "@/lib/attendance";
 import { useAttendance } from "@/hooks/useAttendance";
+import { useCheckIn } from "@/hooks/useCheckIn";
 import { useDbGuests } from "@/hooks/useDbGuests";
 import {
   getGroupMembers,
   getMemberColorAssignments,
   type BouquetColor,
 } from "@/lib/groups";
-import { useWizardStore } from "@/lib/store";
-import { GROUP_COPY } from "@/lib/content";
+import { CHECKIN_COPY, GROUP_COPY } from "@/lib/content";
 import type { Guest } from "@/lib/schema";
 
 export function GroupCheckin({ guest }: { guest: Guest }) {
-  const router = useRouter();
   const reduceMotion = useReducedMotion();
-  const setDirection = useWizardStore((s) => s.setDirection);
-  const setCheckedInThisRound = useWizardStore(
-    (s) => s.setCheckedInThisRound
-  );
+  const { checkIn, status } = useCheckIn();
 
   // Guest list from the database (Stage 6) — falls back to just the
   // current guest until it loads.
@@ -85,7 +79,7 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
     });
   }
 
-  async function handleConfirm() {
+  function handleConfirm() {
     // Already-arrived guests (from a prior round) are NOT in this round —
     // they don't need re-marking, and we want them rendered grey on /lunch.
     const ids = [
@@ -94,10 +88,7 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
         .filter((m) => selected.has(m.id) && !arrivedIds.has(m.id))
         .map((m) => m.id),
     ];
-    await markArrivedMany(ids);
-    setCheckedInThisRound(ids);
-    setDirection("forward");
-    router.push("/checkin/lunch");
+    void checkIn(ids);
   }
 
   const pending = others.filter((m) => !arrivedIds.has(m.id));
@@ -200,14 +191,20 @@ export function GroupCheckin({ guest }: { guest: Guest }) {
         </div>
       </main>
 
-      {/* Footer — confirm */}
+      {/* Footer — confirm, with the retry message above it if a save failed */}
       <footer className="shrink-0 px-6 py-5">
-        <div className="max-w-md mx-auto">
+        <div className="max-w-md mx-auto space-y-3">
+          {status === "failed" && (
+            <p role="alert" className="font-sans text-base text-destructive text-center">
+              {CHECKIN_COPY.saveFailed}
+            </p>
+          )}
           <Button
             onClick={handleConfirm}
+            disabled={status === "saving"}
             className="w-full h-14 rounded-pill text-lg"
           >
-            {GROUP_COPY.confirmLabel}
+            {status === "saving" ? CHECKIN_COPY.saving : GROUP_COPY.confirmLabel}
           </Button>
         </div>
       </footer>
